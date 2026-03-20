@@ -1,0 +1,134 @@
+IF DB_ID('SportsStoreDB_v2') IS NOT NULL
+BEGIN
+    ALTER DATABASE SportsStoreDB_v2 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE SportsStoreDB_v2;
+END
+GO
+CREATE DATABASE SportsStoreDB_v2;
+GO
+
+USE SportsStoreDB_v2;
+GO
+
+------------------------------------------------------------
+-- BẢNG MIGRATION
+------------------------------------------------------------
+CREATE TABLE [dbo].[__EFMigrationsHistory] (
+    [MigrationId]    NVARCHAR (150) NOT NULL,
+    [ProductVersion] NVARCHAR (32)  NOT NULL,
+    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY CLUSTERED ([MigrationId] ASC)
+);
+GO
+
+------------------------------------------------------------
+-- BẢNG Categories
+------------------------------------------------------------
+CREATE TABLE [dbo].[Categories] (
+    [CategoryID]   BIGINT         IDENTITY (1, 1) NOT NULL,
+    [Name]         NVARCHAR (100) NOT NULL,
+    [CategoryName] NVARCHAR (100) NULL,
+    CONSTRAINT [PK_Categories] PRIMARY KEY CLUSTERED ([CategoryID] ASC)
+);
+GO
+
+------------------------------------------------------------
+-- BẢNG Orders
+------------------------------------------------------------
+CREATE TABLE [dbo].[Orders] (
+    [OrderID]        INT             IDENTITY (1, 1) NOT NULL,
+    [Name]           NVARCHAR (100)  NOT NULL,
+    [City]           NVARCHAR (50)   NULL,
+    [Shipped]        BIT             DEFAULT (0) NOT NULL,
+    [AddressDetail]  NVARCHAR (200)  NULL,
+    [CreatedDate]    DATETIME2 (7)   DEFAULT ('0001-01-01T00:00:00') NOT NULL,
+    [DeliveryType]   NVARCHAR (20)   NULL,
+    [District]       NVARCHAR (50)   NULL,
+    [DistrictPickup] NVARCHAR (50)   NULL,
+    [Email]          NVARCHAR (100)  DEFAULT (N'') NOT NULL,
+    [Note]           NVARCHAR (500)  NULL,
+    [Payment]        NVARCHAR (20)   NULL,
+    [Phone]          NVARCHAR (20)   DEFAULT (N'') NOT NULL,
+    [Province]       NVARCHAR (50)   NULL,
+    [Store]          NVARCHAR (100)  NULL,
+    [TotalPrice]     DECIMAL (18, 2) DEFAULT (0) NOT NULL,
+    [Ward]           NVARCHAR (50)   NULL,
+    [UserId]         NVARCHAR (MAX)  DEFAULT (N'') NOT NULL,
+    [DeliveryDate]   DATETIME2 (7)   NULL,
+    [OrderDate]      DATETIME2 (7)   DEFAULT ('0001-01-01T00:00:00') NOT NULL,
+    [ShippedDate]    DATETIME2 (7)   NULL,
+    CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderID] ASC)
+);
+GO
+
+------------------------------------------------------------
+-- BẢNG Products
+------------------------------------------------------------
+CREATE TABLE [dbo].[Products] (
+    [ProductID]    BIGINT          IDENTITY (1, 1) NOT NULL,
+    [Name]         NVARCHAR (MAX)  NOT NULL,
+    [Description]  NVARCHAR (MAX)  NULL,
+    [Price]        DECIMAL (18, 2) NOT NULL,
+    [ImageUrl]     NVARCHAR (MAX)  NULL,
+    [CategoryID]   BIGINT          NOT NULL,
+    [Quantity]     INT             DEFAULT (0) NOT NULL,
+    [CategoryName] NVARCHAR (200)  NULL,
+    [Size]         NVARCHAR (100)  NULL,
+    [Sizes]        NVARCHAR (200)  NULL,
+    [Stock]        INT             DEFAULT (0) NOT NULL,
+    CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED ([ProductID] ASC),
+    CONSTRAINT [FK_Products_Categories_CategoryID] 
+        FOREIGN KEY ([CategoryID]) REFERENCES [dbo].[Categories] ([CategoryID]) ON DELETE CASCADE
+);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_Products_CategoryID]
+    ON [dbo].[Products]([CategoryID] ASC);
+GO
+
+------------------------------------------------------------
+-- BẢNG ProductSizes
+------------------------------------------------------------
+CREATE TABLE [dbo].[ProductSizes] (
+    [ProductSizeID] BIGINT         IDENTITY (1, 1) NOT NULL,
+    [ProductID]     BIGINT         NOT NULL,
+    [Size]          NVARCHAR (MAX) NOT NULL,
+    CONSTRAINT [PK_ProductSizes] PRIMARY KEY CLUSTERED ([ProductSizeID] ASC),
+    CONSTRAINT [FK_ProductSizes_Products_ProductID] 
+        FOREIGN KEY ([ProductID]) REFERENCES [dbo].[Products] ([ProductID]) ON DELETE CASCADE
+);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_ProductSizes_ProductID]
+    ON [dbo].[ProductSizes]([ProductID] ASC);
+GO
+
+------------------------------------------------------------
+-- BẢNG CartLines
+------------------------------------------------------------
+CREATE TABLE [dbo].[CartLines] (
+    [CartLineID]   INT             IDENTITY (1, 1) NOT NULL,
+    [ProductID]    BIGINT          NOT NULL,
+    [Quantity]     INT             NOT NULL,
+    [OrderID]      INT             NULL,
+    [OrderID1]     INT             NULL,
+    [Price]        DECIMAL (18, 2) DEFAULT (0) NOT NULL,
+    [CategoryName] NVARCHAR (MAX)  NULL,
+    CONSTRAINT [PK_CartLines] PRIMARY KEY CLUSTERED ([CartLineID] ASC),
+    CONSTRAINT [FK_CartLines_Orders_OrderID] 
+        FOREIGN KEY ([OrderID]) REFERENCES [dbo].[Orders] ([OrderID]) ON DELETE CASCADE,
+    CONSTRAINT [FK_CartLines_Orders_OrderID1] 
+        FOREIGN KEY ([OrderID1]) REFERENCES [dbo].[Orders] ([OrderID]),
+    CONSTRAINT [FK_CartLines_Products_ProductID] 
+        FOREIGN KEY ([ProductID]) REFERENCES [dbo].[Products] ([ProductID])
+);
+GO
+
+CREATE NONCLUSTERED INDEX [IX_CartLines_OrderID]
+    ON [dbo].[CartLines]([OrderID] ASC);
+
+CREATE NONCLUSTERED INDEX [IX_CartLines_ProductID]
+    ON [dbo].[CartLines]([ProductID] ASC);
+
+CREATE NONCLUSTERED INDEX [IX_CartLines_OrderID1]
+    ON [dbo].[CartLines]([OrderID1] ASC);
+GO
