@@ -1,0 +1,105 @@
+﻿@page "/customer/my-orders"
+@model SportsStore.Pages.Customer.MyOrdersModel
+@using SportsStore.Models
+
+<div class="container mt-5">
+    <h2>📦 Đơn hàng của tôi</h2>
+
+    @if (User.Identity?.IsAuthenticated == false)
+    {
+        <div class="alert alert-warning">
+            <h4>⚠️ Vui lòng đăng nhập</h4>
+            <p>Bạn cần đăng nhập để xem đơn hàng của mình.</p>
+            <a href="/Account/Login" class="btn btn-primary mt-2">Đăng nhập</a>
+        </div>
+    }
+
+    else if (!Model.CustomerOrders.Any())
+    {
+        <div class="alert alert-warning">Bạn chưa có đơn hàng nào</div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID Đơn Hàng</th>
+                    <th>Ngày Đặt</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th>Chi Tiết</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.CustomerOrders)
+                {
+                    <tr>
+                        <td>@order.OrderID</td>
+                        <td>@order.CreatedDate.ToString("dd/MM/yyyy")</td>
+                        <td>@order.Lines.Sum(l => l.Quantity * l.Product.Price):VND</td>
+                        <td>
+                            @if (order.Shipped)
+                            {
+                                <span class="badge bg-success">Đã Giao</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Chưa Giao</span>
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info" data-bs-toggle="collapse" data-bs-target="#order-@order.OrderID">
+                                Xem Chi Tiết
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            <div class="collapse" id="order-@order.OrderID">
+                                <div class="card card-body">
+                                    <h6>Thông tin khách hàng</h6>
+                                    <p><strong>Tên:</strong> @order.Name</p>
+                                    <p><strong>Email:</strong> @order.Email</p>
+                                    <p><strong>SĐT:</strong> @order.Phone</p>
+                                    <p>
+                                        <strong>Địa chỉ:</strong>
+                                        @order.AddressDetail, @order.Ward, @order.District, @order.Province
+                                    </p>
+
+                                    <h6 class="mt-3">Sản phẩm</h6>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Ảnh</th>
+                                                <th>Tên</th>
+                                                <th>SL</th>
+                                                <th>Giá</th>
+                                                <th>Thành Tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var line in order.Lines)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <img src="/images/@line.Product.ImageUrl"
+                                                             style="width: 50px; height: 50px; object-fit: cover;"
+                                                             alt="@line.Product.Name" />
+                                                    </td>
+                                                    <td>@line.Product.Name</td>
+                                                    <td>@line.Quantity</td>
+                                                    <td>@line.Product.Price:VND</td>
+                                                    <td>@(line.Quantity * line.Product.Price):VND</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

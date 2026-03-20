@@ -1,0 +1,211 @@
+{
+  "hcm": {
+    "districts": [
+      "Quận 1",
+      "Quận 3",
+      "Quận 7",
+      "Quận 5",
+      "Quận 10",
+      "Quận 11",
+      "Quận Bình Thạnh",
+      "Quận Gò Vấp",
+      "Quận Phú Nhuận",
+      "Quận Tân Bình",
+      "Quận Tân Phú",
+      "TP. Thủ Đức",
+      "Huyện Hóc Môn"
+    ],
+    "branches": {
+      "Quận 1": [
+        "123 Đường Nguyễn Huệ, Quận 1",
+        "456 Đường Lê Lợi, Quận 1",
+        "789 Đường Đồng Khởi, Quận 1",
+        "101 Đường Trần Hưng Đạo, Quận 1"
+      ],
+      "Quận 3": [
+        "321 Đường Lê Văn Sỹ, Quận 3",
+        "654 Đường Cách Mạng Tháng Tám, Quận 3",
+        "987 Đường Nguyễn Thông, Quận 3",
+        "112 Đường Pasteur, Quận 3"
+      ],
+      "Quận 7": [
+        "654 Đường Nguyễn Thị Thập, Quận 7",
+        "321 Đường Huỳnh Tấn Phát, Quận 7",
+        "879 Đường Nguyễn Văn Linh, Quận 7",
+        "111 Đường Lê Văn Lương, Quận 7"
+      ],
+      "Quận 5": [
+        "234 Đường An Dương Vương, Quận 5",
+        "567 Đường Nguyễn Trãi, Quận 5",
+        "890 Đường Châu Văn Liêm, Quận 5",
+        "432 Đường Nguyễn Biểu, Quận 5"
+      ],
+      "Quận 10": [
+        "321 Đường Tô Hiến Thành, Quận 10",
+        "654 Đường Sư Vạn Hạnh, Quận 10",
+        "987 Đường Lý Thái Tổ, Quận 10",
+        "345 Đường Nguyễn Chí Thanh, Quận 10"
+      ],
+      "Quận 11": [
+        "101 Đường Lạc Long Quân, Quận 11",
+        "202 Đường Hòa Bình, Quận 11",
+        "303 Đường Tô Hiến Thành, Quận 11",
+        "404 Đường Bình Thới, Quận 11"
+      ],
+      "Quận Bình Thạnh": [
+        "1 Xô Viết Nghệ Tĩnh, Quận Bình Thạnh",
+        "2 Nguyễn Hữu Cảnh, Quận Bình Thạnh",
+        "333 Phan Văn Trị, Quận Bình Thạnh",
+        "444 Bạch Đằng, Quận Bình Thạnh"
+      ],
+      "Quận Gò Vấp": [
+        "555 Phan Văn Trị, Quận Gò Vấp",
+        "666 Lê Đức Thọ, Quận Gò Vấp",
+        "777 Nguyễn Oanh, Quận Gò Vấp",
+        "888 Quang Trung, Quận Gò Vấp"
+      ],
+      "Quận Phú Nhuận": [
+        "123 Hoàng Văn Thụ, Quận Phú Nhuận",
+        "23 Nguyễn Văn Trỗi, Quận Phú Nhuận",
+        "345 Phan Đình Phùng, Quận Phú Nhuận",
+        "456 Lê Văn Sỹ, Quận Phú Nhuận"
+      ],
+      "Quận Tân Bình": [
+        "111 Trường Chinh, Quận Tân Bình",
+        "222 Cộng Hòa, Quận Tân Bình",
+        "333 Hoàng Hoa Thám, Quận Tân Bình",
+        "444 Phan Đình Giót, Quận Tân Bình"
+      ],
+      "Quận Tân Phú": [
+        "555 Lê Trọng Tấn, Quận Tân Phú",
+        "666 Thoại Ngọc Hầu, Quận Tân Phú",
+        "777 Nguyễn Sơn, Quận Tân Phú",
+        "888 Lũy Bán Bích, Quận Tân Phú"
+      ],
+      "TP. Thủ Đức": [
+        "123 Nguyễn Văn Bá, TP. Thủ Đức",
+        "234 Linh Đông, TP. Thủ Đức",
+        "345 Phạm Văn Đồng, TP. Thủ Đức",
+        "456 Tam Bình, TP. Thủ Đức"
+      ],
+      "Huyện Hóc Môn": [
+        "111 Nguyễn Ảnh Thủ, Huyện Hóc Môn",
+        "222 Lê Thị Hồng Gấm, Huyện Hóc Môn",
+        "333 Trung Mỹ Tây, Huyện Hóc Môn",
+        "444 Quách Điêu, Huyện Hóc Môn"
+      ]
+    }
+  },
+  "hn": {
+    "districts": [
+      "Quận Ba Đình",
+      "Quận Hoàn Kiếm",
+      "Quận Cầu Giấy",
+      "Quận Đống Đa",
+      "Quận Long Biên",
+      "Quận Tây Hồ",
+      "Quận Bắc Từ Liêm",
+      "Quận Nam Từ Liêm",
+      "Quận Hà Đông"
+    ],
+    "branches": {
+      "Quận Ba Đình": [
+        "123 Lê Hồng Phong, Quận Ba Đình",
+        "456 Hoàng Hoa Thám, Quận Ba Đình",
+        "789 Đội Cấn, Quận Ba Đình",
+        "101 Kim Mã, Quận Ba Đình"
+      ],
+      "Quận Hoàn Kiếm": [
+        "234 Lê Thái Tổ, Quận Hoàn Kiếm",
+        "345 Tràng Tiền, Quận Hoàn Kiếm",
+        "567 Hàng Bài, Quận Hoàn Kiếm",
+        "678 Phố Huế, Quận Hoàn Kiếm",
+        "789 Ngô Quyền, Quận Hoàn Kiếm"
+      ],
+      "Quận Cầu Giấy": [
+        "101 Duy Tân, Quận Cầu Giấy",
+        "202 Nguyễn Phong Sắc, Quận Cầu Giấy",
+        "303 Trần Duy Hưng, Quận Cầu Giấy",
+        "404 Xuân Thủy, Quận Cầu Giấy"
+      ],
+      "Quận Đống Đa": [
+        "123 Chùa Bộc, Quận Đống Đa",
+        "234 Tôn Đức Thắng, Quận Đống Đa",
+        "345 Tây Sơn, Quận Đống Đa",
+        "456 Láng, Quận Đống Đa",
+        "567 Nguyễn Lương Bằng, Quận Đống Đa"
+      ],
+      "Quận Long Biên": [
+        "678 Nguyễn Văn Cừ, Quận Long Biên",
+        "789 Gia Thụy, Quận Long Biên",
+        "890 Ngô Gia Tự, Quận Long Biên",
+        "123 Cổ Linh, Quận Long Biên"
+      ],
+      "Quận Tây Hồ": [
+        "321 Thụy Khuê, Quận Tây Hồ",
+        "432 Lạc Long Quân, Quận Tây Hồ",
+        "543 Nguyễn Đình Thi, Quận Tây Hồ"
+      ],
+      "Quận Bắc Từ Liêm": [
+        "101 Phạm Văn Đồng, Quận Bắc Từ Liêm",
+        "202 Hoàng Quốc Việt, Quận Bắc Từ Liêm",
+        "303 Minh Khai, Quận Bắc Từ Liêm",
+        "404 Trần Cung, Quận Bắc Từ Liêm"
+      ],
+      "Quận Nam Từ Liêm": [
+        "505 Mễ Trì, Quận Nam Từ Liêm",
+        "606 Khuất Duy Tiến, Quận Nam Từ Liêm",
+        "707 Lê Quang Đạo, Quận Nam Từ Liêm",
+        "808 Mỹ Đình, Quận Nam Từ Liêm"
+      ],
+      "Quận Hà Đông": [
+        "909 Quang Trung, Quận Hà Đông",
+        "1010 Nguyễn Trãi, Quận Hà Đông",
+        "1111 Khuất Duy Tiến, Quận Hà Đông",
+        "1212 Lê Lợi, Quận Hà Đông"
+      ]
+    }
+  },
+  "dn": {
+    "districts": [ "Quận Hải Châu", "Quận Thanh Khê" ],
+    "branches": {
+      "Quận Hải Châu": [ "123 Nguyễn Văn Linh, Quận Hải Châu", "234 Hùng Vương, Quận Hải Châu" ],
+      "Quận Thanh Khê": [ "345 Lê Duẩn, Quận Thanh Khê", "456 Hoàng Văn Thụ, Quận Thanh Khê" ]
+    }
+  },
+  "dnai": {
+    "districts": [ "Biên Hòa", "Tân Phú", "Thống Nhất" ],
+    "branches": {
+      "Biên Hòa": [ "567 Đồng Khởi, Biên Hòa", "678 Võ Thị Sáu, Biên Hòa" ],
+      "Tân Phú": [ "789 Trường Chinh, Tân Phú" ],
+      "Thống Nhất": [ "123 Nguyễn Huệ, Thống Nhất" ]
+    }
+  },
+  "ld": {
+    "districts": [ "Di Linh", "TP. Bảo Lộc" ],
+    "branches": {
+      "Di Linh": [ "890 Nguyễn Huệ, Di Linh" ],
+      "TP. Bảo Lộc": [ "123 Lê Hồng Phong, TP. Bảo Lộc" ]
+    }
+  },
+  "bd": {
+    "districts": [ "Thành Phố Dĩ An", "Thành phố Thủ Dầu Một" ],
+    "branches": {
+      "Thành Phố Dĩ An": [ "234 Bình An, Dĩ An" ],
+      "Thành phố Thủ Dầu Một": [ "345 Đoàn Thị Điểm, Thủ Dầu Một" ]
+    }
+  },
+  "ct": {
+    "districts": [ "Ninh Kiều" ],
+    "branches": {
+      "Ninh Kiều": [ "456 Hòa Bình, Ninh Kiều" ]
+    }
+  },
+  "tth": {
+    "districts": [ "Thành Phố Huế", "Thị xã Hương Thủy" ],
+    "branches": {
+      "Thành Phố Huế": [ "789 Phan Chu Trinh, TP. Huế" ],
+      "Thị xã Hương Thủy": [ "890 Nguyễn Sinh Cung, Hương Thủy" ]
+    }
+  }
+}

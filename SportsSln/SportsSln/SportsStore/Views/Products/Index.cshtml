@@ -1,0 +1,116 @@
+﻿@model ProductsListViewModel
+
+<!-- DANH SÁCH SẢN PHẨM -->
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @foreach (var p in Model.Products)
+    {
+        <div class="col">
+            <!-- 👉 Cả card là 1 link -->
+            <a asp-action="Details" asp-route-id="@p.ProductID"
+               class="text-decoration-none text-dark">
+                <div class="card h-100 text-center shadow-sm border-0 product-card">
+                    <img src="~/images/@p.ImageUrl"
+                         class="card-img-top p-3"
+                         alt="@p.Name"
+                         style="height: 200px; object-fit: contain;">
+
+                    <div class="card-body">
+                        <h6 class="card-title fw-semibold mb-2">@p.Name</h6>
+                        <p class="card-text text-muted small mb-2 text-truncate">@p.Description</p>
+                        <h5 class="text-danger fw-bold">@p.Price.ToString("N0") đ</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<!-- PHÂN TRANG -->
+@if (Model.PagingInfo.TotalPages > 1)
+{
+    <div class="text-center mt-4">
+        <!-- Nút Previous -->
+        @if (Model.PagingInfo.CurrentPage > 1)
+        {
+            <a asp-action="Index"
+               asp-route-productPage="@(Model.PagingInfo.CurrentPage - 1)"
+               asp-route-category="@Model.CurrentCategory"
+               class="btn btn-outline-warning btn-sm mx-1">
+                ‹ Trước
+            </a>
+        }
+
+        <!-- Nút số trang -->
+        @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
+        {
+            <a asp-action="Index"
+               asp-route-productPage="@i"
+               asp-route-category="@Model.CurrentCategory"
+               class="btn @(i == Model.PagingInfo.CurrentPage ? "btn-warning" : "btn-outline-warning") btn-sm mx-1">
+                @i
+            </a>
+        }
+
+        <!-- Nút Next -->
+        @if (Model.PagingInfo.CurrentPage < Model.PagingInfo.TotalPages)
+        {
+            <a asp-action="Index"
+               asp-route-productPage="@(Model.PagingInfo.CurrentPage + 1)"
+               asp-route-category="@Model.CurrentCategory"
+               class="btn btn-outline-warning btn-sm mx-1">
+                Sau ›
+            </a>
+        }
+    </div>
+}
+
+<style>
+    /* 💎 CARD SẢN PHẨM */
+    .product-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        border: 1px solid #f5e6a1;
+        background-color: #fffef7;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+            border-color: #d4af37;
+        }
+
+        .product-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.07);
+        }
+
+    .card-title {
+        color: #2a2a2a;
+        transition: color 0.3s;
+    }
+
+    .product-card:hover .card-title {
+        color: #d4af37; /* vàng ánh kim */
+    }
+
+    /* 💎 PHÂN TRANG */
+    .btn-warning {
+        background: linear-gradient(45deg, #ffd700, #f5c542);
+        color: #6b4e16;
+        font-weight: 500;
+        border: none;
+    }
+
+    .btn-outline-warning {
+        color: #6b4e16;
+        border-color: #f5c542;
+    }
+
+        .btn-outline-warning:hover {
+            background: linear-gradient(45deg, #ffe066, #ffd24d);
+            color: #4b3a11;
+        }
+</style>

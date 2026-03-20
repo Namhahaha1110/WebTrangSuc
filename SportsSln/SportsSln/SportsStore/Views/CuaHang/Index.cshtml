@@ -1,0 +1,234 @@
+﻿@{
+    ViewData["Title"] = "Cửa Hàng";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    body {
+        background: #f9fafc;
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .store-container {
+        padding: 40px 0;
+        margin: 50px auto;
+        max-width: 1100px;
+    }
+
+        .store-container h1 {
+            color: #b8860b;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+    .divider {
+        border-bottom: 2px solid #cd9b1d;
+        width: 80%;
+        margin: 0 auto 25px auto;
+    }
+
+    .select-row {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+        .select-row .col-md-6 {
+            flex: 1;
+            max-width: 340px;
+        }
+
+        .select-row label {
+            font-weight: 600;
+            color: #5a4b00;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+    .form-control {
+        width: 100%;
+        border: 1.5px solid #d4af37;
+        border-radius: 8px;
+        transition: 0.2s;
+        background: #fff;
+        color: #222;
+        padding: 8px 12px;
+        font-size: 15px;
+    }
+
+        .form-control:focus {
+            border-color: #ffcc33;
+            box-shadow: 0 0 5px rgba(255, 204, 51, 0.6);
+        }
+
+    #branchList {
+        margin-top: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        justify-content: flex-start;
+    }
+
+        #branchList h4 {
+            width: 100%;
+            color: #8b7500;
+            border-left: 5px solid #d4af37;
+            padding-left: 10px;
+            margin-bottom: 10px;
+        }
+
+    .branch-item {
+        flex: 1 0 30%;
+        min-width: 320px;
+        max-width: 33%;
+        background: linear-gradient(135deg, #fffdf3 0%, #fff6cc 100%);
+        border: 1px solid #e5c45d;
+        border-radius: 10px;
+        padding: 12px 16px;
+        color: #4a3c00;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+        .branch-item i {
+            margin-right: 12px;
+            font-size: 22px;
+            color: #d4af37;
+        }
+
+        .branch-item:hover {
+            background: linear-gradient(135deg, #ffeb99 0%, #ffe066 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+        }
+
+    @@media (max-width: 768px) {
+        .select-row {
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .select-row .col-md-6 {
+                max-width: 100%;
+            }
+    }
+</style>
+
+<div class="store-container">
+    <h1>Hệ thống cửa hàng</h1>
+    <div class="divider"></div>
+
+    <div class="select-row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="citySelect">Chọn Thành Phố:</label>
+                <select id="citySelect" class="form-control" onchange="updateDistricts()">
+                    <option value="">-- Chọn Thành Phố --</option>
+                    <option value="hcm">TP Hồ Chí Minh</option>
+                    <option value="hn">Hà Nội</option>
+                    <option value="dn">Đà Nẵng</option>
+                    <option value="dnai">Đồng Nai</option>
+                    <option value="ld">Lâm Đồng</option>
+                    <option value="bd">Bình Dương</option>
+                    <option value="ct">Cần Thơ</option>
+                    <option value="tth">Thừa Thiên Huế</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="districtSelect">Chọn Quận/Huyện:</label>
+                <select id="districtSelect" class="form-control" onchange="updateBranches()">
+                    <option value="">-- Chọn Quận/Huyện --</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="branchList"></div>
+</div>
+
+<script>
+    const districts = {
+         hcm: ["Quận 1", "Quận 3", "Quận 7", "Quận 5", "Quận 10", "Quận 11", "Quận Bình Thạnh", "Quận Gò Vấp", "Quận Phú Nhuận", "Quận Tân Bình", "Quận Tân Phú", "TP. Thủ Đức", "Huyện Hóc Môn"],
+         hn: ["Quận Ba Đình", "Quận Hoàn Kiếm", "Quận Cầu Giấy", "Quận Đống Đa", "Quận Long Biên", "Quận Tây Hồ", "Quận Bắc Từ Liêm", "Quận Nam Từ Liêm", "Quận Hà Đông"],
+         dn: ["Quận Hải Châu", "Quận Thanh Khê"],
+         dnai: ["Biên Hòa", "Tân Phú", "Thống Nhất"],
+         ld: ["Di Linh", "TP. Bảo Lộc"], bd: ["Thành Phố Dĩ An", "Thành phố Thủ Dầu Một"], ct: ["Ninh Kiều"], tth: ["Thành Phố Huế", "Thị xã Hương Thủy"]
+     }; const branches = { hcm: { "Quận 1": ["123 Đường Nguyễn Huệ, Quận 1", "456 Đường Lê Lợi, Quận 1", "789 Đường Đồng Khởi, Quận 1", "101 Đường Trần Hưng Đạo, Quận 1"], "Quận 3": ["321 Đường Lê Văn Sỹ, Quận 3", "654 Đường Cách Mạng Tháng Tám, Quận 3", "987 Đường Nguyễn Thông, Quận 3", "112 Đường Pasteur, Quận 3"], "Quận 7": ["654 Đường Nguyễn Thị Thập, Quận 7", "321 Đường Huỳnh Tấn Phát, Quận 7", "879 Đường Nguyễn Văn Linh, Quận 7", "111 Đường Lê Văn Lương, Quận 7"], "Quận 5": ["234 Đường An Dương Vương, Quận 5", "567 Đường Nguyễn Trãi, Quận 5", "890 Đường Châu Văn Liêm, Quận 5", "432 Đường Nguyễn Biểu, Quận 5"], "Quận 10": ["321 Đường Tô Hiến Thành, Quận 10", "654 Đường Sư Vạn Hạnh, Quận 10", "987 Đường Lý Thái Tổ, Quận 10", "345 Đường Nguyễn Chí Thanh, Quận 10"], "Quận 11": ["101 Đường Lạc Long Quân, Quận 11", "202 Đường Hòa Bình, Quận 11", "303 Đường Tô Hiến Thành, Quận 11", "404 Đường Bình Thới, Quận 11"], "Quận Bình Thạnh": ["1 Xô Viết Nghệ Tĩnh, Quận Bình Thạnh", "2 Nguyễn Hữu Cảnh, Quận Bình Thạnh", "333 Phan Văn Trị, Quận Bình Thạnh", "444 Đường Bạch Đằng, Quận Bình Thạnh"], "Quận Gò Vấp": ["555 Đường Phan Văn Trị, Quận Gò Vấp", "666 Đường Lê Đức Thọ, Quận Gò Vấp", "777 Đường Nguyễn Oanh, Quận Gò Vấp", "888 Đường Quang Trung, Quận Gò Vấp"], "Quận Phú Nhuận": ["123 Hoàng Văn Thụ, Quận Phú Nhuận", "23 Nguyễn Văn Trỗi, Quận Phú Nhuận", "345 Phan Đình Phùng, Quận Phú Nhuận", "456 Đường Lê Văn Sỹ, Quận Phú Nhuận"], "Quận Tân Bình": ["111 Đường Trường Chinh, Quận Tân Bình", "222 Đường Cộng Hòa, Quận Tân Bình", "333 Đường Hoàng Hoa Thám, Quận Tân Bình", "444 Đường Phan Đình Giót, Quận Tân Bình"], "Quận Tân Phú": ["555 Đường Lê Trọng Tấn, Quận Tân Phú", "666 Đường Thoại Ngọc Hầu, Quận Tân Phú", "777 Đường Nguyễn Sơn, Quận Tân Phú", "888 Đường Lũy Bán Bích, Quận Tân Phú"], "TP. Thủ Đức": ["123 Đường Nguyễn Văn Bá, TP. Thủ Đức", "234 Đường Linh Đông, TP. Thủ Đức", "345 Đường Phạm Văn Đồng, TP. Thủ Đức", "456 Đường Tam Bình, TP. Thủ Đức"], "Huyện Hóc Môn": ["111 Đường Nguyễn Ảnh Thủ, Huyện Hóc Môn", "222 Đường Lê Thị Hồng Gấm, Huyện Hóc Môn", "333 Đường Trung Mỹ Tây, Huyện Hóc Môn", "444 Đường Quách Điêu, Huyện Hóc Môn"] }, hn: { "Quận Ba Đình": ["123 Đường Lê Hồng Phong, Quận Ba Đình", "456 Đường Hoàng Hoa Thám, Quận Ba Đình", "789 Đường Đội Cấn, Quận Ba Đình", "101 Đường Kim Mã, Quận Ba Đình"], "Quận Hoàn Kiếm": ["234 Đường Lê Thái Tổ, Quận Hoàn Kiếm", "345 Đường Tràng Tiền, Quận Hoàn Kiếm", "567 Đường Hàng Bài, Quận Hoàn Kiếm", "678 Đường Phố Huế, Quận Hoàn Kiếm", "789 Đường Ngô Quyền, Quận Hoàn Kiếm"], "Quận Cầu Giấy": ["101 Đường Duy Tân, Quận Cầu Giấy", "202 Đường Nguyễn Phong Sắc, Quận Cầu Giấy", "303 Đường Trần Duy Hưng, Quận Cầu Giấy", "404 Đường Xuân Thủy, Quận Cầu Giấy"], "Quận Đống Đa": ["123 Đường Chùa Bộc, Quận Đống Đa", "234 Đường Tôn Đức Thắng, Quận Đống Đa", "345 Đường Tây Sơn, Quận Đống Đa", "456 Đường Láng, Quận Đống Đa", "567 Đường Nguyễn Lương Bằng, Quận Đống Đa"], "Quận Long Biên": ["678 Đường Nguyễn Văn Cừ, Quận Long Biên", "789 Đường Gia Thụy, Quận Long Biên", "890 Đường Ngô Gia Tự, Quận Long Biên", "123 Đường Cổ Linh, Quận Long Biên"], "Quận Tây Hồ": ["321 Đường Thụy Khuê, Quận Tây Hồ", "432 Đường Lạc Long Quân, Quận Tây Hồ", "543 Đường Nguyễn Đình Thi, Quận Tây Hồ"], "Quận Bắc Từ Liêm": ["101 Đường Phạm Văn Đồng, Quận Bắc Từ Liêm", "202 Đường Hoàng Quốc Việt, Quận Bắc Từ Liêm", "303 Đường Minh Khai, Quận Bắc Từ Liêm", "404 Đường Trần Cung, Quận Bắc Từ Liêm"], "Quận Nam Từ Liêm": ["505 Đường Mễ Trì, Quận Nam Từ Liêm", "606 Đường Khuất Duy Tiến, Quận Nam Từ Liêm", "707 Đường Lê Quang Đạo, Quận Nam Từ Liêm", "808 Đường Mỹ Đình, Quận Nam Từ Liêm"], "Quận Hà Đông": ["909 Đường Quang Trung, Quận Hà Đông", "1010 Đường Nguyễn Trãi, Quận Hà Đông", "1111 Đường Khuất Duy Tiến, Quận Hà Đông", "1212 Đường Lê Lợi, Quận Hà Đông"] }, dn: { "Quận Hải Châu": ["123 Đường Nguyễn Văn Linh, Quận Hải Châu", "234 Đường Hùng Vương, Quận Hải Châu"], "Quận Thanh Khê": ["345 Đường Lê Duẩn, Quận Thanh Khê", "456 Đường Hoàng Văn Thụ, Quận Thanh Khê"] }, dnai: { "Biên Hòa": ["567 Đường Đồng Khởi, Biên Hòa", "678 Đường Võ Thị Sáu, Biên Hòa"], "Tân Phú": ["789 Đường Trường Chinh, Tân Phú"] }, ld: { "Di Linh": ["890 Đường Nguyễn Huệ, Di Linh"], "TP. Bảo Lộc": ["123 Đường Lê Hồng Phong, TP. Bảo Lộc"] }, bd: { "Thành Phố Dĩ An": ["234 Đường Bình An, Dĩ An"], "Thành phố Thủ Dầu Một": ["345 Đường Đoàn Thị Điểm, Thủ Dầu Một"] }, ct: { "Ninh Kiều": ["456 Đường Hòa Bình, Ninh Kiều"] }, tth: { "Thành Phố Huế": ["789 Đường Phan Chu Trinh, TP. Huế"], "Thị xã Hương Thủy": ["890 Đường Nguyễn Sinh Cung, Hương Thủy"] } };
+
+
+    function updateBranches() {
+        const city = document.getElementById("citySelect").value;
+        const district = document.getElementById("districtSelect").value;
+        const branchList = document.getElementById("branchList");
+        branchList.innerHTML = '';
+
+        if (!city && !district) {
+            const header = document.createElement("h4");
+            header.textContent = "Tất cả các Chi nhánh:";
+            branchList.appendChild(header);
+
+            for (const cityKey in branches) {
+                for (const districtKey in branches[cityKey]) {
+                    branches[cityKey][districtKey].forEach(branch => {
+                        const div = document.createElement("div");
+                        div.classList.add('branch-item');
+                        div.innerHTML = `<i class="fa-solid fa-map-location-dot"></i> ${branch}`;
+                        branchList.appendChild(div);
+                    });
+                }
+            }
+        } else if (city && district && branches[city] && branches[city][district]) {
+            const header = document.createElement("h4");
+            header.textContent = "Các Chi nhánh:";
+            branchList.appendChild(header);
+
+            branches[city][district].forEach(branch => {
+                const div = document.createElement("div");
+                div.classList.add('branch-item');
+                div.innerHTML = `<i class="fa-solid fa-map-location-dot"></i> ${branch}`;
+                branchList.appendChild(div);
+            });
+        } else if (city && !district) {
+            const header = document.createElement("h4");
+            header.textContent = "Các Chi nhánh trong thành phố " + city;
+            branchList.appendChild(header);
+
+            for (const districtKey in branches[city]) {
+                branches[city][districtKey].forEach(branch => {
+                    const div = document.createElement("div");
+                    div.classList.add('branch-item');
+                    div.innerHTML = `<i class="fa-solid fa-map-location-dot"></i> ${branch}`;
+                    branchList.appendChild(div);
+                });
+            }
+        }
+    }
+
+    function updateDistricts() {
+        const city = document.getElementById("citySelect").value;
+        const districtSelect = document.getElementById("districtSelect");
+        districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+
+        if (city && districts[city]) {
+            districts[city].forEach(district => {
+                const option = document.createElement("option");
+                option.value = district;
+                option.textContent = district;
+                districtSelect.appendChild(option);
+            });
+        }
+        updateBranches();
+    }
+
+    window.onload = updateBranches;
+</script>

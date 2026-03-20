@@ -1,0 +1,759 @@
+﻿@page
+@model SportsStore.Pages.CartModel
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background-color: #fffdfa;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .checkout-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 30px 40px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #b8860b;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .product-list {
+        border-bottom: 2px solid #f4f4f4;
+        margin-bottom: 25px;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #fafafa;
+        gap: 15px;
+    }
+
+    .product-checkbox {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        accent-color: #b8860b;
+    }
+
+    .product-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+    }
+
+        .product-left img {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid #f2e2b1;
+        }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        color: #333;
+    }
+
+    .product-name {
+        font-weight: 600;
+        font-size: 17px;
+    }
+
+    .product-code {
+        font-size: 14px;
+        color: #999;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .product-price {
+        text-align: right;
+        color: #b8860b;
+        font-weight: 600;
+        font-size: 17px;
+        min-width: 120px;
+    }
+
+    .btn-delete {
+        background-color: #ff4444;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+        .btn-delete:hover {
+            background-color: #cc0000;
+        }
+
+    .quantity-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        background: #fff7e6;
+        border: 1px solid #f0dca1;
+        border-radius: 8px;
+        font-size: 18px;
+        color: #b8860b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .quantity-btn:hover {
+            background: #b8860b;
+            color: #fff;
+        }
+
+    .quantity-input {
+        width: 45px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        height: 30px;
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .input-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        width: 100%;
+    }
+
+        .input-group input, .input-group select {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 15px;
+            width: 100%;
+        }
+
+    .delivery-options {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .delivery-btn {
+        flex: 1;
+        padding: 14px;
+        border: 1px solid #f0dca1;
+        border-radius: 10px;
+        background-color: #fff7e6;
+        color: #b8860b;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .delivery-btn.active {
+            background-color: #b8860b;
+            color: #fff;
+        }
+
+    .summary {
+        margin-top: 30px;
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #fff8e5;
+        font-size: 17px;
+    }
+
+        .summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .summary .total {
+            font-weight: 700;
+            color: #b8860b;
+            font-size: 18px;
+        }
+
+    .btn-order {
+        width: 100%;
+        background-color: #b8860b;
+        color: #fff;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 20px;
+        transition: 0.3s;
+        font-weight: 500;
+    }
+
+        .btn-order:hover {
+            background-color: #8b6914;
+        }
+</style>
+
+<div class="checkout-container">
+    <h2>Thông tin đặt hàng</h2>
+
+    @if (Model?.ShoppingCart?.Lines?.Any() ?? false)
+    {
+        <div class="product-list">
+            @foreach (var item in Model.ShoppingCart.Lines)
+            {
+                <div class="product-item" data-id="@item.Product.ProductID">
+                    <input type="checkbox" class="product-checkbox" data-product-id="@item.Product.ProductID" checked />
+                    <div class="product-left">
+                        <img src="~/images/@item.Product.ImageUrl" alt="@item.Product.Name" />
+                        <div class="product-details">
+                            <div class="product-name">@item.Product.Name</div>
+                            <div class="product-code">Mã: @item.Product.ProductID</div>
+                            <div class="quantity-group">
+                                <button type="button" class="quantity-btn" data-action="subtract">-</button>
+                                <input type="number" class="quantity-input" value="@item.Quantity" data-product-id="@item.Product.ProductID" data-price="@item.Product.Price" min="1" />
+                                <button type="button" class="quantity-btn" data-action="add">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        <div class="product-price" data-product-id="@item.Product.ProductID" data-base-price="@item.Product.Price">
+                            @((item.Quantity * item.Product.Price).ToString("#,##0")) ₫
+                        </div>
+                        <button type="button" class="btn-delete" data-product-id="@item.Product.ProductID">Xóa</button>
+                    </div>
+                </div>
+            }
+        </div>
+        @if (ViewData.ModelState.ContainsKey("PaymentError"))
+        {
+            <div class="alert alert-warning" style="margin-bottom:15px;">
+                @ViewData.ModelState["PaymentError"].Errors[0].ErrorMessage
+            </div>
+        }
+
+        <form method="post" asp-page-handler="Checkout" id="checkoutForm">
+            @Html.AntiForgeryToken()
+
+            <div class="section-title">Thông tin người mua</div>
+            <div class="input-group">
+                <input type="text" name="Name" placeholder="Tên người mua *" required />
+                <input type="text" name="Phone" placeholder="Số điện thoại *" required />
+                <input type="email" name="Email" placeholder="Email *" required />
+            </div>
+
+            <input type="hidden" name="DeliveryType" id="deliveryTypeInput" value="delivery" />
+
+            <div class="section-title">Hình thức nhận hàng</div>
+            <div class="delivery-options">
+                <button type="button" id="btnDelivery" class="delivery-btn active">🚚 Giao hàng tận nơi</button>
+                <button type="button" id="btnPickup" class="delivery-btn">🏬 Nhận tại cửa hàng</button>
+            </div>
+
+            <!-- Added data-saved attributes to preserve form data -->
+            <div id="deliveryForm">
+                <div class="input-group">
+                    <select name="Province" id="province" data-saved=""><option value="">Chọn tỉnh/thành *</option></select>
+                    <select name="District" id="district" data-saved=""><option value="">Chọn quận/huyện *</option></select>
+                    <select name="Ward" id="ward" data-saved=""><option value="">Chọn phường/xã *</option></select>
+                    <input type="text" name="AddressDetail" id="addressDetail" placeholder="Nhập địa chỉ cụ thể *" data-saved="" />
+                </div>
+            </div>
+
+            <div id="pickupForm" style="display:none;">
+                <div class="input-group">
+                    <select id="citySelect" name="City" data-saved="">
+                        <option value="">-- Chọn Thành Phố --</option>
+                        <option value="hcm">Hồ Chí Minh</option>
+                        <option value="hn">Hà Nội</option>
+                        <option value="dn">Đà Nẵng</option>
+                        <option value="dnai">Đồng Nai</option>
+                        <option value="ld">Lâm Đồng</option>
+                        <option value="bd">Bình Dương</option>
+                        <option value="ct">Cần Thơ</option>
+                        <option value="tth">Thừa Thiên Huế</option>
+                    </select>
+                    <select id="districtSelect" name="DistrictPickup" data-saved="" disabled>
+                        <option value="">-- Chọn Quận/Huyện --</option>
+                    </select>
+                    <select id="storeSelect" name="Store" data-saved="" disabled>
+                        <option value="">-- Chọn Cửa Hàng --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title">Phương thức thanh toán</div>
+            <div>
+                <label><input type="radio" name="Payment" value="COD" checked /> Thanh toán khi nhận hàng</label><br />
+                <label><input type="radio" name="Payment" value="Bank" /> Chuyển khoản ngân hàng</label>
+
+            </div>
+
+            <div class="summary">
+                <div><span>Tạm tính:</span><span id="subtotal">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
+                <div><span>Phí giao hàng:</span><span>Miễn phí</span></div>
+                <div class="total"><span>Tổng cộng:</span><span id="total">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
+            </div>
+
+            <!-- QR VietQR -->
+            <div id="vietqrSection" style="display:none;">
+                <div class="section-title">Thanh toán bằng VietQR</div>
+                <p>Quét QR để chuyển khoản trực tiếp vào tài khoản ACB.</p>
+                <img src="@Model.ShoppingCart.QrUrl" width="280" alt="QR VietQR">
+                <p>Mã đơn hàng: <strong>@Model.ShoppingCart.OrderId</strong></p>
+            </div>
+
+            <textarea name="Note" placeholder="VD: Giao giờ hành chính hoặc nhắn tin trước khi giao..." style="width:100%;margin-top:10px;border-radius:8px;border:1px solid #ddd;padding:10px;"></textarea>
+
+            <button type="submit" class="btn-order">ĐẶT HÀNG</button>
+        </form>
+    }
+    else
+    {
+        <p style="text-align:center;">Giỏ hàng rỗng, vui lòng quay lại mua hàng.</p>
+    }
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let locationData = [];
+    let storesData = {};
+
+    let formData = {
+        delivery: {
+            province: "",
+            district: "",
+            ward: "",
+            addressDetail: ""
+        },
+        pickup: {
+            city: "",
+            district: "",
+            store: ""
+        }
+    };
+
+    function saveDeliveryData() {
+        formData.delivery.province = $("#province").val();
+        formData.delivery.district = $("#district").val();
+        formData.delivery.ward = $("#ward").val();
+        formData.delivery.addressDetail = $("#addressDetail").val();
+    }
+
+    function savePickupData() {
+        formData.pickup.city = $("#citySelect").val();
+        formData.pickup.district = $("#districtSelect").val();
+        formData.pickup.store = $("#storeSelect").val();
+    }
+
+    function restoreDeliveryData() {
+        if(!formData.delivery.province) return;
+
+        $("#province").val(formData.delivery.province);
+        onProvinceChange(); // Trigger district load after setting province
+
+        setTimeout(() => {
+            $("#district").val(formData.delivery.district);
+            onDistrictChange(); // Trigger ward load after setting district
+            $("#ward").val(formData.delivery.ward);
+            $("#addressDetail").val(formData.delivery.addressDetail);
+        }, 100);
+    }
+
+    function restorePickupData() {
+        if(!formData.pickup.city) return;
+
+        $("#citySelect").val(formData.pickup.city);
+        onCityChange(); // Trigger district load after setting city
+
+        setTimeout(() => {
+            $("#districtSelect").val(formData.pickup.district);
+            onPickupDistrictChange(); // Trigger store load after setting district
+            $("#storeSelect").val(formData.pickup.store);
+        }, 100);
+    }
+
+    function loadProvinces() {
+        fetch('/data/vietnam-provinces.json')
+            .then(res => res.json())
+            .then(data => {
+                locationData = data;
+                const provinceSelect = $("#province");
+                provinceSelect.html('<option value="">Chọn tỉnh/thành *</option>');
+
+                data.forEach(province => {
+                    provinceSelect.append(`<option value="${province.name}">${province.name}</option>`);
+                });
+            })
+            .catch(err => console.error("[v0] Error loading provinces:", err));
+    }
+
+    function onProvinceChange() {
+        const provinceName = $("#province").val();
+        const districtSelect = $("#district");
+        districtSelect.html('<option value="">Chọn quận/huyện *</option>');
+        districtSelect.prop('disabled', false);
+        $("#ward").html('<option value="">Chọn phường/xã *</option>');
+        $("#ward").prop('disabled', false);
+
+        if(!provinceName) {
+            districtSelect.prop('disabled', true);
+            return;
+        }
+
+        const province = locationData.find(p => p.name === provinceName);
+        if(province && province.districts && province.districts.length > 0) {
+            province.districts.forEach(district => {
+                districtSelect.append(`<option value="${district.name}">${district.name}</option>`);
+            });
+        } else {
+            console.error("[v0] Province not found or no districts:", provinceName);
+            districtSelect.prop('disabled', true);
+        }
+    }
+
+    function onDistrictChange() {
+        const provinceName = $("#province").val();
+        const districtName = $("#district").val();
+        const wardSelect = $("#ward");
+        wardSelect.html('<option value="">Chọn phường/xã *</option>');
+        wardSelect.prop('disabled', false);
+
+        if(!provinceName || !districtName) {
+            wardSelect.prop('disabled', true);
+            return;
+        }
+
+        const province = locationData.find(p => p.name === provinceName);
+        if(province && province.districts && province.districts.length > 0) {
+            const district = province.districts.find(d => d.name === districtName);
+            if(district && district.wards && district.wards.length > 0) {
+                district.wards.forEach(ward => {
+                    wardSelect.append(`<option value="${ward.name}">${ward.name}</option>`);
+                });
+            } else {
+                console.error("[v0] District not found or no wards:", districtName);
+                wardSelect.prop('disabled', true);
+            }
+        }
+    }
+
+    function loadStores() {
+        fetch('/data/stores.json')
+            .then(res => res.json())
+            .then(data => {
+                storesData = data;
+            })
+            .catch(err => console.error("[v0] Error loading stores:", err));
+    }
+
+    function onCityChange() {
+        const city = $("#citySelect").val();
+        const districtSelect = $("#districtSelect");
+        districtSelect.html('<option value="">-- Chọn Quận/Huyện --</option>');
+        $("#storeSelect").html('<option value="">-- Chọn Cửa Hàng --</option>');
+
+        if(!city || !storesData[city]) {
+            districtSelect.prop('disabled', true);
+            return;
+        }
+
+        const districts = [...new Set(storesData[city].map(s => s.district))];
+        districts.forEach(district => {
+            districtSelect.append(`<option value="${district}">${district}</option>`);
+        });
+
+        districtSelect.prop('disabled', false);
+    }
+
+    function onPickupDistrictChange() {
+        const city = $("#citySelect").val();
+        const district = $("#districtSelect").val();
+        const storeSelect = $("#storeSelect");
+        storeSelect.html('<option value="">-- Chọn Cửa Hàng --</option>');
+
+        if(!city || !district || !storesData[city]) {
+            storeSelect.prop('disabled', true);
+            return;
+        }
+
+        const stores = storesData[city].filter(s => s.district === district);
+        stores.forEach(store => {
+            storeSelect.append(`<option value="${store.id}" data-address="${store.address}">${store.name}</option>`);
+        });
+
+        storeSelect.prop('disabled', false);
+    }
+
+    // Hàm cập nhật tổng tiền + QR
+    function updateQr() {
+        const paymentMethod = $('input[name="Payment"]:checked').val();
+        if(paymentMethod !== "Bank") return;
+
+        const total = parseInt($("#total").text().replace(/[^\d]/g, ""));
+        const orderId = "@Model.ShoppingCart.OrderId";
+        const bankCode = "ACB";
+        const accountNumber = "21234611";
+        const accountName = "NGUYEN THI YEN NHI";
+        const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.png?amount=${total}&addInfo=${orderId}&accountName=${encodeURIComponent(accountName)}`;
+
+        $("img[alt='QR VietQR']").attr("src", qrUrl);
+    }
+
+    function updateTotal() {
+        let total = 0;
+        $(".product-item").each(function () {
+            const $checkbox = $(this).find(".product-checkbox");
+            if ($checkbox.is(":checked")) {
+                const $price = $(this).find(".product-price");
+                const priceText = $price.text().replace(/[^\d]/g, "");
+                total += parseInt(priceText) || 0;
+            }
+        });
+
+        $("#subtotal").text(total.toLocaleString("vi-VN") + " ₫");
+        $("#total").text(total.toLocaleString("vi-VN") + " ₫");
+        updateQr();
+    }
+
+    $(document).ready(function() {
+        loadProvinces();
+        loadStores();
+
+        const paymentMethod = $('input[name="Payment"]:checked').val();
+        if (paymentMethod === "Bank") $("#vietqrSection").show();
+
+        $(document).on("change", 'input[name="Payment"]', function() {
+            if($(this).val() === "Bank") {
+                $("#vietqrSection").fadeIn(300);
+                updateQr();
+            } else {
+                $("#vietqrSection").fadeOut(300);
+            }
+        });
+
+        $(document).on("change", "#province", function() {
+            onProvinceChange();
+        });
+
+        $(document).on("change", "#district", function() {
+            onDistrictChange();
+        });
+
+        $(document).on("change", "#citySelect", function() {
+            onCityChange();
+        });
+
+        $(document).on("change", "#districtSelect", function() {
+            onPickupDistrictChange();
+        });
+
+        $(document).on("click", ".quantity-btn", function () {
+            const $btn = $(this);
+            const $input = $btn.siblings(".quantity-input");
+            const $productItem = $btn.closest(".product-item");
+            const $price = $productItem.find(".product-price");
+            const basePrice = parseInt($price.attr("data-base-price"));
+            let quantity = parseInt($input.val());
+
+            if ($btn.attr("data-action") === "add") quantity++;
+            else if (quantity > 1) quantity--;
+
+            $input.val(quantity);
+            const newPrice = quantity * basePrice;
+            $price.text(newPrice.toLocaleString("vi-VN") + " ₫");
+
+            updateTotal();
+            updateQuantity($input.data("product-id"), quantity);
+        });
+
+        $(document).on("change", ".quantity-input", function () {
+            const $input = $(this);
+            const $productItem = $input.closest(".product-item");
+            const $price = $productItem.find(".product-price");
+            const basePrice = parseInt($price.attr("data-base-price"));
+            let quantity = parseInt($input.val()) || 1;
+            if (quantity < 1) quantity = 1;
+            $input.val(quantity);
+            $price.text((quantity*basePrice).toLocaleString("vi-VN") + " ₫");
+
+            updateTotal();
+            updateQuantity($input.data("product-id"), quantity);
+        });
+
+        $(document).on("change", ".product-checkbox", function () {
+            updateTotal();
+        });
+
+        $(document).on("click", ".btn-delete", function () {
+            const $productItem = $(this).closest(".product-item");
+            const productId = $(this).data("product-id");
+            $.post("/Cart?handler=RemoveLine", { productId: productId }, function (res) {
+                if(res.success) {
+                    $productItem.fadeOut(300, function() { $(this).remove(); updateTotal(); });
+                }
+            }).fail(function(){ alert("Lỗi khi xóa sản phẩm"); });
+        });
+
+        $("#btnDelivery").click(function(e){
+            e.preventDefault();
+            savePickupData();
+            $(this).addClass("active");
+            $("#btnPickup").removeClass("active");
+            $("#pickupForm").hide();
+            $("#deliveryForm").show();
+            $("#deliveryTypeInput").val("delivery");
+            restoreDeliveryData();
+        });
+
+        $("#btnPickup").click(function(e){
+            e.preventDefault();
+            saveDeliveryData();
+            $(this).addClass("active");
+            $("#btnDelivery").removeClass("active");
+            $("#deliveryForm").hide();
+            $("#pickupForm").show();
+            $("#deliveryTypeInput").val("pickup");
+            restorePickupData();
+        });
+
+        $("#checkoutForm").on("submit", function(e) {
+            const deliveryType = $("#deliveryTypeInput").val();
+            let isValid = true;
+            let errorMsg = "";
+
+            if(!$('input[name="Name"]').val().trim()) {
+                isValid = false;
+                errorMsg += "- Tên người mua không được để trống\n";
+            }
+            if(!$('input[name="Phone"]').val().trim()) {
+                isValid = false;
+                errorMsg += "- Số điện thoại không được để trống\n";
+            }
+            if(!$('input[name="Email"]').val().trim()) {
+                isValid = false;
+                errorMsg += "- Email không được để trống\n";
+            }
+
+            if(deliveryType === "delivery") {
+                if(!$("#province").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Tỉnh/Thành\n";
+                }
+                if(!$("#district").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Quận/Huyện\n";
+                }
+                if(!$("#ward").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Phường/Xã\n";
+                }
+                if(!$("#addressDetail").val().trim()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng nhập địa chỉ cụ thể\n";
+                }
+            } else if(deliveryType === "pickup") {
+                if(!$("#citySelect").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Thành Phố\n";
+                }
+                if(!$("#districtSelect").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Quận/Huyện\n";
+                }
+                if(!$("#storeSelect").val()) {
+                    isValid = false;
+                    errorMsg += "- Vui lòng chọn Cửa Hàng\n";
+                }
+            }
+
+            let hasCheckedProduct = false;
+            $(".product-checkbox:checked").each(function() {
+                hasCheckedProduct = true;
+            });
+            if(!hasCheckedProduct) {
+                isValid = false;
+                errorMsg += "- Vui lòng chọn ít nhất 1 sản phẩm\n";
+            }
+
+            if(!isValid) {
+                e.preventDefault();
+                alert("Vui lòng kiểm tra các trường sau:\n\n" + errorMsg);
+                return false;
+            }
+
+            if(deliveryType === "delivery") {
+                saveDeliveryData();
+            } else {
+                savePickupData();
+            }
+        });
+    });
+        function toggleOrderButton() {
+        const paymentMethod = $('input[name="Payment"]:checked').val();
+        if (paymentMethod === "Bank") {
+            $("#btnOrder").prop("disabled", true).css("opacity", 0.6);
+        } else {
+            $("#btnOrder").prop("disabled", false).css("opacity", 1);
+        }
+    }
+
+    $('input[name="Payment"]').change(function() {
+        toggleOrderButton();
+    });
+
+    toggleOrderButton();
+
+
+    function updateQuantity(productId, quantity) {
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        $.post("/Cart?handler=UpdateQuantity", { __RequestVerificationToken: token, productId: productId, quantity: quantity })
+        .done(function(res){
+            $("#subtotal").text(res.total.toLocaleString("vi-VN") + " ₫");
+            $("#total").text(res.total.toLocaleString("vi-VN") + " ₫");
+            updateQr();
+        }).fail(function(xhr){
+            console.error(xhr.responseJSON?.message || "Lỗi AJAX");
+            alert("Lỗi khi cập nhật số lượng: " + (xhr.responseJSON?.message || "Không xác định"));
+        });
+    }
+
+
+        $("#checkoutForm").on("submit", function(e){
+        const paymentMethod = $('input[name="Payment"]:checked').val();
+        $(this).append(`<input type="hidden" name="payment" value="${paymentMethod}">`);
+    });
+
+</script>

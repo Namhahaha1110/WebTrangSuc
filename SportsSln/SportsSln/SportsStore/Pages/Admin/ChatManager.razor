@@ -1,0 +1,136 @@
+﻿@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.SignalR.Client
+
+<div class="chat-wrapper">
+    <div class="chatbox">
+        <ul class="messages list-unstyled">
+            @foreach (var msg in Messages)
+            {
+                <li class="@GetMessageClass(msg)">
+                    @msg.Split(':', 2)[1].Trim()
+                </li>
+            }
+        </ul>
+
+        <div class="input-area">
+            <input @bind="Message" @bind:event="oninput" placeholder="Nhập tin nhắn..." />
+            <button @onclick="SendMessage">Gửi</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string UserName { get; set; } = "Admin";
+    private string Message { get; set; } = "";
+    private List<string> Messages { get; set; } = new List<string>();
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            InvokeAsync(() =>
+            {
+                Messages.Add($"{user}: {message}");
+                StateHasChanged();
+            });
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(Message))
+        {
+            await hubConnection.InvokeAsync("SendMessage", UserName, Message);
+            Message = "";
+        }
+    }
+
+    private string GetMessageClass(string msg)
+    {
+        var username = msg.Split(':', 2)[0].Trim();
+        return username == "Admin" ? "admin-message" : "user-message";
+    }
+}
+
+<style>
+    .chat-wrapper {
+        width: 1100px;
+        margin: auto;
+        margin-top: 20px;
+    }
+
+    .chatbox {
+        background: #fff7e6; /* vàng kem */
+        border-radius: 18px;
+        padding: 20px;
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+        border: 1px solid #f3d9a8;
+    }
+
+    .messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+        .messages li {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            max-width: 75%;
+            line-height: 1.4;
+            clear: both;
+        }
+
+    /* khách hàng */
+    .user-message {
+        float: left;
+        background: #ffffff;
+        border: 1px solid #ffe7b3;
+        color: #5a4b32;
+    }
+
+    /* admin */
+    .admin-message {
+        float: right;
+        background: #ffc54d;
+        color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+
+    .input-area {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+        .input-area input {
+            flex-grow: 1;
+            border-radius: 20px;
+            border: 1px solid #ffdd99;
+            padding: 10px 14px;
+            background: white;
+        }
+
+        .input-area button {
+            margin-left: 10px;
+            border-radius: 20px;
+            background: #ffb800;
+            border: none;
+            padding: 10px 18px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0px 3px 7px rgba(0,0,0,0.2);
+        }
+</style>

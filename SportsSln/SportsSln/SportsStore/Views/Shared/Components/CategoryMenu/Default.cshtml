@@ -1,0 +1,9 @@
+﻿@model IEnumerable<Category>
+
+@foreach (var cat in Model)
+{
+    <a href="/?category=@cat.Name.ToLower().Replace(" ", "-")"
+       class="btn btn-outline-dark mx-1">
+        @cat.Name
+    </a>
+}

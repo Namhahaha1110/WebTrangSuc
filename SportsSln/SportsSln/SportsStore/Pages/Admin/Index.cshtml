@@ -1,0 +1,39 @@
+﻿@page "/admin"
+@{
+    Layout = null;
+}
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SportsStore Admin</title>
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <base href="/" />
+</head>
+<body>
+    <component type="typeof(Routed)" render-mode="Server" />
+    <script src="/_framework/blazor.server.js"></script>
+    
+    <!-- Chart.js for Revenue -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/revenueChart.js"></script>
+    
+    <!-- Toggle Password Script -->
+    <script>
+        function togglePassword(id, pw) {
+            const el = document.getElementById("pw-" + id);
+            if (!el) return;
+            if (el.textContent === "********") {
+                el.textContent = pw;
+            } else {
+                el.textContent = "********";
+            }
+        }
+    </script>
+</body>
+</html>

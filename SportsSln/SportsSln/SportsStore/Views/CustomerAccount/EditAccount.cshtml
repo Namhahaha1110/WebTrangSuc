@@ -1,0 +1,120 @@
+﻿@model SportsStore.Models.ViewModels.EditAccountViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background-color: #fff8e1;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .edit-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        border-top: 6px solid #f5c542;
+    }
+
+        .edit-container h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #3e2723;
+            margin-bottom: 25px;
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #5d4037;
+    }
+
+    .form-control {
+        border: 1px solid #d7ccc8;
+        border-radius: 10px;
+        transition: all 0.3s;
+        padding: 10px 12px;
+    }
+
+        .form-control:focus {
+            border-color: #f5c542;
+            box-shadow: 0 0 6px rgba(245, 197, 66, 0.5);
+        }
+
+    .btn-primary {
+        background-color: #f5c542;
+        border: none;
+        color: #3e2723;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #ffd740;
+            transform: translateY(-2px);
+        }
+
+    .btn-secondary {
+        background-color: #d7ccc8;
+        color: #3e2723;
+        font-weight: 600;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #c5b7b1;
+            transform: translateY(-2px);
+        }
+
+    .btn-group {
+        text-align: center;
+        margin-top: 25px;
+    }
+</style>
+
+<div class="edit-container">
+    <h2>✏️ Chỉnh sửa tài khoản</h2>
+
+    <form asp-action="EditAccount" method="post">
+        <input type="hidden" asp-for="IDCus" />
+
+        <div class="mb-3">
+            <label class="form-label">Họ tên</label>
+            <input asp-for="NameCus" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Số điện thoại</label>
+            <input asp-for="PhoneCus" class="form-control" readonly />
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="EmailCus" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tên đăng nhập</label>
+            <input asp-for="UserName" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mật khẩu</label>
+            <input asp-for="Password" type="password" class="form-control" />
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary me-2">💾 Lưu thay đổi</button>
+            <a href="@Url.Action("MyAccount", "CustomerAccount")" class="btn btn-secondary">⬅️ Hủy</a>
+        </div>
+    </form>
+</div> 

@@ -1,0 +1,11 @@
+﻿@model IEnumerable<Category>
+
+@foreach (var cat in Model)
+{
+    <li>
+        <a class="dropdown-item"
+           href="/Products?category=@cat.Name.ToLower().Replace(" ", "-")">
+            @cat.Name
+        </a>
+    </li>
+}

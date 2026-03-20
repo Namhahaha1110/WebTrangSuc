@@ -1,0 +1,148 @@
+﻿@using Microsoft.JSInterop
+@page "/admin/products"
+@page "/admin"
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="mb-3" style="color:#6b4e16;">Quản lý sản phẩm</h3>
+<NavLink class="btn btn-sm mt-3"
+         style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+         href="/admin/products/create">
+    <i class="bi bi-plus-circle"></i> Thêm sản phẩm mới
+</NavLink>
+<p></p>
+@if (ProductData == null)
+{
+    <div class="alert alert-info">Đang tải dữ liệu...</div>
+}
+else
+{
+    <table class="table table-sm align-middle table-hover"
+           style="border:1px solid #f3e5ab; background-color:#fff8e1; border-collapse: collapse; table-layout: fixed; width:100%;">
+        <thead class="text-center" style="background-color:#fff3b0; color:#6b4e16; font-weight:600; border-bottom:2px solid #f3e5ab;">
+            <tr>
+                <th style="border-right:1px solid #f3e5ab; width:70px;">ID</th>
+                <th style="border-right:1px solid #f3e5ab; width:120px;">Hình ảnh</th>
+                <th style="border-right:1px solid #f3e5ab;">Tên sản phẩm</th>
+                <th style="border-right:1px solid #f3e5ab; max-width:250px;">Mô tả</th>
+                <th style="border-right:1px solid #f3e5ab; width:100px;">Giá tiền</th>
+                <th style="border-right:1px solid #f3e5ab; width:80px;">Số lượng</th>
+                <th style="border-right:1px solid #f3e5ab; width:120px;">Phân loại</th>
+                <th style="width:220px;">Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (ProductData.Any())
+            {
+                @foreach (var p in ProductData)
+                {
+                    <tr style="transition: background 0.3s;"
+                        onmouseover="this.style.background='#fff4c2';"
+                        onmouseout="this.style.background='transparent';">
+
+                        <td style="border-right:1px solid #f3e5ab;">@p.ProductID</td>
+
+                        <td style="border-right:1px solid #f3e5ab;" class="text-center">
+                            @if (!string.IsNullOrEmpty(p.ImageUrl))
+                            {
+                                <img src="images/@p.ImageUrl" alt="@p.Name"
+                                     style="width:80px; height:80px; object-fit:cover; border:1px solid #f3e5ab; border-radius:4px;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Image</span>
+                            }
+                        </td>
+
+                        <td style="border-right:1px solid #f3e5ab;">@p.Name</td>
+
+                        <td style="border-right:1px solid #f3e5ab; white-space:normal; max-width:250px;">
+                            @p.Description
+                        </td>
+
+                        <td style="border-right:1px solid #f3e5ab;">
+                            @p.Price.ToString("N0") ₫
+                        </td>
+
+                        <td style="border-right:1px solid #f3e5ab; text-align: center;">
+                            @if (p.Quantity == 0)
+                            {
+                                <span style="color: #dc3545; font-weight: bold;">Hết hàng</span>
+                            }
+                            else
+                            {
+                                <span style="color: #28a745; font-weight: bold;">@p.Quantity</span>
+                            }
+                        </td>
+
+                        <td style="border-right:1px solid #f3e5ab;">@p.Category?.Name</td>
+
+                        <td class="text-center">
+                            <NavLink class="btn btn-sm me-1"
+                                     style="background: linear-gradient(45deg, #ffec8b, #ffd700); color:#6b4e16; font-weight:500; border:none;"
+                                     href="@GetEditUrl(p.ProductID)">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </NavLink>
+                            <NavLink class="btn btn-sm"
+                                     style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+                                     href="@GetDetailsUrl(p.ProductID)">
+                                <i class="bi bi-eye"></i> Chi tiết
+                            </NavLink>
+                        </td>
+
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Không có sản phẩm nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+}
+
+@code {
+    [Parameter] public long? CategoryId { get; set; }
+
+    public IStoreRepository Repository => Service;
+    public IEnumerable<Product> ProductData { get; set; } = Enumerable.Empty<Product>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateData();
+    }
+
+    private async Task UpdateData()
+    {
+        var query = Repository.Products
+                    .Include(p => p.Category)
+                    .AsQueryable();
+
+        if (CategoryId.HasValue && CategoryId.Value > 0)
+        {
+            query = query.Where(p => p.CategoryID == CategoryId.Value);
+        }
+
+        ProductData = await query.ToListAsync();
+    }
+
+    private async Task DeleteProductAsync(Product p)
+    {
+        if (await JsConfirm($"Bạn có chắc muốn xóa sản phẩm '{p.Name}' không?"))
+        {
+            await Repository.DeleteProduct(p);
+            await UpdateData();
+        }
+    }
+
+    private string GetDetailsUrl(long id) => $"/admin/products/details/{id}";
+    private string GetEditUrl(long id) => $"/admin/products/edit/{id}";
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    private async Task<bool> JsConfirm(string message)
+        => await JS.InvokeAsync<bool>("confirm", message);
+}

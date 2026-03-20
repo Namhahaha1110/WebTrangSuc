@@ -1,0 +1,125 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Tài khoản của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background-color: #f7f6f2;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .customer-card {
+        max-width: 650px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px 50px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        border-top: 6px solid #c9a227;
+    }
+
+    h2 {
+        text-align: center;
+        color: #b68d40;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding: 14px 0;
+        font-size: 17px;
+    }
+
+    .info-label {
+        color: #777;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .action-buttons {
+        margin-top: 35px;
+        text-align: center;
+    }
+
+        .action-buttons a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+    .btn-edit {
+        background-color: #f9d371;
+        color: #000;
+    }
+
+        .btn-edit:hover {
+            background-color: #e6b325;
+            color: #fff;
+        }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+        .btn-delete:hover {
+            background-color: #b02a37;
+            color: #fff;
+        }
+</style>
+
+@if (Model != null)
+{
+    <div class="customer-card">
+        <h2>Thông tin tài khoản</h2>
+
+        <div class="info-item">
+            <span class="info-label">👤 Họ và tên:</span>
+            <span class="info-value">@Model.NameCus</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">📞 Số điện thoại:</span>
+            <span class="info-value">@Model.PhoneCus</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">✉️ Email:</span>
+            <span class="info-value">@Model.EmailCus</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">👥 Tài khoản đăng nhập:</span>
+            <span class="info-value">@Model.UserName</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">🔒 Mật khẩu:</span>
+            <span class="info-value">@Model.Password</span>
+        </div>
+
+        <div class="action-buttons">
+            <a href="@Url.Action("EditAccount", "CustomerAccount", new { id = Model.IDCus })" class="btn-edit">✏️ Chỉnh sửa</a>
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-center text-danger">Không tìm thấy thông tin khách hàng.</p>
+}

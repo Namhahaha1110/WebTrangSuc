@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "1hkBjJNdsRc=",
+  "success": true,
+  "projectFilePath": "D:\\N3-HK1\\SportsSln_4-11_qldơndhàng\\SportsSln\\SportsSln\\SportsSln\\VietQRPaymentAPI\\VietQRPaymentAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\yennh\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
+    "C:\\Users\\yennh\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

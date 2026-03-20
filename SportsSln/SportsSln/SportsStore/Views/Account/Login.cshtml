@@ -1,0 +1,107 @@
+﻿@model LoginModel
+@{
+    Layout = null; 
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - SportsStore</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffffff, #f8e1e7);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 2.5rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+            .login-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .login-card h3 {
+                font-weight: 700;
+                margin-bottom: 1.5rem;
+                color: #333;
+            }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn-primary {
+            border-radius: 10px;
+            background-color: #6c63ff;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #574fd6;
+            }
+
+        .text-danger {
+            font-size: 0.875rem;
+        }
+
+        .text-center a {
+            color: #6c63ff;
+        }
+
+            .text-center a:hover {
+                color: #574fd6;
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h3 class="text-center">Đăng nhập quản trị</h3>
+
+        <form asp-action="Login" asp-controller="Account" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Tên đăng nhập</label>
+                <input asp-for="Name" class="form-control" placeholder="Nhập tên đăng nhập" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Mật khẩu</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">Đăng nhập</button>
+
+          
+        </form>
+    </div>
+
+    <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>

@@ -1,0 +1,39 @@
+﻿@using Microsoft.JSInterop
+@page "/admin/categories/create"
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="mb-3">Thêm phân loại sản phẩm</h3>
+
+<div class="card shadow-sm p-4">
+    <EditForm Model="@category" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tên phân loại</label>
+            <InputText class="form-control" @bind-Value="category.Name" />
+        </div>
+
+        <button type="submit" class="btn btn-success me-2">
+            <i class="bi bi-save"></i> Lưu
+        </button>
+        <NavLink href="/admin/categories" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </NavLink>
+    </EditForm>
+</div>
+
+@code {
+    public IStoreRepository Repository => Service;
+    private Category category = new();
+
+    private async Task HandleValidSubmit()
+    {
+        Repository.CreateCategory(category);
+        await JS.InvokeVoidAsync("alert", "✅ Đã thêm phân loại thành công!");
+        NavigationManager.NavigateTo("/admin/categories");
+    }
+
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
+}

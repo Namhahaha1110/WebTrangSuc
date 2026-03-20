@@ -1,0 +1,145 @@
+﻿@page "/admin/revenue"
+@inject IOrderRepository OrderRepo
+@using System.Globalization
+@using Microsoft.JSInterop
+
+<h3 class="mb-3">📈 Thống kê doanh thu</h3>
+
+<div class="card p-3 mb-3" style="background:#fff4cc;">
+    <h5>
+        Tổng doanh thu:
+        <span class="text-danger font-weight-bold">
+            @TotalRevenue.ToString("n0") VNĐ
+        </span>
+    </h5>
+    <h6>Tổng đơn đã giao: @TotalDelivered</h6>
+</div>
+
+<div class="mb-3">
+    <label for="timeFilter">Thống kê theo:</label>
+    <select id="timeFilter" class="form-select w-auto" @onchange="OnTimeFilterChanged">
+        <option value="day">Ngày</option>
+        <option value="month">Tháng</option>
+        <option value="year">Năm</option>
+    </select>
+</div>
+
+<!-- Wrapper chart nhỏ vừa -->
+<div class="chart-wrapper mb-4">
+    <canvas id="revenueChart"></canvas>
+</div>
+
+<style>
+    .chart-wrapper {
+        max-width: 1100px; /* Nhỏ vừa content */
+        height: 550px; /* Cao vừa phải */
+        margin: auto;
+        background: #fff4cc;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .form-select {
+        display: inline-block;
+        margin-left: 10px;
+        width: auto;
+    }
+</style>
+
+@code {
+    public List<Order> DeliveredOrders = new();
+    public decimal TotalRevenue = 0;
+    public int TotalDelivered = 0;
+
+    private string TimeFilter = "day";
+    private List<string> Labels = new();
+    private List<decimal> DataPoints = new();
+
+    [Inject] IJSRuntime JS { get; set; }
+
+    protected override void OnInitialized()
+    {
+        LoadOrders();
+        PrepareChartData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RenderChart();
+        }
+    }
+
+    private void LoadOrders()
+    {
+        DeliveredOrders = OrderRepo.Orders
+            .Where(o => o.Shipped == true)
+            .OrderBy(o => o.ShippedDate)
+            .ToList();
+
+        TotalDelivered = DeliveredOrders.Count;
+        TotalRevenue = DeliveredOrders.Sum(o => o.TotalPrice);
+    }
+
+    private void PrepareChartData()
+    {
+        Labels.Clear();
+        DataPoints.Clear();
+
+        if (TimeFilter == "day")
+        {
+            var grouped = DeliveredOrders
+                .GroupBy(o => o.ShippedDate?.Date)
+                .OrderBy(g => g.Key);
+
+            foreach (var g in grouped)
+            {
+                Labels.Add(g.Key?.ToString("dd/MM/yyyy") ?? "");
+                DataPoints.Add(g.Sum(x => x.TotalPrice));
+            }
+        }
+        else if (TimeFilter == "month")
+        {
+            var grouped = DeliveredOrders
+                .GroupBy(o => new { o.ShippedDate?.Year, o.ShippedDate?.Month })
+                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month);
+
+            foreach (var g in grouped)
+            {
+                Labels.Add($"{g.Key.Month:00}/{g.Key.Year}");
+                DataPoints.Add(g.Sum(x => x.TotalPrice));
+            }
+        }
+        else if (TimeFilter == "year")
+        {
+            var grouped = DeliveredOrders
+                .GroupBy(o => o.ShippedDate?.Year)
+                .OrderBy(g => g.Key);
+
+            foreach (var g in grouped)
+            {
+                Labels.Add(g.Key?.ToString() ?? "");
+                DataPoints.Add(g.Sum(x => x.TotalPrice));
+            }
+        }
+    }
+
+    private async Task RenderChart()
+    {
+        await JS.InvokeVoidAsync("renderRevenueLineChart", Labels, DataPoints);
+    }
+
+    private async Task OnTimeFilterChanged(ChangeEventArgs e)
+    {
+        TimeFilter = e.Value?.ToString() ?? "day";
+        PrepareChartData();
+        await RenderChart();
+    }
+}

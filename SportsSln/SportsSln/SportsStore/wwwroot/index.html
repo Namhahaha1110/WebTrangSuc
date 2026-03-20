@@ -1,0 +1,42 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let revenueChart = null;
+
+    window.drawRevenueChart = (labels, values, mode) => {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+
+        if (revenueChart) {
+            revenueChart.destroy();
+        }
+
+        revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu',
+                    data: values,
+                    fill: false,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Biểu đồ doanh thu theo " +
+                              (mode === "day" ? "ngày" :
+                               mode === "month" ? "tháng" : "quý")
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    };
+</script>

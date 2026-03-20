@@ -1,0 +1,110 @@
+﻿@page "/customer/my-orders"
+@using SportsStore.Models
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject IOrderRepository Repository
+@inject UserManager<ApplicationUser> UserManager
+
+<AuthorizeView>
+    <Authorized>
+        <div class="container mt-5">
+            <h2>📦 Đơn hàng của tôi</h2>
+
+            @if (IsLoading)
+            {
+                <div class="alert alert-info">Đang tải dữ liệu...</div>
+            }
+            else if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger">@ErrorMessage</div>
+            }
+            else if (!CustomerOrders.Any())
+            {
+                <div class="alert alert-warning">Bạn chưa có đơn hàng nào</div>
+            }
+            else
+            {
+                <CustomerOrderTable Orders="CustomerOrders" />
+            }
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="container mt-5">
+            <div class="alert alert-warning">
+                <h4>⚠️ Vui lòng đăng nhập</h4>
+                <p>Bạn cần đăng nhập để xem đơn hàng của mình.</p>
+                <a href="/Account/Login" class="btn btn-primary mt-2">Đăng nhập</a>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    public List<Order> CustomerOrders { get; set; } = new();
+    public bool IsLoading { get; set; } = false;
+    public string? ErrorMessage { get; set; } = null;
+    private string? CurrentUserEmail { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState != null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                CurrentUserEmail = user.FindFirst(ClaimTypes.Email)?.Value
+                    ?? user.FindFirst("email")?.Value
+                    ?? user.Identity.Name;
+
+                await LoadMyOrders();
+            }
+        }
+    }
+
+
+    private async Task LoadMyOrders()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            if (AuthenticationState != null)
+            {
+                var authState = await AuthenticationState;
+                var user = authState.User;
+
+                if (user.Identity?.IsAuthenticated == true)
+                {
+                    // Lấy UserId từ claim
+                    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        CustomerOrders = Repository.Orders
+                            .Where(o => o.UserId == userId)
+                            .OrderByDescending(o => o.CreatedDate)
+                            .ToList();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Lỗi khi tải dữ liệu: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+
+        StateHasChanged();
+    }
+}

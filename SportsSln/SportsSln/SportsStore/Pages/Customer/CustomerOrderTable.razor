@@ -1,0 +1,142 @@
+﻿@using SportsStore.Models
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Đơn</th>
+                <th>Khách hàng</th>
+                <th>Ảnh & Tên Sản Phẩm</th>
+                <th>SL</th>
+                <th>Giá</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Orders != null && Orders.Any())
+            {
+                @foreach (var order in Orders)
+                {
+                    @if (order.Lines != null && order.Lines.Any())
+                    {
+                        var linesList = order.Lines.ToList();
+                        @foreach (var line in linesList)
+                        {
+                            <tr>
+                                @if (linesList.IndexOf(line) == 0)
+                                {
+                                    <td rowspan="@order.Lines.Count" class="align-middle fw-bold">
+                                        <a href="#" class="text-decoration-none text-primary">
+                                            #@order.OrderID
+                                        </a>
+                                    </td>
+                                    <td rowspan="@order.Lines.Count" class="align-middle">
+                                        <div class="small">
+                                            <strong>@order.Name</strong><br />
+                                            📱 @order.Phone<br />
+                                            📍 @GetFullAddress(order)
+                                        </div>
+                                    </td>
+                                }
+
+                                <td class="align-middle">
+                                    @if (line.Product != null)
+                                    {
+                                        <div class="d-flex gap-2 align-items-center">
+                                            @{
+                                                /* Changed from ImageData (base64) to ImageUrl (file path) */
+                                            }
+                                            @if (!string.IsNullOrEmpty(line.Product.ImageUrl))
+                                            {
+                                                <img src="images/@line.Product.ImageUrl"
+                                                     alt="@line.Product.Name"
+                                                     class="img-thumbnail"
+                                                     style="width: 50px; height: 50px; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
+                                                     style="width: 50px; height: 50px;">
+                                                    No image
+                                                </div>
+                                            }
+                                            <span>@line.Product.Name</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sản phẩm không tồn tại</span>
+                                    }
+                                </td>
+
+                                <td class="align-middle text-center">@line.Quantity</td>
+                                <td class="align-middle text-end">@string.Format("{0:VND}", line.Product?.Price ?? 0)₫</td>
+
+                                @if (linesList.IndexOf(line) == 0)
+                                {
+                                    <td rowspan="@order.Lines.Count" class="align-middle text-end fw-bold text-success">
+                                        @string.Format("{0:VND}", order.TotalPrice)₫
+                                    </td>
+                                    <td rowspan="@order.Lines.Count" class="align-middle text-center">
+                                        @if (order.Shipped)
+                                        {
+                                            <span class="badge bg-success">✓ Đã giao</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">⏳ Chưa giao</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                Đơn hàng không có sản phẩm
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        Không có dữ liệu
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Order>? Orders { get; set; }
+
+    /// <summary>
+    /// Lấy địa chỉ giao hàng đầy đủ từ Order
+    /// </summary>
+    private string GetFullAddress(Order order)
+    {
+        if (order.DeliveryType == "pickup")
+        {
+            return $"{order.Store}, {order.DistrictPickup}, {order.City}";
+        }
+        else
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(order.AddressDetail)) parts.Add(order.AddressDetail);
+            if (!string.IsNullOrEmpty(order.Ward)) parts.Add(order.Ward);
+            if (!string.IsNullOrEmpty(order.District)) parts.Add(order.District);
+            if (!string.IsNullOrEmpty(order.Province)) parts.Add(order.Province);
+
+            return string.Join(", ", parts);
+        }
+    }
+}

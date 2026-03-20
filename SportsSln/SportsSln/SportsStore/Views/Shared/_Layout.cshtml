@@ -1,0 +1,747 @@
+﻿@* Pages/Shared/_Layout.cshtml *@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Flower Jewelry</title>
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --jewel-gold: #d4af37;
+            --jewel-pink: #f8e1e7;
+            --jewel-dark: #2a2a2a;
+            --jewel-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--jewel-white);
+            color: var(--jewel-dark);
+            margin: 0;
+        }
+
+        /* ---------- HEADER ---------- */
+        .site-navbar {
+            background: var(--jewel-white);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+            .site-navbar .navbar-brand {
+                font-family: 'Playfair Display', serif;
+                font-size: 32px;
+                color: var(--jewel-gold);
+                letter-spacing: 1px;
+            }
+
+            .site-navbar .nav-link {
+                color: #333 !important;
+                font-weight: 500;
+                text-transform: uppercase;
+                transition: 0.3s;
+            }
+
+                .site-navbar .nav-link:hover {
+                    color: var(--jewel-gold) !important;
+                }
+
+        /* ---------- CART ICON ---------- */
+        .cart-icon {
+            color: var(--jewel-gold);
+            font-size: 22px;
+            margin-left: 20px;
+            transition: 0.3s;
+        }
+
+            .cart-icon:hover {
+                color: #b9972f;
+                transform: scale(1.1);
+            }
+
+        /* ---------- SLIDESHOW ---------- */
+        .image-container {
+            width: 100%;
+            height: 420px;
+            position: relative;
+            overflow: hidden;
+            background: #fff6fa;
+        }
+
+        .sliding-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1.02);
+            transition: opacity 1s ease-in-out, transform 8s linear;
+        }
+
+            .sliding-image.active {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+            .controls .button {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                cursor: pointer;
+            }
+
+                .controls .button.active {
+                    background: var(--jewel-gold);
+                }
+
+        /* ---------- MAIN CONTENT ---------- */
+        .main-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px 40px;
+        }
+
+        #categories {
+            flex: 0 0 250px;
+            background: var(--jewel-pink);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-left: 40px;
+        }
+
+        /* ---------- WHY CHOOSE ---------- */
+        .why-choose {
+            background: #fff8fb;
+            border-top: 3px solid var(--jewel-gold);
+            border-bottom: 3px solid var(--jewel-gold);
+            padding: 50px 0;
+        }
+
+            .why-choose h3 {
+                text-align: center;
+                font-weight: 700;
+                margin-bottom: 40px;
+                color: var(--jewel-dark);
+                font-family: 'Playfair Display', serif;
+            }
+
+        .why-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+            .why-card:hover {
+                transform: scale(1.05);
+            }
+
+            .why-card i {
+                font-size: 30px;
+                color: var(--jewel-gold);
+                margin-bottom: 10px;
+            }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            background: var(--jewel-dark);
+            color: #fff;
+            text-align: center;
+            padding: 14px 0;
+        }
+
+        @@media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            .main-content {
+                padding-left: 0;
+                margin-top: 20px;
+            }
+
+            #categories {
+                width: 100%;
+            }
+        }
+
+
+
+        footer {
+            background-color: #f9f9f9 !important;
+            color: #222 !important;
+        }
+
+            footer h6,
+            footer .fw-bold {
+                color: var(--jewel-gold) !important;
+            }
+
+            footer a {
+                color: #333 !important;
+                transition: color 0.3s;
+            }
+
+                footer a:hover {
+                    color: var(--jewel-gold) !important;
+                }
+
+
+        /* ======= MEGA MENU SẢN PHẨM ======= */
+        .navbar .dropdown-menu.mega-menu {
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+            background-color: #fff;
+            padding: 30px 50px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+        }
+
+        .navbar .dropdown:hover .dropdown-menu.mega-menu,
+        .navbar .dropdown.show .dropdown-menu.mega-menu {
+            display: block;
+        }
+
+        .mega-menu .col-md-3 {
+            padding: 10px 25px;
+        }
+
+        .mega-menu .dropdown-header {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--jewel-gold);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .mega-menu .dropdown-item {
+            color: #222;
+            font-size: 16px;
+            line-height: 1.8;
+            font-weight: 400;
+            padding: 3px 0;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+            .mega-menu .dropdown-item:hover {
+                color: var(--jewel-gold);
+                background: transparent;
+                transform: translateX(5px);
+            }
+        /* Tùy chỉnh đẹp hơn cho dropdown sản phẩm */
+        .dropdown-menu {
+            animation: fadeDown 0.25s ease-in-out;
+        }
+
+        @@keyframes fadeDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .dropdown-item {
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f8e1e7;
+                color: #d4af37 !important;
+            }
+
+
+ 
+        .category-bar a {
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 18px;
+        }
+
+        .category-bar a:hover,
+        .category-bar a.active {
+            background-color: #d4af37;
+            color: white !important;
+            border-color: #d4af37;
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    @await Html.PartialAsync("_NavbarLogo")
+
+    <header class="site-navbar">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">FLOWER JEWELRY</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Products" asp-action="Index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="GioiThieu" asp-action="Index">Giới thiệu</a>
+                        </li>
+
+                        <!-- Dropdown SẢN PHẨM -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Sản phẩm
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-center p-3 shadow-lg border-0"
+                                aria-labelledby="navbarDropdown"
+                                style="min-width: 250px; border-radius: 12px; font-size: 15px;">
+                                <li><a class="dropdown-item fw-bold text-center" href="/Products">Tất cả</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+
+                                @await Component.InvokeAsync("CategoryDropdown")
+                            </ul>
+
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="TinTuc" asp-action="Index">Tin tức</a>
+                        </li>
+
+                        <!-- Add My Orders link - only show when logged in -->
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/customer/my-orders">Đơn hàng của tôi</a>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/LienHe/Index">Liên hệ</a>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <!-- Cart Icon -->
+                <div class="d-flex align-items-center pe-3">
+                    <a href="/Cart" class="cart-icon"><i class="fa-solid fa-shopping-cart"></i></a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- SLIDESHOW -->
+    @if (Context.Request.Path == "/" || Context.Request.Path.ToString().ToLower() == "/home/index")
+    {
+        <div class="image-container" id="mainSlideshow">
+            <img src="https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress" class="sliding-image active" alt="Jewelry Banner 1" />
+            <img src="https://i.pinimg.com/1200x/d3/c8/02/d3c802f56a5f1941ad0e46ec7cf59671.jpg" class="sliding-image" alt="Jewelry Banner 2" />
+            <img src="https://i.pinimg.com/1200x/d6/ea/4c/d6ea4c929ed5fb89d5966758e841ff47.jpg" class="sliding-image" alt="Jewelry Banner 3" />
+
+            <div class="controls">
+                <button class="button active" data-index="0"></button>
+                <button class="button" data-index="1"></button>
+                <button class="button" data-index="2"></button>
+            </div>
+        </div>
+    }
+   @{
+    var currentPath = Context.Request.Path.ToString().ToLower();
+}
+    @if (currentPath == "/")
+    {
+        <div class="container my-4">
+            <!-- Thanh phân loại nằm ngang -->
+            <div id="categories" class="category-bar d-flex flex-wrap justify-content-center gap-3 mb-4">
+                <a href="/" class="btn btn-outline-dark @(ViewBag.CurrentCategory == null ? "active" : "")">Tất cả</a>
+                @await Component.InvokeAsync("CategoryMenu")
+            </div>
+
+            <div>
+                @RenderBody()
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="container mt-4">
+            @RenderBody()
+        </div>
+    }
+    <!-- WHY CHOOSE -->
+    <section class="why-choose">
+        <div class="container">
+            <h3>TẠI SAO CHỌN <span style="color:var(--jewel-gold)">FLOWER JEWELRY?</span></h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-3 col-sm-6">
+                    <div class="why-card">
+                        <i class="fa-solid fa-gem"></i>
+                        <h6>CHẤT LƯỢNG CAO CẤP</h6>
+                        <p>Trang sức tinh xảo, được chế tác từ nguyên liệu chọn lọc.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="why-card">
+                        <i class="fa-solid fa-gift"></i>
+                        <h6>MẪU MÃ ĐA DẠNG</h6>
+                        <p>Phù hợp cho mọi dịp, quà tặng đến sự kiện đặc biệt.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="why-card">
+                        <i class="fa-solid fa-rotate"></i>
+                        <h6>ĐỔI TRẢ LINH HOẠT</h6>
+                        <p>Đổi trả trong 7 ngày nếu sản phẩm không như mong đợi.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="why-card">
+                        <i class="fa-solid fa-headset"></i>
+                        <h6>HỖ TRỢ 24/7</h6>
+                        <p>Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (chuẩn Huy Thanh Jewelry style) -->
+    <footer style="background-color:#fff; color:#000; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.7; padding:50px 0 10px;">
+        <div class="container">
+            <div class="row">
+                <!-- CỘT 1: HOTLINE -->
+                <div class="col-md-4 col-sm-12 mb-4" style="text-align: left;">
+                    <div class="d-flex align-items-start mb-4">
+                        <div style="background-color:#000; color:#fff; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1" style="font-weight:600; margin:0;">
+                                GỌI MUA HÀNG (Phím 1)
+                                <span style="font-weight:400;">(8:00 - 21:00)</span>
+                            </p>
+                            <p class="mb-1" style="font-size:22px; font-weight:500; margin:0;">
+                                <a href="tel:1900888999" style="color:#000; text-decoration:none;">1900 888 999</a>
+                            </p>
+                            <small>Tất cả các ngày trong tuần</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start">
+                        <div style="background-color:#000; color:#fff; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="mb-1" style="font-weight:600; margin:0;">
+                                GÓP Ý, KHIẾU NẠI (Phím 3)
+                                <span style="font-weight:400;">(8:00 - 21:00)</span>
+                            </p>
+                            <p class="mb-1" style="font-size:22px; font-weight:500; margin:0;">
+                                <a href="tel:1900246864" style="color:#000; text-decoration:none;">1900 246 864</a>
+                            </p>
+                            <small>Tất cả các ngày trong tuần</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT 2: SHOWROOM -->
+                <div class="col-md-4 col-sm-12 mb-4 text-center">
+                    <a class="nav-link" asp-controller="CuaHang" asp-action="Index"
+                       style="display:inline-block; text-decoration:none; color:inherit;">
+                        <p style="font-weight:600; text-transform:uppercase; margin-bottom:10px; transition:color 0.3s;">
+                            HỆ THỐNG SHOWROOM
+                        </p>
+                        <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/ft_showroom_image_custom.webp"
+                             alt="Hệ thống cửa hàng"
+                             class="img-fluid"
+                             style="border-radius:4px; transition:transform 0.3s;">
+                    </a>
+                </div>
+
+                <!-- CỘT 3: FANPAGE -->
+                <div class="col-md-4 col-sm-12 mb-4 text-center">
+                    <p style="font-weight:600; text-transform:uppercase; margin-bottom:10px;">FANPAGE CỦA CHÚNG TÔI</p>
+                    <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/footer-fanpage-custom-image.webp"
+                         alt="Fanpage Flower Jewelry"
+                         class="img-fluid"
+                         style="border-radius:4px; margin-bottom:15px;">
+                    <div class="d-flex justify-content-center gap-4">
+                        <a href="#" style="color:#000;"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" style="color:#000;"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" style="color:#000;"><i class="fab fa-youtube fa-lg"></i></a>
+                        <a href="#" style="color:#000;"><i class="fab fa-tiktok fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THÔNG TIN CÔNG TY -->
+            <div class="text-end mt-4" style="color:#555; font-size:11px; text-align:right;">
+                <p class="fw-bold mb-1" style="color:#2d2d2d;">CÔNG TY TNHH VÀNG BẠC ĐÁ QUÝ FLOWER JEWELRY</p>
+                <p class="mb-1">Trụ sở chính: 828 Sư Vạn Hạnh, Phường Hòa Hưng, TP. HCM, Việt Nam.</p>
+                <p class="mb-1">
+                    Điện thoại: 0123456789 - Fax: 0987654321 - Email: cskh@FlowerJewelry.vn
+                </p>
+                <p class="mb-1">
+                    Giấy chứng nhận đăng ký doanh nghiệp: 1234567890 do Sở KH&ĐT TP. Hà Nội cấp lần đầu ngày 02/10/2025.
+                </p>
+                <small>© @DateTime.Now.Year - <b>Flower Jewelry</b></small>
+                <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/logo_bocongthuong.png"
+                     style="height:40px; margin-top:10px; float:right;">
+                
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Slideshow
+        (function () {
+            const container = document.getElementById('mainSlideshow');
+            if (!container) return;
+            const slides = Array.from(container.querySelectorAll('.sliding-image'));
+            const buttons = Array.from(container.querySelectorAll('.controls .button'));
+            let index = 0;
+            let timer;
+
+            function showSlide(i) {
+                slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+                buttons.forEach((b, idx) => b.classList.toggle('active', idx === i));
+                index = i;
+            }
+
+            function next() {
+                showSlide((index + 1) % slides.length);
+            }
+
+            function start() {
+                stop();
+                timer = setInterval(next, 5000);
+            }
+
+            function stop() {
+                if (timer) clearInterval(timer);
+            }
+
+            buttons.forEach((b, i) => {
+                b.addEventListener('click', () => {
+                    showSlide(i);
+                    start();
+                });
+            });
+
+            container.addEventListener('mouseenter', stop);
+            container.addEventListener('mouseleave', start);
+
+            showSlide(0);
+            start();
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+
+<div id="chatIcon"
+     style="position:fixed; bottom:20px; right:20px;
+            width:160px; height:60px;
+            background:#f39a9a; border-radius:30px;
+            display:flex; justify-content:center; align-items:center;
+            cursor:pointer; color:white; font-size:28px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.25); z-index:9999;
+            padding:0 16px; gap:8px;">
+    💬<span style="font-size:14px;">Flower Jewelry</span>
+</div>
+
+
+<!-- CHAT BOX -->
+<div id="chatBox"
+     style="display:none; position:fixed; bottom:90px; right:20px; width:360px;
+            background:white; border-radius:22px; overflow:hidden;
+            box-shadow:0 4px 20px rgba(0,0,0,0.25); z-index:9999;">
+
+    <!-- HEADER -->
+    <div style="background:#f39a9a; padding:14px; display:flex; align-items:center;">
+        <div style="width:45px; height:45px; background:white; border-radius:50%;
+                    display:flex; justify-content:center; align-items:center; margin-right:12px;">
+            <img src="https://i.pinimg.com/736x/73/fb/de/73fbde1145fa156318b20b494536e34f.jpg" style="width:28px;">
+        </div>
+
+        <div style="color:white; flex:1;">
+            <div style="font-size:16px; font-weight:700;">Flower Jewelry</div>
+            <div style="font-size:13px; opacity:0.9;">Chúng tôi sẵn sàng trợ giúp. Hãy để lại số điện thoại của bạn nhé! </div>
+        </div>
+
+        <div id="closeChat"
+             style="cursor:pointer; font-size:20px; color:white;">
+            ✕
+        </div>
+    </div>
+
+    <!-- MESSAGE AREA -->
+    <div id="messagesList"
+         style="height:320px; overflow-y:auto; padding:15px;
+                background:#ffffff; display:flex; flex-direction:column; gap:10px;">
+    </div>
+
+    <!-- INPUT AREA -->
+    <div style="padding:12px; border-top:1px solid #eee; background:white;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <input type="text" id="messageInput" placeholder="Tin nhắn..."
+                   style="flex:1; border-radius:20px; padding:10px 15px;
+                          border:1px solid #ddd; outline:none;">
+
+            <button id="sendButton"
+                    style="background:#f39a9a; border:none; width:42px; height:42px;
+                           border-radius:50%; color:white; font-size:18px;">
+                ➤
+            </button>
+        </div>
+    </div>
+
+    <div style="text-align:center; font-size:12px; color:#888; padding-bottom:10px;">
+        Được phát triển bởi 🐟 Flower Jewelry
+    </div>
+</div>
+
+
+<!-- SIGNALR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+
+<script>
+    // Mở chat
+        // Mở chat
+    document.getElementById("chatIcon").onclick = function () {
+        document.getElementById("chatBox").style.display = "block";
+        this.style.display = "none";
+
+        // Hiển thị tin nhắn mặc định từ admin
+        renderMessage("Flower Jewelry", "Flower Jewelry xin chào\nFlower Jewelry có thể hỗ trợ gì cho mình hôm nay không ạ?");
+    };
+
+
+    // Đóng chat
+    document.getElementById("closeChat").onclick = function () {
+        document.getElementById("chatBox").style.display = "none";
+        document.getElementById("chatIcon").style.display = "flex";
+    };
+
+    // SignalR
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chathub")
+        .build();
+
+    const currentUser = "Bạn";
+
+    // Tạo bong bóng chat
+    function renderMessage(user, message) {
+        const container = document.getElementById("messagesList");
+        const wrap = document.createElement("div");
+        const bubble = document.createElement("div");
+
+        bubble.style.maxWidth = "70%";
+        bubble.style.padding = "10px 14px";
+        bubble.style.borderRadius = "16px";
+        bubble.style.fontSize = "14px";
+        bubble.style.whiteSpace = "pre-wrap";
+
+        // Bạn → bên phải
+        if (user === currentUser) {
+            wrap.style.display = "flex";
+            wrap.style.justifyContent = "flex-end";
+            bubble.style.background = "#f39a9a";
+            bubble.style.color = "white";
+        }
+        // Admin → bên trái
+        else {
+            wrap.style.display = "flex";
+            wrap.style.justifyContent = "flex-start";
+            bubble.style.background = "#f0f0f0";
+            bubble.style.color = "#000";
+        }
+
+        bubble.textContent = message;
+        wrap.appendChild(bubble);
+        container.appendChild(wrap);
+
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Nhận tin nhắn
+    connection.on("ReceiveMessage", (user, message) => {
+        renderMessage(user, message);
+    });
+
+    // Start
+    connection.start().catch(err => console.error(err.toString()));
+
+    // Gửi tin nhắn
+    document.getElementById("sendButton").onclick = function () {
+        const message = document.getElementById("messageInput").value.trim();
+        if (message === "") return;
+
+        connection.invoke("SendMessage", currentUser, message);
+        document.getElementById("messageInput").value = "";
+    };
+</script>
+
+
+

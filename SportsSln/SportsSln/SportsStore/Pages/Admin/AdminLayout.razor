@@ -1,0 +1,184 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using SportsStore.Pages.Admin  @* Thay bằng namespace thực tế *@
+
+<div class="header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col">
+                <span class="navbar-brand ml-2">✨ JEWELRY STORE Admin</span>
+            </div>
+            <div class="col-2 text-right">
+                <a class="btn btn-sm btn-outline-dark" href="/account/logout">Log Out</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid p-0">
+    <div class="admin-layout-row">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="admin-info text-center mb-4">
+                <img src="/images/icon_quantri.png" alt="Admin Icon" class="admin-icon" />
+                <div class="admin-text">
+                    <div class="admin-title">Quản trị viên</div>
+                    <div class="admin-sub">Quản lý</div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <NavLink class="btn nav-btn" href="/admin/products" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Quản lý sản phẩm
+                </NavLink>
+                <NavLink class="btn nav-btn" href="/admin/Categories" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Quản lý phân loại
+                </NavLink>
+                <NavLink class="btn nav-btn" href="/admin/orders" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Quản lý đơn hàng
+                </NavLink>
+                <NavLink class="btn nav-btn" href="/admin/users" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Quản lý tài khoản
+                </NavLink>
+                <NavLink class="btn nav-btn" href="/admin/revenue" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Thống kê doanh thu
+                </NavLink>
+                <NavLink class="btn nav-btn" href="/admin/chat" ActiveClass="active-nav" Match="NavLinkMatch.Prefix">
+                    Quản lý chatbox
+                </NavLink>
+
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            @Body
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ----- Header ----- */
+    .header {
+        background: linear-gradient(135deg, #f9e79f, #f4d03f);
+        color: #4b3e2a;
+        padding: 12px 0;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(200,160,50,0.2);
+    }
+
+        .header .navbar-brand {
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+        }
+
+    /* ----- Layout ----- */
+    .admin-layout-row {
+        display: flex;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: #fff8e1;
+        border-right: 1px solid rgba(200,180,120,0.3);
+        padding: 20px;
+        flex-shrink: 0;
+    }
+
+    .admin-info {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .admin-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #f5d76e, #f9e79f);
+        padding: 10px;
+    }
+
+    .admin-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #4b3e2a;
+    }
+
+    .admin-sub {
+        font-size: 0.9rem;
+        color: #7d6a46;
+    }
+
+    .nav-btn {
+        padding: 8px 12px;
+        font-size: 0.95rem;
+        background: linear-gradient(135deg, #fff4cc, #f5d76e);
+        color: #4b3e2a;
+        border: 1px solid rgba(200,160,50,0.4);
+        border-radius: 8px;
+        text-align: left;
+        transition: all 0.3s ease;
+    }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #f5d76e, #f9e79f);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(200,160,50,0.3);
+        }
+
+    .active-nav {
+        background: linear-gradient(135deg, #f9e79f, #f4d03f) !important;
+        font-weight: 600;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+        background: #fffaf0;
+        min-height: 100vh;
+        overflow-x: auto;
+        color: #4b3e2a;
+        position: relative;
+    }
+
+    .btn-outline-dark {
+        background-color: #fff4cc;
+        border: 1px solid #d4af37;
+        color: #4b3e2a;
+        font-weight: 600;
+    }
+
+        .btn-outline-dark:hover {
+            background-color: #f5d76e;
+            color: #3e2f1c;
+            border-color: #c99f2b;
+        }
+</style>
+
+@code {
+    // ----- Admin authentication -----
+    private bool isAdmin = false;
+    private bool initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!initialized)
+        {
+            initialized = true;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                isAdmin = user.IsInRole("Admin");
+                StateHasChanged();
+            }
+        }
+    }
+}

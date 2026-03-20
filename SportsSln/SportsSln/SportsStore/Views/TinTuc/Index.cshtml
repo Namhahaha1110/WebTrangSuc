@@ -1,0 +1,241 @@
+﻿@{
+    ViewData["Title"] = "Tin tức";
+}
+
+<style>
+    /* ==== PHONG CÁCH CHUNG ==== */
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #faf7f2;
+        color: #333;
+    }
+
+    .title-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 60px auto 45px;
+        max-width: 850px;
+    }
+
+    .title {
+        font-size: 34px;
+        color: #c49a35;
+        font-weight: 800;
+        margin: 0 18px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .title-hr-left, .title-hr-right {
+        border: none;
+        border-top: 3px solid #c49a35;
+        flex: 1;
+        opacity: 0.8;
+    }
+
+    /* ==== BẢNG GIÁ VÀNG ==== */
+    .table-responsive {
+        max-width: 70%;
+        margin: 0 auto 65px;
+    }
+
+    .table-style-custom {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fffdf7;
+        box-shadow: 0 4px 20px rgba(196, 154, 53, 0.15);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+        .table-style-custom thead {
+            background: linear-gradient(90deg, #c49a35, #e8d8a6);
+            color: #fff;
+        }
+
+        .table-style-custom th, .table-style-custom td {
+            text-align: center;
+            padding: 16px;
+            font-size: 17px;
+            border-bottom: 1px solid #f2e7c9;
+        }
+
+        .table-style-custom tbody tr:hover {
+            background-color: #fff6dd;
+            transition: 0.25s;
+        }
+
+    /* ==== TIN TỨC HÌNH ẢNH ==== */
+    .image-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 35px;
+        max-width: 2000px;
+        margin: 0 auto 80px;
+        padding: 0 25px;
+    }
+
+    /* === ẢNH LỚN === */
+    .large-image {
+        flex: 2;
+        background: #fffdf7;
+        border-radius: 14px;
+        padding: 35px;
+        box-shadow: 0 4px 20px rgba(196, 154, 53, 0.25);
+        min-height: 600px;
+    }
+
+    .img-large {
+        width: 85%;
+        max-width: 780px;
+        border-radius: 14px;
+        margin: 0 auto 18px;
+        display: block;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        transition: transform 0.4s ease;
+    }
+
+        .img-large:hover {
+            transform: scale(1.03);
+        }
+
+    /* === ẢNH NHỎ === */
+    .small-images {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .small-box {
+        background: #fffdf7;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 3px 15px rgba(196, 154, 53, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+        .small-box:hover {
+            transform: translateY(-6px);
+        }
+
+    .img-small {
+        width: 100%;
+        max-width: 260px;
+        border-radius: 10px;
+        margin: 0 auto 12px;
+        display: block;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-caption {
+        font-size: 22px;
+        font-weight: 700;
+        color: #c49a35;
+        text-align: center;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+    }
+
+    .image-text, .image-text2 {
+        font-size: 17px;
+        line-height: 1.7;
+        color: #444;
+        text-align: justify;
+        padding: 0 8px;
+    }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- ====== TIÊU ĐỀ GIÁ VÀNG ====== -->
+<div class="title-container fade-in">
+    <hr class="title-hr-left">
+    <h2 class="title">Giá vàng Flower Jewelry</h2>
+    <hr class="title-hr-right">
+</div>
+
+<!-- ====== BẢNG GIÁ VÀNG ====== -->
+<div class="table-responsive fade-in">
+    <table class="table-style-custom">
+        <thead>
+            <tr>
+                <th>Loại vàng</th>
+                <th>Mua vào (VNĐ/lượng)</th>
+                <th>Bán ra (VNĐ/lượng)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Trang sức 99.99</td><td>151,950,000</td><td>151,320,000</td></tr>
+            <tr><td>Trang sức 99.9</td><td>150,940,000</td><td>150,310,000</td></tr>
+            <tr><td>NL 99.99</td><td>149,980,000</td><td>149,350,000</td></tr>
+            <tr><td>Nhẫn tròn không ép vỉ T.Bình</td><td>149,940,000</td><td>149,200,000</td></tr>
+            <tr><td>N.Tròn, 3A, Đ.Vàng T.Bình</td><td>150,030,000</td><td>150,300,000</td></tr>
+            <tr><td>N.Tròn, 3A, Đ.Vàng N.An</td><td>150,040,000</td><td>150,310,000</td></tr>
+            <tr><td>N.Tròn, 3A, Đ.Vàng H.Nội</td><td>150,050,000</td><td>150,320,000</td></tr>
+            <tr><td>Miếng SJC Thái Bình</td><td>150,080,000</td><td>150,420,000</td></tr>
+            <tr><td>Miếng SJC Nghệ An</td><td>149,980,000</td><td>149,920,000</td></tr>
+            <tr><td>Miếng SJC Hà Nội</td><td>149,080,000</td><td>149,420,000</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ====== TIÊU ĐỀ TIN TỨC ====== -->
+<div class="title-container fade-in">
+    <hr class="title-hr-left">
+    <h2 class="title">Tin tức</h2>
+    <hr class="title-hr-right">
+</div>
+
+<!-- ====== PHẦN HÌNH ẢNH TIN TỨC ====== -->
+<div class="image-container fade-in">
+    <!-- Ảnh lớn -->
+    <div class="large-image">
+        <img src="https://media.vov.vn/sites/default/files/styles/large/public/2022-09-2/gia-vang-20072022.jpg"
+             class="img-large" alt="Giá vàng trong nước">
+
+        <p class="image-caption">Giá vượt 144 triệu đồng/lượng.</p>
+
+        <p class="image-text2">
+            Giá vàng SJC bật tăng hơn 500.000 đồng/lượng sau khi USD giảm,
+            vàng trang sức 99.9 tiếp cận 83,2 triệu đồng.
+        </p>
+    </div>
+
+    <!-- Ảnh nhỏ -->
+    <div class="small-images">
+        <div class="small-box">
+            <img src="https://9746c6837f.vws.vegacdn.vn/posts/files/lich-su-gia-vang-the-gioi-tu-2000-den-nay.png"
+                 class="img-small" alt="Giá vàng thế giới">
+            <p class="image-caption">TIN NHANH 18/10</p>
+            <p class="image-text2">
+                Giá vàng SJC bật tăng hơn 500.000 đồng/lượng sau khi USD giảm,
+                vàng trang sức 99.9 tiếp cận 83,2 triệu đồng.
+            </p>
+        </div>
+
+        <div class="small-box">
+            <p class="image-text2">
+                Giá vàng hôm nay dự báo tăng.
+                Giá vàng SJC trong nước tuần qua tăng gần 8 triệu đồng/lượng.
+            </p>
+        </div>
+    </div>
+</div>

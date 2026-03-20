@@ -1,0 +1,142 @@
+﻿@page "/admin/products/{CategoryID:long}"
+@inherits OwningComponentBase<IStoreRepository>
+
+<div class="container py-3">
+
+    <h2 class="mb-4 fw-bold text-title-gold">
+        Sản phẩm thuộc phân loại: @CategoryName
+    </h2>
+
+    @if (Products?.Any() != true)
+    {
+        <div class="alert alert-light border-warning shadow-sm">
+            <i class="bi bi-info-circle"></i>
+            Chưa có sản phẩm nào trong phân loại này.
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-3 bg-panel-light">
+            <div class="card-body p-0">
+
+                <table class="table table-sm align-middle table-hover mb-0 product-table">
+                    <thead class="bg-gold-light text-dark">
+                        <tr>
+                            <th class="text-center">ID</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá (VND)</th>
+                            <!-- Add Quantity and Size columns -->
+                            <th class="text-center">Số lượng</th>
+                            <th>Kích thước</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var p in Products)
+                        {
+                            <tr class="table-row-light">
+                                <td class="text-center fw-bold">@p.ProductID</td>
+                                <td class="text-center">
+                                    @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                    {
+                                        <img src="images/@p.ImageUrl" alt="@p.Name"
+                                             style="width:60px; height:60px; object-fit:cover; border-radius:4px; border:1px solid #f3e5ab;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No Image</span>
+                                    }
+                                </td>
+                                <td class="fw-semibold">@p.Name</td>
+                                <td class="text-danger fw-bold">@p.Price.ToString("N0") ₫</td>
+                                <!-- Display Quantity with status -->
+                                <td class="text-center">
+                                    @if (p.Quantity == 0)
+                                    {
+                                        <span style="color: #dc3545; font-weight: bold;">Hết hàng</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #28a745; font-weight: bold;">@p.Quantity</span>
+                                    }
+                                </td>
+                                <!-- Display available sizes -->
+                               
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    }
+
+    <NavLink class="btn btn-back mt-4 px-4 py-2 fw-semibold rounded-pill shadow-sm"
+             href="/admin/categories">
+        <i class="bi bi-arrow-left-circle"></i> Quay lại phân loại
+    </NavLink>
+
+</div>
+
+<style>
+    .text-title-gold {
+        color: #8c6a10;
+    }
+
+    .bg-gold-light {
+        background-color: #f8e9b8 !important;
+    }
+
+    .bg-panel-light {
+        background-color: #fff9ec !important;
+    }
+
+    .btn-back {
+        background-color: #f8e9b8;
+        color: #5a4505;
+        border: 1px solid #e5cf8a;
+        transition: 0.2s;
+    }
+
+        .btn-back:hover {
+            background-color: #f2d77f;
+            color: #3b2e03;
+            transform: translateY(-1px);
+        }
+
+    .product-table th {
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .product-table td {
+        padding: 10px;
+    }
+
+    .table-row-light:hover {
+        background-color: #fff4d6 !important;
+        transition: 0.25s;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    [Parameter] public long CategoryID { get; set; }
+
+    public string CategoryName { get; set; } = string.Empty;
+    public IEnumerable<Product> Products { get; set; } = Enumerable.Empty<Product>();
+    public IStoreRepository Repository => Service;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var category = await Repository.Categories.FirstOrDefaultAsync(c => c.CategoryID == CategoryID);
+        if (category != null)
+        {
+            CategoryName = category.Name;
+            Products = await Repository.Products
+                        .Where(p => p.CategoryID == CategoryID)
+                        .ToListAsync();
+        }
+    }
+}

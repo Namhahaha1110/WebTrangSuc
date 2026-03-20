@@ -1,0 +1,189 @@
+﻿@{
+    ViewData["Title"] = "Về chúng tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="about-container">
+
+    <!-- Hàng 1: Ảnh trái -->
+    <div class="about-section fade-in">
+        <div class="about-image">
+            <img src="https://doanhnghiepvathuongmai.vn/public/storage/uploads/images/PNJ-%20Tr%E1%BA%A7u%20cau%201.jpg" alt="Thiết kế độc quyền">
+        </div>
+        <div class="about-text">
+            <h1>THIẾT KẾ ĐỘC QUYỀN</h1>
+            <p>
+                Với tầm nhìn trở thành “Nhà bán lẻ trang sức dẫn đầu xu hướng”, HBN Jewelry không chỉ là thương hiệu trang sức,
+                mà còn là biểu tượng của sự sáng tạo và đổi mới. Mỗi sản phẩm là một tác phẩm nghệ thuật mang tinh thần trẻ trung, hiện đại,
+                đại diện cho phong cách sống tinh tế và cá tính.
+            </p>
+            <p>
+                Ba dòng sản phẩm chủ lực của HBN gồm: Nhẫn cưới, Trang sức cưới và Trang sức hiện đại.
+                Khách hàng sở hữu sản phẩm HBN không chỉ mang vẻ đẹp bên ngoài, mà còn cảm nhận được giá trị nghệ thuật và cảm xúc bên trong.
+            </p>
+        </div>
+    </div>
+
+    <!-- Hàng 2: Chữ trái -->
+    <div class="about-section fade-in">
+        <div class="about-text">
+            <h1>NHỮNG CÂU CHUYỆN HẠNH PHÚC</h1>
+            <p>
+                HBN tin rằng mỗi món trang sức đều kể một “Câu chuyện hạnh phúc” riêng — về tình yêu, sự gắn bó, hay thành tựu cá nhân.
+                Mỗi sản phẩm là kỷ vật lưu giữ cảm xúc, nhắc nhớ những khoảnh khắc đáng trân trọng nhất.
+            </p>
+            <ul>
+                <li>Chiếc lắc tay tự thưởng sau một chặng đường nỗ lực.</li>
+                <li>Sợi dây chuyền tặng người yêu nhân dịp kỷ niệm.</li>
+                <li>Chiếc nhẫn cưới mở ra chương mới trong cuộc đời.</li>
+            </ul>
+        </div>
+        <div class="about-image">
+            <img src="https://huythanhjewelry.vn/storage/photos/shares/ve-chung-toi/banner-aboutus-custom2022-2.webp" alt="Câu chuyện hạnh phúc">
+        </div>
+    </div>
+
+    <!-- Hàng 3: Ảnh trái -->
+    <div class="about-section fade-in">
+        <div class="about-image">
+            <img src="https://huythanhjewelry.vn/storage/photos/shares/ve-chung-toi/banner-aboutus-custom2022-3.webp" alt="Lợi thế cạnh tranh">
+        </div>
+        <div class="about-text">
+            <h1>LỢI THẾ CẠNH TRANH</h1>
+            <p>
+                Với xưởng chế tác hiện đại hơn 3000m² cùng kinh nghiệm hơn 18 năm trong ngành kim hoàn,
+                HBN tự hào mang đến các sản phẩm đạt chuẩn chất lượng cao với mức giá hợp lý.
+            </p>
+            <p>
+                Chúng tôi được nhà nước cấp phép bảo hộ chế tác vàng — minh chứng cho cam kết về chất lượng,
+                tính pháp lý và trách nhiệm với khách hàng.
+            </p>
+        </div>
+    </div>
+
+    <!-- Hàng 4: Chữ trái -->
+    <div class="about-section fade-in">
+        <div class="about-text">
+            <h1>DỊCH VỤ TẬN TÂM</h1>
+            <p>
+                HBN đặt chữ “Tâm” làm nền tảng cho mọi hoạt động. Mỗi sản phẩm đều có hóa đơn, chứng nhận rõ ràng — minh bạch và đáng tin cậy.
+            </p>
+            <p>
+                Đội ngũ tư vấn viên chuyên nghiệp luôn sẵn sàng hỗ trợ 24/7, giúp khách hàng an tâm từ lúc chọn sản phẩm
+                đến khi hoàn tất giao dịch và chăm sóc sau bán hàng.
+            </p>
+        </div>
+        <div class="about-image">
+            <img src="https://media.kinhdoanhvaphattrien.vn/files/quynhlk/2024/06/15/666d8057448f6.jpg" alt="Dịch vụ tận tâm">
+        </div>
+    </div>
+</div>
+
+<style>
+    .about-container {
+        max-width: 100%;
+        margin: 50px auto;
+        padding-left: 2cm;
+        padding-right: 2cm;
+        font-family: 'Segoe UI', sans-serif;
+        color: #4e342e;
+    }
+
+    .about-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 80px;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .about-text {
+        flex: 1;
+        min-width: 300px;
+    }
+
+        .about-text h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #d1a954;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border-left: 5px solid #d1a954;
+            padding-left: 15px;
+        }
+
+        .about-text p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+    .about-image {
+        flex: 1;
+        min-width: 300px;
+        text-align: center;
+    }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+            transition: transform 0.5s, box-shadow 0.5s;
+        }
+
+            .about-image img:hover {
+                transform: scale(1.03);
+                box-shadow: 0 10px 25px rgba(209, 169, 84, 0.35);
+            }
+
+    @@media (max-width: 992px) {
+        .about-section {
+            flex-direction: column;
+        }
+
+        .about-text h1 {
+            text-align: center;
+            border-left: none;
+            border-bottom: 3px solid #d1a954;
+            padding-left: 0;
+            padding-bottom: 8px;
+        }
+
+        .about-container {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    }
+
+    /* Hiệu ứng mờ dần khi xuất hiện */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fadeElements = document.querySelectorAll('.fade-in');
+
+        function fadeInOnScroll() {
+            fadeElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', fadeInOnScroll);
+        fadeInOnScroll(); // Gọi 1 lần khi load trang
+    });
+</script>

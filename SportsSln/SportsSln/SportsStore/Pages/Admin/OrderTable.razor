@@ -1,0 +1,174 @@
+﻿<table class="table table-sm align-middle table-hover"
+       style="border: 1px solid #f3e5ab; background-color: #fff8e1;
+              border-collapse: collapse; table-layout: fixed; width: 100%;">
+    <thead class="text-center"
+           style="background-color: #fff3b0; color: #6b4e16; font-weight: 600;
+                  border-bottom: 2px solid #f3e5ab;">
+
+        <tr>
+            <th colspan="14" style="font-size:1.3rem; border-bottom: 2px solid #f3e5ab;">
+                @TableTitle
+            </th>
+        </tr>
+
+        <tr>
+            <th style="border-right:1px solid #f3e5ab; width:40px; max-width:40px; min-width:35px; white-space:nowrap;">
+                ID
+            </th>
+
+            <th style="border-right:1px solid #f3e5ab; width:15%;">Khách hàng</th>
+            <th style="border-right:1px solid #f3e5ab; width:12%;">Số điện thoại</th>
+            <th style="border-right:1px solid #f3e5ab; width:20%;">Địa chỉ</th>
+            <th style="border-right:1px solid #f3e5ab; width:6%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ghi chú</th>
+            <th style="border-right:1px solid #f3e5ab; width:10%;">Ảnh sản phẩm</th>
+            <th style="border-right:1px solid #f3e5ab; width:15%;">Tên sản phẩm</th>
+            <th style="border-right:1px solid #f3e5ab; width:5%;">SL</th>
+            <th style="border-right:1px solid #f3e5ab; width:5%;">Giá</th>
+            <th style="border-right:1px solid #f3e5ab; width:5%;">Tổng</th>
+            <th style="border-right:1px solid #f3e5ab; width:10%;">Ngày đặt</th>
+            @if (ShowShipped)
+            {
+                <th style="border-right:1px solid #f3e5ab; width:10%;">Ngày giao</th>
+            }
+            <th style="border-right:1px solid #f3e5ab; width:7%;">Hành động</th>
+            <th style="border-right:1px solid #f3e5ab; width:10%;">Thanh toán</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Orders?.Any() == true)
+        {
+            @foreach (var o in Orders)
+            {
+                <tr style="transition: background 0.3s;"
+                    onmouseover="this.style.background='#fff4c2';"
+                    onmouseout="this.style.background='transparent';">
+                    <td class="text-center"
+                        style="border-right:1px solid #f3e5ab; width:40px; max-width:40px; min-width:35px; white-space:nowrap;">
+                        @o.OrderID
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">@o.Name</td>
+                    <td style="border-right:1px solid #f3e5ab;">@o.Phone</td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        @if (o.DeliveryType == "delivery")
+                        {
+                            <div>@o.AddressDetail</div>
+                            <div>@o.Ward, @o.District, @o.Province</div>
+                        }
+                        else
+                        {
+                            <div>@o.Store (@o.City)</div>
+                        }
+                    </td>
+                    <td style="border-right:1px solid #f3e5ab; max-width:60px;
+                               overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+                               font-size:0.85rem;">
+                        @o.Note
+                    </td>
+
+                    <td class="text-center" style="border-right:1px solid #f3e5ab;">
+                        @if (o.Lines != null)
+                        {
+                            <div style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center;">
+                                @foreach (var line in o.Lines)
+                                {
+                                    <img src="images/@line.Product.ImageUrl"
+                                         alt="@line.Product.Name"
+                                         style="width:60px; height:60px; object-fit:cover; border:1px solid #f3e5ab;" />
+                                }
+                            </div>
+                        }
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        <ul style="margin:0; padding-left:20px;">
+                            @foreach (var line in o.Lines)
+                            {
+                                <li>@line.Product.Name</li>
+                            }
+                        </ul>
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        <ul style="margin:0; padding-left:20px;">
+                            @foreach (var line in o.Lines)
+                            {
+                                <li>@line.Quantity</li>
+                            }
+                        </ul>
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        <ul style="margin:0; padding-left:20px;">
+                            @foreach (var line in o.Lines)
+                            {
+                                <li>@((line.Product.Price * line.Quantity).ToString("#,##0")) ₫</li>
+                            }
+                        </ul>
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        <strong style="color:#b8860b;">@(o.TotalPrice.ToString("#,##0")) ₫</strong>
+                    </td>
+
+                    <td style="border-right:1px solid #f3e5ab;">
+                        @o.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                    </td>
+
+                    @if (ShowShipped)
+                    {
+                        <td style="border-right:1px solid #f3e5ab;">
+                            @if (o.ShippedDate != null)
+                            {
+                                @o.ShippedDate?.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
+                    }
+                    <td class="text-center" style="border-right:1px solid #f3e5ab;">
+                        <button class="btn btn-sm"
+                                style="background: linear-gradient(45deg, #ffd700, #ffec8b);
+                                       color:#6b4e16; font-weight:500; border:none;"
+                                @onclick="() => OrderSelected.InvokeAsync(o.OrderID)">
+                            @ButtonLabel
+                        </button>
+                    </td>
+
+                    <td class="text-center" style="border-right:1px solid #f3e5ab;">
+                        @if (o.Payment == "COD")
+                        {
+                            <span>Thanh toán khi nhận</span>
+                        }
+                        else if (o.Payment == "Bank")
+                        {
+                            <span>Chuyển khoản</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="14" class="text-center text-muted">Không có đơn hàng</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public string TableTitle { get; set; } = "Đơn hàng";
+    [Parameter] public IEnumerable<Order> Orders { get; set; } = Enumerable.Empty<Order>();
+    [Parameter] public string ButtonLabel { get; set; } = "Giao hàng";
+    [Parameter] public bool ShowShipped { get; set; } = false;
+    [Parameter] public EventCallback<int> OrderSelected { get; set; }
+}

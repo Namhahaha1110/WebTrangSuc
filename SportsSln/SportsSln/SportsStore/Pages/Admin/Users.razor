@@ -1,0 +1,96 @@
+﻿@page "/admin/users"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<h3 class="mb-3" style="color:#6b4e16;">Danh sách người dùng</h3>
+
+@if (users == null)
+{
+    <div class="alert alert-info">Đang tải dữ liệu...</div>
+}
+else if (!users.Any())
+{
+    <div class="alert alert-warning">Không có người dùng nào.</div>
+}
+else
+{
+    <table class="table table-sm align-middle table-hover"
+           style="border: 1px solid #f3e5ab; background-color: #fff8e1; border-collapse: collapse; table-layout: fixed; width: 100%;">
+        <thead class="text-center" style="background-color: #fff3b0; color: #6b4e16; font-weight: 600; border-bottom: 2px solid #f3e5ab;">
+            <tr>
+                <th style="border-right:1px solid #f3e5ab; width:12%;">Tên đăng nhập</th>
+                <th style="border-right:1px solid #f3e5ab; width:12%;">Họ tên</th>
+                <th style="border-right:1px solid #f3e5ab; width:15%;">Email</th>
+                <th style="border-right:1px solid #f3e5ab; width:10%;">Số điện thoại</th>
+                <th style="border-right:1px solid #f3e5ab; width:15%;">Địa chỉ</th>
+                <th style="border-right:1px solid #f3e5ab; width:10%;">Vai trò</th>
+                <th style="border-right:1px solid #f3e5ab; width:10%;">Mật khẩu</th>
+                <th style="width:16%;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in users)
+            {
+                <tr style="transition: background 0.3s;"
+                    onmouseover="this.style.background='#fff4c2';"
+                    onmouseout="this.style.background='transparent';">
+                    <td style="border-right:1px solid #f3e5ab;">@u.UserName</td>
+                    <td style="border-right:1px solid #f3e5ab;">@u.FullName</td>
+                    <td style="border-right:1px solid #f3e5ab;">@u.Email</td>
+                    <td style="border-right:1px solid #f3e5ab;">@(string.IsNullOrEmpty(u.PhoneNumber) ? "—" : u.PhoneNumber)</td>
+                    <td style="border-right:1px solid #f3e5ab;">@u.Address</td>
+                    <td style="border-right:1px solid #f3e5ab;">@u.Role</td>
+                    <td style="border-right:1px solid #f3e5ab;">
+                        <span id="pw-@u.Id">********</span>
+                        <button class="btn btn-sm"
+                                style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none; margin-left:0.3rem;"
+                                @onclick="() => TogglePassword(u.Id, u.PasswordHash)">
+                            👁️
+                        </button>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm"
+                                style="background: linear-gradient(45deg, #ff8c00, #ffd700); color:#fff; font-weight:500; border:none; margin-right:0.3rem;"
+                                @onclick="() => ConfirmDelete(u.Id)">
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private List<ApplicationUser>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = UserManager.Users.ToList();
+    }
+
+    private async Task TogglePassword(string id, string pwHash)
+    {
+        // ⚠️ Chỉ hiển thị tạm — ở đây là demo, không giải mã hash được
+        await JSRuntime.InvokeVoidAsync("togglePassword", id, "[Không thể hiển thị mật khẩu]");
+    }
+
+    private async Task ConfirmDelete(string id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Bạn có chắc chắn muốn xóa người dùng này không?");
+        if (confirmed)
+        {
+            var user = await UserManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                await UserManager.DeleteAsync(user);
+                users!.Remove(user);
+                StateHasChanged();
+            }
+        }
+    }
+}

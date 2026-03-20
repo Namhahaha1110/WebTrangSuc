@@ -1,0 +1,97 @@
+﻿@using Microsoft.JSInterop
+@page "/admin/categories"
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="mb-3" style="color:#6b4e16;">Quản lý phân loại sản phẩm</h3>
+
+<NavLink class="btn btn-sm mt-3" style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+         href="/admin/categories/create">
+    <i class="bi bi-plus-circle"></i> Thêm phân loại mới
+</NavLink>
+<p></p>
+@if (CategoryData == null)
+{
+    <div class="alert alert-info">Đang tải dữ liệu...</div>
+}
+else
+{
+    <table class="table table-sm align-middle table-hover"
+           style="border:1px solid #f3e5ab; background-color:#fff8e1; border-collapse: collapse; table-layout: fixed; width:100%;">
+        <thead class="text-center" style="background-color:#fff3b0; color:#6b4e16; font-weight:600; border-bottom:2px solid #f3e5ab;">
+            <tr>
+                <th style="border-right:1px solid #f3e5ab; width:80px;">ID</th>
+                <th style="border-right:1px solid #f3e5ab;">Tên phân loại</th>
+                <th style="width:220px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (CategoryData.Any())
+            {
+                @foreach (var c in CategoryData)
+                {
+                    <tr style="transition: background 0.3s;"
+                        onmouseover="this.style.background='#fff4c2';"
+                        onmouseout="this.style.background='transparent';">
+                        <td style="border-right:1px solid #f3e5ab;">@c.CategoryID</td>
+                        <td style="border-right:1px solid #f3e5ab;">@c.Name</td>
+                        <td class="text-center">
+                            <NavLink class="btn btn-sm me-1" style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+                                     href="@($"/admin/products/{c.CategoryID}")">
+                                <i class="bi bi-box-seam"></i> Xem sản phẩm
+                            </NavLink>
+                            <NavLink class="btn btn-sm me-1" style="background: linear-gradient(45deg, #ffec8b, #ffd700); color:#6b4e16; font-weight:500; border:none;"
+                                     href="@GetEditUrl(c.CategoryID)">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </NavLink>
+                            <button class="btn btn-sm"
+                                    style="background: linear-gradient(45deg, #ff8c00, #ffd700); color:#fff; font-weight:500; border:none;"
+                                    @onclick="() => DeleteCategory(c)">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">Chưa có phân loại nào</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+ 
+}
+
+@code {
+    public IStoreRepository Repository => Service;
+    public IEnumerable<Category> CategoryData { get; set; } = Enumerable.Empty<Category>();
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateData();
+    }
+
+    private async Task UpdateData()
+    {
+        CategoryData = await Repository.Categories.ToListAsync();
+        StateHasChanged(); // cập nhật lại UI
+    }
+
+    private async Task DeleteCategory(Category c)
+    {
+        if (await JsConfirm($"Bạn có chắc muốn xóa phân loại '{c.Name}' không?"))
+        {
+            await Repository.DeleteCategory(c);
+            await UpdateData();
+        }
+    }
+
+    private string GetEditUrl(long id) => $"/admin/categories/edit/{id}";
+
+    private async Task<bool> JsConfirm(string message)
+        => await JS.InvokeAsync<bool>("confirm", message);
+}
