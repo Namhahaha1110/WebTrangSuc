@@ -355,9 +355,9 @@
 
             <div class="section-title">Thông tin người mua</div>
             <div class="input-group">
-                <input type="text" name="Name" placeholder="Tên người mua *" required />
-                <input type="text" name="Phone" placeholder="Số điện thoại *" required />
-                <input type="email" name="Email" placeholder="Email *" required />
+                <input type="text" name="Name" placeholder="Tên người mua *" value="@Model.PrefillName" required />
+                <input type="text" name="Phone" placeholder="Số điện thoại *" value="@Model.PrefillPhone" required />
+                <input type="email" name="Email" placeholder="Email *" value="@Model.PrefillEmail" required />
             </div>
 
             <input type="hidden" name="DeliveryType" id="deliveryTypeInput" value="delivery" />
@@ -371,10 +371,10 @@
             <!-- Added data-saved attributes to preserve form data -->
             <div id="deliveryForm">
                 <div class="input-group">
-                    <select name="Province" id="province" data-saved=""><option value="">Chọn tỉnh/thành *</option></select>
-                    <select name="District" id="district" data-saved=""><option value="">Chọn quận/huyện *</option></select>
-                    <select name="Ward" id="ward" data-saved=""><option value="">Chọn phường/xã *</option></select>
-                    <input type="text" name="AddressDetail" id="addressDetail" placeholder="Nhập địa chỉ cụ thể *" data-saved="" />
+                    <select name="Province" id="province" data-saved="" data-prefill="@Model.PrefillProvince"><option value="">Chọn tỉnh/thành *</option></select>
+                    <select name="District" id="district" data-saved="" data-prefill="@Model.PrefillDistrict"><option value="">Chọn quận/huyện *</option></select>
+                    <select name="Ward" id="ward" data-saved="" data-prefill="@Model.PrefillWard"><option value="">Chọn phường/xã *</option></select>
+                    <input type="text" name="AddressDetail" id="addressDetail" placeholder="Nhập địa chỉ cụ thể *" value="@Model.PrefillAddressDetail" data-saved="" />
                 </div>
             </div>
 
@@ -492,7 +492,7 @@
     }
 
     function loadProvinces() {
-        fetch('/data/vietnam-provinces.json')
+        return fetch('/data/vietnam-provinces.json')
             .then(res => res.json())
             .then(data => {
                 locationData = data;
@@ -504,6 +504,30 @@
                 });
             })
             .catch(err => console.error("[v0] Error loading provinces:", err));
+    }
+
+    function applyInitialDeliveryPrefill() {
+        const province = ($("#province").data("prefill") || "").toString().trim();
+        const district = ($("#district").data("prefill") || "").toString().trim();
+        const ward = ($("#ward").data("prefill") || "").toString().trim();
+
+        if(!province) return;
+
+        $("#province").val(province);
+        onProvinceChange();
+
+        if(district) {
+            setTimeout(() => {
+                $("#district").val(district);
+                onDistrictChange();
+
+                if(ward) {
+                    setTimeout(() => {
+                        $("#ward").val(ward);
+                    }, 120);
+                }
+            }, 120);
+        }
     }
 
     function onProvinceChange() {
@@ -635,7 +659,9 @@
     }
 
     $(document).ready(function() {
-        loadProvinces();
+        loadProvinces().then(() => {
+            applyInitialDeliveryPrefill();
+        });
         loadStores();
 
         const paymentMethod = $('input[name="Payment"]:checked').val();
