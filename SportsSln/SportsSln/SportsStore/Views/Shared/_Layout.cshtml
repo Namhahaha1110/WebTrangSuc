@@ -37,12 +37,47 @@
             z-index: 100;
         }
 
+        .site-navbar .container-fluid {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+            position: relative;
+            min-height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
             .site-navbar .navbar-brand {
                 font-family: 'Playfair Display', serif;
                 font-size: 32px;
                 color: var(--jewel-gold);
                 letter-spacing: 1px;
+                margin-right: 0;
+                position: absolute;
+                left: 20px;
             }
+
+        .site-navbar .navbar-collapse {
+            justify-content: center !important;
+        }
+
+        .site-navbar .navbar-nav {
+            gap: 8px;
+        }
+
+        .site-navbar .nav-link {
+            font-size: 13px;
+            letter-spacing: 0.2px;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+        }
+
+        .site-navbar .header-actions {
+            position: absolute;
+            right: 20px;
+        }
 
             .site-navbar .nav-link {
                 color: #333 !important;
@@ -368,6 +403,15 @@
                 display: none;
             }
 
+            .site-navbar .container-fluid {
+                display: flex;
+                max-width: 100%;
+                padding-left: 12px;
+                padding-right: 12px;
+                min-height: auto;
+                justify-content: flex-start;
+            }
+
             .mobile-account {
                 display: block;
             }
@@ -380,6 +424,7 @@
 
             .site-navbar .navbar-brand {
                 font-size: 24px;
+                position: static;
             }
 
             .site-navbar .navbar-collapse {
@@ -402,6 +447,21 @@
 
             .site-navbar .cart-icon {
                 margin-left: 0;
+            }
+
+            .site-navbar .header-actions {
+                position: static;
+                margin-left: auto;
+            }
+        }
+
+        @@media (min-width: 992px) {
+            .site-navbar .header-actions {
+                display: none !important;
+            }
+
+            .site-navbar .navbar-nav {
+                justify-content: center;
             }
         }
 
@@ -540,7 +600,7 @@
 
 
                 <!-- Cart Icon -->
-                <div class="d-flex align-items-center pe-3 gap-2">
+                <div class="d-flex align-items-center pe-3 gap-2 header-actions">
                     <div class="dropdown mobile-account">
                         <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-user"></i>
