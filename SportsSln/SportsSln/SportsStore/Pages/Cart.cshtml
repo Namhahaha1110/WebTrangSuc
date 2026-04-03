@@ -304,11 +304,6 @@
                 padding: 11px;
             }
 
-            #vietqrSection img {
-                width: 100%;
-                max-width: 280px;
-                height: auto;
-            }
         }
 </style>
 
@@ -403,7 +398,7 @@
             <div class="section-title">Phương thức thanh toán</div>
             <div>
                 <label><input type="radio" name="Payment" value="COD" checked /> Thanh toán khi nhận hàng</label><br />
-                <label><input type="radio" name="Payment" value="Bank" /> Chuyển khoản ngân hàng</label>
+                <label><input type="radio" name="Payment" value="VNPAY" /> Thanh toán online qua VNPAY</label>
 
             </div>
 
@@ -411,14 +406,6 @@
                 <div><span>Tạm tính:</span><span id="subtotal">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
                 <div><span>Phí giao hàng:</span><span>Miễn phí</span></div>
                 <div class="total"><span>Tổng cộng:</span><span id="total">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
-            </div>
-
-            <!-- QR VietQR -->
-            <div id="vietqrSection" style="display:none;">
-                <div class="section-title">Thanh toán bằng VietQR</div>
-                <p>Quét QR để chuyển khoản trực tiếp vào tài khoản ACB.</p>
-                <img src="@Model.ShoppingCart.QrUrl" width="280" alt="QR VietQR">
-                <p>Mã đơn hàng: <strong>@Model.ShoppingCart.OrderId</strong></p>
             </div>
 
             <textarea name="Note" placeholder="VD: Giao giờ hành chính hoặc nhắn tin trước khi giao..." style="width:100%;margin-top:10px;border-radius:8px;border:1px solid #ddd;padding:10px;"></textarea>
@@ -669,21 +656,6 @@
         storeSelect.prop('disabled', stores.length === 0);
     }
 
-    // Hàm cập nhật tổng tiền + QR
-    function updateQr() {
-        const paymentMethod = $('input[name="Payment"]:checked').val();
-        if(paymentMethod !== "Bank") return;
-
-        const total = parseInt($("#total").text().replace(/[^\d]/g, ""));
-        const orderId = "@Model.ShoppingCart.OrderId";
-        const bankCode = "ACB";
-        const accountNumber = "21234611";
-        const accountName = "NGUYEN THI YEN NHI";
-        const qrUrl = `https://img.vietqr.io/image/${bankCode}-${accountNumber}-compact.png?amount=${total}&addInfo=${orderId}&accountName=${encodeURIComponent(accountName)}`;
-
-        $("img[alt='QR VietQR']").attr("src", qrUrl);
-    }
-
     function updateTotal() {
         let total = 0;
         $(".product-item").each(function () {
@@ -697,7 +669,6 @@
 
         $("#subtotal").text(total.toLocaleString("vi-VN") + " ₫");
         $("#total").text(total.toLocaleString("vi-VN") + " ₫");
-        updateQr();
     }
 
     $(document).ready(function() {
@@ -705,18 +676,6 @@
             applyInitialDeliveryPrefill();
         });
         loadStores();
-
-        const paymentMethod = $('input[name="Payment"]:checked').val();
-        if (paymentMethod === "Bank") $("#vietqrSection").show();
-
-        $(document).on("change", 'input[name="Payment"]', function() {
-            if($(this).val() === "Bank") {
-                $("#vietqrSection").fadeIn(300);
-                updateQr();
-            } else {
-                $("#vietqrSection").fadeOut(300);
-            }
-        });
 
         $(document).on("change", "#province", function() {
             onProvinceChange();
@@ -875,29 +834,12 @@
             }
         });
     });
-        function toggleOrderButton() {
-        const paymentMethod = $('input[name="Payment"]:checked').val();
-        if (paymentMethod === "Bank") {
-            $("#btnOrder").prop("disabled", true).css("opacity", 0.6);
-        } else {
-            $("#btnOrder").prop("disabled", false).css("opacity", 1);
-        }
-    }
-
-    $('input[name="Payment"]').change(function() {
-        toggleOrderButton();
-    });
-
-    toggleOrderButton();
-
-
     function updateQuantity(productId, quantity) {
         const token = $('input[name="__RequestVerificationToken"]').val();
         $.post("/Cart?handler=UpdateQuantity", { __RequestVerificationToken: token, productId: productId, quantity: quantity })
         .done(function(res){
             $("#subtotal").text(res.total.toLocaleString("vi-VN") + " ₫");
             $("#total").text(res.total.toLocaleString("vi-VN") + " ₫");
-            updateQr();
         }).fail(function(xhr){
             console.error(xhr.responseJSON?.message || "Lỗi AJAX");
             alert("Lỗi khi cập nhật số lượng: " + (xhr.responseJSON?.message || "Không xác định"));

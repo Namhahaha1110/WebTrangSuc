@@ -130,5 +130,25 @@ namespace SportsStore.Models
             }
         }
 
+        public void UpdateOrderPaymentStatus(int orderId, string paymentStatus)
+        {
+            try
+            {
+                var order = context.Orders.FirstOrDefault(o => o.OrderID == orderId);
+                if (order == null)
+                {
+                    return;
+                }
+
+                order.Payment = paymentStatus;
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EFOrderRepository] UpdateOrderPaymentStatus Error: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

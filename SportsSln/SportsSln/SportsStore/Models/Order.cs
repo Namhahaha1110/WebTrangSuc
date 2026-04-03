@@ -52,7 +52,7 @@ namespace SportsStore.Models
         public string? DeliveryType { get; set; } // "delivery" hoặc "pickup"
 
         [StringLength(20)]
-        public string? Payment { get; set; } // "COD" hoặc "Bank"
+        public string? Payment { get; set; } // "COD", "VNPAY_PENDING", "VNPAY_PAID"
 
         [StringLength(500)]
         public string? Note { get; set; }

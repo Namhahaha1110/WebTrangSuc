@@ -41,18 +41,7 @@
                         </td>
                         <td style="border-right:1px solid #f3e5ab;">@o.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td class="text-center" style="border-right:1px solid #f3e5ab;">
-                            @if (o.Payment == "COD")
-                            {
-                                <span>COD</span>
-                            }
-                            else if (o.Payment == "Bank")
-                            {
-                                <span>Chuyển khoản</span>
-                            }
-                            else
-                            {
-                                <span>-</span>
-                            }
+                            @GetPaymentLabel(o.Payment)
                         </td>
                         <td class="text-center">
                             <button class="btn btn-sm me-1 mb-1"
@@ -63,8 +52,9 @@
                             <button class="btn btn-sm mb-1"
                                     style="background: linear-gradient(45deg, #ffd700, #ffec8b);
                                            color:#6b4e16; font-weight:500; border:none;"
+                                    disabled="@IsActionDisabled(o)"
                                     @onclick="() => OrderSelected.InvokeAsync(o.OrderID)">
-                                @ButtonLabel
+                                @GetActionLabel(o)
                             </button>
                         </td>
                     </tr>
@@ -94,7 +84,7 @@
                         <div class="col-md-6"><strong>Khách hàng:</strong> @SelectedOrder.Name</div>
                         <div class="col-md-6"><strong>Số điện thoại:</strong> @SelectedOrder.Phone</div>
                         <div class="col-md-6"><strong>Email:</strong> @SelectedOrder.Email</div>
-                        <div class="col-md-6"><strong>Thanh toán:</strong> @(string.IsNullOrWhiteSpace(SelectedOrder.Payment) ? "-" : SelectedOrder.Payment)</div>
+                        <div class="col-md-6"><strong>Thanh toán:</strong> @GetPaymentLabel(SelectedOrder.Payment)</div>
                         <div class="col-md-6"><strong>Ngày đặt:</strong> @SelectedOrder.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
                         <div class="col-md-6"><strong>Ngày giao:</strong> @(SelectedOrder.ShippedDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</div>
                         <div class="col-12">
@@ -200,5 +190,34 @@
     {
         ShowDetailsModal = false;
         SelectedOrder = null;
+    }
+
+    private static bool IsBankPending(Order order)
+        => order.Payment == "VNPAY_PENDING" || order.Payment == "BANK_PENDING" || order.Payment == "Bank";
+
+    private bool IsActionDisabled(Order order)
+        => !ShowShipped && IsBankPending(order);
+
+    private string GetActionLabel(Order order)
+        => IsActionDisabled(order) ? "Chờ thanh toán" : ButtonLabel;
+
+    private static string GetPaymentLabel(string? payment)
+    {
+        if (payment == "COD")
+        {
+            return "COD";
+        }
+
+        if (payment == "VNPAY_PAID" || payment == "BANK_PAID")
+        {
+            return "VNPAY - Đã thanh toán";
+        }
+
+        if (payment == "VNPAY_PENDING" || payment == "BANK_PENDING" || payment == "Bank")
+        {
+            return "VNPAY - Đang chờ";
+        }
+
+        return "-";
     }
 }
