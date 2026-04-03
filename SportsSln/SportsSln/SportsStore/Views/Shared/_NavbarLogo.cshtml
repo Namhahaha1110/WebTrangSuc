@@ -8,8 +8,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="padding: 3px 0; min-height: 50px;">
     <div class="container d-flex justify-content-between align-items-center">
         <!-- Nút thu gọn khi màn hình nhỏ -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
                 aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -22,18 +22,18 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- Menu bên trái -->
-            <ul class="navbar-nav mr-auto d-flex align-items-center" style="font-size: 14px;">
-                <li class="nav-item mr-2">
+            <ul class="navbar-nav me-auto d-flex align-items-center" style="font-size: 14px;">
+                <li class="nav-item me-2">
                     <a class="nav-link" asp-controller="QuanHeCoDong" asp-action="Index">
                         <i class="fa-solid fa-handshake"></i> Quan hệ cổ đông
                     </a>
                 </li>
-                <li class="nav-item mr-2">
+                <li class="nav-item me-2">
                     <a class="nav-link" asp-controller="CuaHang" asp-action="Index">
                         <i class="fa-solid fa-store"></i> Cửa hàng
                     </a>
                 </li>
-                <li class="nav-item mr-2">
+                <li class="nav-item me-2">
                     <a class="nav-link" asp-controller="TinTuc" asp-action="Index">
                         <i class="fa-solid fa-newspaper"></i> Tin tức
                     </a>
@@ -41,23 +41,23 @@
             </ul>
 
             <!-- Menu bên phải -->
-            <ul class="nav navbar-nav navbar-right d-flex align-items-center" style="font-size: 14px;">
-                <li class="nav-item mr-3">
+            <ul class="nav navbar-nav d-flex align-items-center" style="font-size: 14px;">
+                <li class="nav-item me-3">
                     <a href="tel:190012345" class="text-dark text-decoration-none">
                         <i class="fas fa-phone-alt"></i> 1900 12345
                     </a>
                 </li>
-                <li class="nav-item mr-3">
+                <li class="nav-item me-3">
                     <a href="mailto:FlowerJewelry@gmail.com" class="text-dark text-decoration-none">
                         <i class="fas fa-envelope"></i> FlowerJewelry@gmail.com
                     </a>
                 </li>
-                <li class="nav-item dropdown ml-2">
+                <li class="nav-item dropdown ms-2">
                     @if (!string.IsNullOrEmpty(nameCus))
                     {
                         <!-- ✅ Nếu đã đăng nhập -->
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="accountDropdown"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             👤 @nameCus
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
@@ -75,7 +75,7 @@
                     {
                         <!-- ❌ Nếu chưa đăng nhập -->
                         <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="guestDropdown"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-user"></i> Tài khoản
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="guestDropdown">
@@ -93,8 +93,6 @@
     </div>
 
 </nav> <!-- ================= CSS & JS ================= -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <style>
     .navbar-nav .nav-link {
         padding-top: 2px !important;
@@ -107,5 +105,42 @@
 
     .dropdown-menu a:hover {
         background-color: #f8f9fa;
+    }
+
+    @@media (max-width: 991.98px) {
+        .navbar .container {
+            gap: 8px;
+        }
+
+        .navbar-brand.logo {
+            margin-right: auto;
+        }
+
+        .navbar-brand.logo img {
+            height: 38px !important;
+            margin-left: 0 !important;
+        }
+
+        #navbarNav {
+            width: 100%;
+            background: #fff;
+            border-top: 1px solid #f1f1f1;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        #navbarNav .navbar-nav {
+            align-items: flex-start !important;
+        }
+
+        #navbarNav .nav-item {
+            margin-right: 0 !important;
+            margin-bottom: 6px;
+        }
+
+        .dropdown-menu-right {
+            right: auto;
+            left: 0;
+        }
     }
 </style>

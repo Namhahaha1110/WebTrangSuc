@@ -1,7 +1,7 @@
 ﻿@model ProductsListViewModel
 
 <!-- DANH SÁCH SẢN PHẨM -->
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
     @foreach (var p in Model.Products)
     {
         <div class="col">
@@ -112,5 +112,31 @@
         .btn-outline-warning:hover {
             background: linear-gradient(45deg, #ffe066, #ffd24d);
             color: #4b3a11;
+        }
+
+        @@media (max-width: 575.98px) {
+            .product-card .card-body {
+                padding: 0.9rem;
+            }
+
+            .card-title {
+                font-size: 14px;
+                min-height: 38px;
+            }
+
+            .product-card img {
+                height: 170px !important;
+            }
+
+            .text-center.mt-4 {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .text-center.mt-4 .btn {
+                margin: 0 !important;
+            }
         }
 </style>

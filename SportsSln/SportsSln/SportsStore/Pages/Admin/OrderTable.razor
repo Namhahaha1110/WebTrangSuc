@@ -1,4 +1,5 @@
-﻿<table class="table table-sm align-middle table-hover"
+﻿<div class="table-responsive">
+<table class="table table-sm align-middle table-hover"
        style="border: 1px solid #f3e5ab; background-color: #fff8e1;
               border-collapse: collapse; table-layout: fixed; width: 100%;">
     <thead class="text-center"
@@ -164,6 +165,22 @@
         }
     </tbody>
 </table>
+</div>
+
+<style>
+    @@media (max-width: 767.98px) {
+        .table td,
+        .table th {
+            white-space: nowrap;
+            font-size: 12px;
+        }
+
+        .table img {
+            width: 48px !important;
+            height: 48px !important;
+        }
+    }
+</style>
 
 @code {
     [Parameter] public string TableTitle { get; set; } = "Đơn hàng";

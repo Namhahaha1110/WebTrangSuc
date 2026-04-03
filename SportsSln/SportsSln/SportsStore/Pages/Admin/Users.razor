@@ -17,6 +17,7 @@ else if (!users.Any())
 }
 else
 {
+    <div class="table-responsive">
     <table class="table table-sm align-middle table-hover"
            style="border: 1px solid #f3e5ab; background-color: #fff8e1; border-collapse: collapse; table-layout: fixed; width: 100%;">
         <thead class="text-center" style="background-color: #fff3b0; color: #6b4e16; font-weight: 600; border-bottom: 2px solid #f3e5ab;">
@@ -62,7 +63,23 @@ else
             }
         </tbody>
     </table>
+    </div>
 }
+
+<style>
+    @@media (max-width: 767.98px) {
+        .table td,
+        .table th {
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .table .btn {
+            padding: 0.2rem 0.45rem;
+            font-size: 12px;
+        }
+    }
+</style>
 
 
 @code {

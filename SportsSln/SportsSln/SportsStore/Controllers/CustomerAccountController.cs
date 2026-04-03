@@ -158,8 +158,8 @@ namespace SportsStore.Controllers
                 return NotFound("Không tìm thấy tài khoản.");
             }
 
-            // Tạo ViewModel (nếu bạn chưa có class riêng thì tạm dùng dynamic)
-            var model = new
+            // Trả về ViewModel kiểu mạnh để tránh lỗi runtime binder trong Razor View
+            var model = new EditAccountViewModel
             {
                 NameCus = user.FullName,
                 PhoneCus = user.PhoneNumber,

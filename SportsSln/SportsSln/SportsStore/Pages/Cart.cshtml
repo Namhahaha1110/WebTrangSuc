@@ -224,6 +224,92 @@
         .btn-order:hover {
             background-color: #8b6914;
         }
+
+        @@media (max-width: 991.98px) {
+            .checkout-container {
+                margin: 20px auto;
+                padding: 22px;
+            }
+
+            .product-item {
+                align-items: flex-start;
+            }
+
+            .product-actions {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 8px;
+            }
+        }
+
+        @@media (max-width: 767.98px) {
+            .checkout-container {
+                border-radius: 12px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+
+            .product-item {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px;
+            }
+
+            .product-left {
+                width: 100%;
+                align-items: flex-start;
+            }
+
+            .product-left img {
+                width: 72px;
+                height: 72px;
+            }
+
+            .product-name {
+                font-size: 15px;
+            }
+
+            .product-actions {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .product-price {
+                min-width: 0;
+                font-size: 16px;
+                text-align: left;
+            }
+
+            .input-group {
+                gap: 10px;
+            }
+
+            .delivery-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .summary {
+                font-size: 15px;
+            }
+
+            .summary .total {
+                font-size: 17px;
+            }
+
+            .btn-order {
+                font-size: 16px;
+                padding: 11px;
+            }
+
+            #vietqrSection img {
+                width: 100%;
+                max-width: 280px;
+                height: auto;
+            }
+        }
 </style>
 
 <div class="checkout-container">

@@ -63,6 +63,31 @@
             transition: 0.3s;
         }
 
+        .mobile-account {
+            display: none;
+        }
+
+        .mobile-account .btn {
+            border-color: rgba(212, 175, 55, 0.6);
+            color: #6b4e16;
+            font-weight: 500;
+            background: #fff9eb;
+        }
+
+        .mobile-account .btn:focus {
+            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.22);
+        }
+
+        .mobile-account .dropdown-menu {
+            width: max-content;
+            max-width: calc(100vw - 16px);
+            overflow-x: hidden;
+        }
+
+        .mobile-account .dropdown-item {
+            white-space: nowrap;
+        }
+
             .cart-icon:hover {
                 color: #b9972f;
                 transform: scale(1.1);
@@ -316,12 +341,149 @@
             border-color: #d4af37;
         }
 
+        .category-bar {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+
+        .category-bar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .category-bar::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.45);
+            border-radius: 999px;
+        }
+
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        @@media (max-width: 991.98px) {
+            .top-utility-bar {
+                display: none;
+            }
+
+            .mobile-account {
+                display: block;
+            }
+
+            .mobile-account .dropdown-menu {
+                min-width: 210px;
+                right: 0;
+                left: auto;
+            }
+
+            .site-navbar .navbar-brand {
+                font-size: 24px;
+            }
+
+            .site-navbar .navbar-collapse {
+                background: #fff;
+                margin-top: 10px;
+                border-radius: 10px;
+                padding: 10px 12px;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            }
+
+            .site-navbar .navbar-nav {
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .site-navbar .navbar-nav .dropdown-menu {
+                width: 100%;
+                min-width: 0 !important;
+            }
+
+            .site-navbar .cart-icon {
+                margin-left: 0;
+            }
+        }
+
+        @@media (max-width: 767.98px) {
+            .image-container {
+                height: 250px;
+            }
+
+            .controls {
+                bottom: 12px;
+            }
+
+            .controls .button {
+                width: 10px;
+                height: 10px;
+            }
+
+            .category-bar {
+                justify-content: flex-start !important;
+                flex-wrap: nowrap !important;
+                gap: 10px !important;
+                padding-inline: 4px;
+            }
+
+            .category-bar a {
+                white-space: nowrap;
+                flex: 0 0 auto;
+            }
+
+            footer {
+                font-size: 14px !important;
+            }
+
+            footer .text-end {
+                text-align: left !important;
+            }
+
+            footer img[style*='float:right'] {
+                float: none !important;
+                display: block;
+                margin-left: 0;
+            }
+
+            .chat-widget #chatIcon {
+                width: 58px !important;
+                height: 58px !important;
+                border-radius: 50% !important;
+                padding: 0 !important;
+                gap: 0 !important;
+            }
+
+            .chat-widget #chatIcon span {
+                display: none !important;
+            }
+
+            .chat-widget #chatBox {
+                width: calc(100vw - 20px) !important;
+                right: 10px !important;
+                bottom: 86px !important;
+            }
+
+            .mobile-account .btn {
+                padding: 0.32rem 0.55rem;
+            }
+
+            .mobile-account .btn span {
+                display: none !important;
+            }
+
+            .site-navbar .navbar-brand {
+                font-size: 22px;
+            }
+        }
+
 
     </style>
 </head>
 <body>
     <!-- HEADER -->
-    @await Html.PartialAsync("_NavbarLogo")
+    <div class="top-utility-bar">
+        @await Html.PartialAsync("_NavbarLogo")
+    </div>
 
     <header class="site-navbar">
         <nav class="navbar navbar-expand-lg navbar-light">
@@ -378,7 +540,34 @@
 
 
                 <!-- Cart Icon -->
-                <div class="d-flex align-items-center pe-3">
+                <div class="d-flex align-items-center pe-3 gap-2">
+                    <div class="dropdown mobile-account">
+                        <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user"></i>
+                            <span class="ms-1 d-none d-sm-inline">Tài khoản</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            @if (User.Identity?.IsAuthenticated ?? false)
+                            {
+                                <li><a class="dropdown-item" href="/CustomerAccount/MyAccount"><i class="fa-regular fa-user me-2"></i>Tài khoản của tôi</a></li>
+                                <li><a class="dropdown-item" href="/customer/my-orders"><i class="fa-solid fa-box me-2"></i>Đơn hàng của tôi</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form method="post" asp-controller="CustomerAccount" asp-action="Logout" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li><a class="dropdown-item" href="/CustomerAccount/Login"><i class="fa-solid fa-right-to-bracket me-2"></i>Đăng nhập</a></li>
+                                <li><a class="dropdown-item" href="/CustomerAccount/Register"><i class="fa-solid fa-user-plus me-2"></i>Đăng ký</a></li>
+                            }
+                        </ul>
+                    </div>
                     <a href="/Cart" class="cart-icon"><i class="fa-solid fa-shopping-cart"></i></a>
                 </div>
             </div>
@@ -600,8 +789,9 @@
 </html>
 
 
+<div class="chat-widget">
 <div id="chatIcon"
-     style="position:fixed; bottom:20px; right:20px;
+    style="position:fixed; bottom:20px; right:20px;
             width:160px; height:60px;
             background:#f39a9a; border-radius:30px;
             display:flex; justify-content:center; align-items:center;
@@ -617,6 +807,7 @@
      style="display:none; position:fixed; bottom:90px; right:20px; width:360px;
             background:white; border-radius:22px; overflow:hidden;
             box-shadow:0 4px 20px rgba(0,0,0,0.25); z-index:9999;">
+
 
     <!-- HEADER -->
     <div style="background:#f39a9a; padding:14px; display:flex; align-items:center;">
@@ -742,6 +933,8 @@
         document.getElementById("messageInput").value = "";
     };
 </script>
+
+</div>
 
 
 

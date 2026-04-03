@@ -1,5 +1,7 @@
 ﻿@page "/admin/products/edit/{Id:long}"
 @page "/admin/products/create"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
 @inherits OwningComponentBase<IStoreRepository>
 <h3 class="mb-3">Thêm phân loại sản phẩm</h3>
 
@@ -108,6 +110,26 @@
 
         .btn-add-size:hover {
             background: #218838;
+        }
+
+        @@media (max-width: 767.98px) {
+            .card.gold-card {
+                padding: 14px !important;
+            }
+
+            .d-flex.gap-2.mt-4 {
+                flex-direction: column;
+            }
+
+            .d-flex.gap-2.mt-4 .btn {
+                width: 100%;
+            }
+
+            img.preview {
+                width: 100%;
+                max-width: 220px;
+                height: auto;
+            }
         }
 </style>
 
