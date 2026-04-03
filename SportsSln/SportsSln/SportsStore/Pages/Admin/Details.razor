@@ -1,4 +1,5 @@
 ﻿@page "/admin/products/details/{id:long}"
+@using Microsoft.EntityFrameworkCore
 <h3 class="bg-info text-white text-center p-1">Details</h3>
 
 <table class="table table-sm table-bordered table-striped">
@@ -17,7 +18,7 @@
         </tr>
         <tr>
             <th>Category</th>
-            <td>@Product?.Category</td>
+            <td>@(Product?.Category?.Name ?? "-")</td>
         </tr>
         <tr>
             <th>Price</th>
@@ -35,7 +36,9 @@
     public Product? Product { get; set; }
     protected override void OnParametersSet()
     {
-        Product = Repository?.Products.FirstOrDefault(p => p.ProductID == Id);
+        Product = Repository?.Products
+            .Include(p => p.Category)
+            .FirstOrDefault(p => p.ProductID == Id);
     }
     public string EditUrl => $"/admin/products/edit/{Product?.ProductID}";
 }

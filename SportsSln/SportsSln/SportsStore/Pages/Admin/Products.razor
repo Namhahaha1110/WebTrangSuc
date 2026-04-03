@@ -25,10 +25,8 @@ else
                 <th style="border-right:1px solid #f3e5ab; width:70px;">ID</th>
                 <th style="border-right:1px solid #f3e5ab; width:120px;">Hình ảnh</th>
                 <th style="border-right:1px solid #f3e5ab;">Tên sản phẩm</th>
-                <th style="border-right:1px solid #f3e5ab; max-width:250px;">Mô tả</th>
-                <th style="border-right:1px solid #f3e5ab; width:100px;">Giá tiền</th>
-                <th style="border-right:1px solid #f3e5ab; width:80px;">Số lượng</th>
-                <th style="border-right:1px solid #f3e5ab; width:120px;">Phân loại</th>
+                <th style="border-right:1px solid #f3e5ab; width:130px;">Giá tiền</th>
+                <th style="border-right:1px solid #f3e5ab; width:100px;">Số lượng</th>
                 <th style="width:220px;">Thao tác</th>
             </tr>
         </thead>
@@ -58,10 +56,6 @@ else
 
                         <td style="border-right:1px solid #f3e5ab;">@p.Name</td>
 
-                        <td style="border-right:1px solid #f3e5ab; white-space:normal; max-width:250px;">
-                            @p.Description
-                        </td>
-
                         <td style="border-right:1px solid #f3e5ab;">
                             @p.Price.ToString("N0") ₫
                         </td>
@@ -77,19 +71,17 @@ else
                             }
                         </td>
 
-                        <td style="border-right:1px solid #f3e5ab;">@p.Category?.Name</td>
-
                         <td class="text-center">
-                            <NavLink class="btn btn-sm me-1"
-                                     style="background: linear-gradient(45deg, #ffec8b, #ffd700); color:#6b4e16; font-weight:500; border:none;"
-                                     href="@GetEditUrl(p.ProductID)">
-                                <i class="bi bi-pencil-square"></i> Sửa
-                            </NavLink>
-                            <NavLink class="btn btn-sm"
+                            <NavLink class="btn btn-sm me-1 mb-1"
                                      style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
                                      href="@GetDetailsUrl(p.ProductID)">
                                 <i class="bi bi-eye"></i> Chi tiết
                             </NavLink>
+                            <button class="btn btn-sm mb-1"
+                                    style="background: #d9534f; color: white; border:none;"
+                                    @onclick="() => DeleteProductAsync(p)">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
                         </td>
 
                     </tr>
@@ -98,7 +90,7 @@ else
             else
             {
                 <tr>
-                    <td colspan="8" class="text-center text-muted">Không có sản phẩm nào</td>
+                    <td colspan="6" class="text-center text-muted">Không có sản phẩm nào</td>
                 </tr>
             }
         </tbody>
@@ -164,7 +156,6 @@ else
     }
 
     private string GetDetailsUrl(long id) => $"/admin/products/details/{id}";
-    private string GetEditUrl(long id) => $"/admin/products/edit/{id}";
 
     [Inject] IJSRuntime JS { get; set; } = default!;
     private async Task<bool> JsConfirm(string message)

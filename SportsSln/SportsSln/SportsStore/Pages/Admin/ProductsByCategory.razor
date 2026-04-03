@@ -26,9 +26,7 @@
                             <th>Hình ảnh</th>
                             <th>Tên sản phẩm</th>
                             <th>Giá (VND)</th>
-                            <!-- Add Quantity and Size columns -->
                             <th class="text-center">Số lượng</th>
-                            <th>Kích thước</th>
                         </tr>
                     </thead>
 
@@ -50,7 +48,6 @@
                                 </td>
                                 <td class="fw-semibold">@p.Name</td>
                                 <td class="text-danger fw-bold">@p.Price.ToString("N0") ₫</td>
-                                <!-- Display Quantity with status -->
                                 <td class="text-center">
                                     @if (p.Quantity == 0)
                                     {
@@ -61,8 +58,6 @@
                                         <span style="color: #28a745; font-weight: bold;">@p.Quantity</span>
                                     }
                                 </td>
-                                <!-- Display available sizes -->
-                               
                             </tr>
                         }
                     </tbody>
