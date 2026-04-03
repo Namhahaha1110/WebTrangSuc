@@ -5,8 +5,8 @@
 }
 
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="padding: 6px 0; min-height: 54px;">
-    <div class="container-fluid utility-header-wrap">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style="padding: 3px 0; min-height: 50px;">
+    <div class="container d-flex justify-content-between align-items-center">
         <!-- Nút thu gọn khi màn hình nhỏ -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
@@ -22,7 +22,7 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- Menu bên trái -->
-            <ul class="navbar-nav utility-left d-flex align-items-center" style="font-size: 14px;">
+            <ul class="navbar-nav me-auto d-flex align-items-center" style="font-size: 14px;">
                 <li class="nav-item me-2">
                     <a class="nav-link" asp-controller="QuanHeCoDong" asp-action="Index">
                         <i class="fa-solid fa-handshake"></i> Quan hệ cổ đông
@@ -41,12 +41,7 @@
             </ul>
 
             <!-- Menu bên phải -->
-            <ul class="nav navbar-nav utility-right d-flex align-items-center" style="font-size: 14px;">
-                <li class="nav-item me-3">
-                    <a href="/Cart" class="text-dark text-decoration-none">
-                        <i class="fa-solid fa-shopping-cart"></i>
-                    </a>
-                </li>
+            <ul class="nav navbar-nav d-flex align-items-center" style="font-size: 14px;">
                 <li class="nav-item me-3">
                     <a href="tel:190012345" class="text-dark text-decoration-none">
                         <i class="fas fa-phone-alt"></i> 1900 12345
@@ -108,50 +103,12 @@
         font-size: 14px;
     }
 
-    .utility-header-wrap {
-        width: 100%;
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .navbar .container-fluid {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        align-items: center;
-        column-gap: 16px;
-    }
-
-    .navbar-brand.logo {
-        margin-right: 0;
-    }
-
-    #navbarNav {
-        display: flex !important;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    #navbarNav .utility-left {
-        gap: 8px;
-        margin-right: auto;
-    }
-
-    #navbarNav .utility-right {
-        margin-left: auto;
-        gap: 8px;
-    }
-
-    #navbarNav .nav-item > a,
-    #navbarNav .nav-item > button {
-        white-space: nowrap;
-    }
-
     .dropdown-menu a:hover {
         background-color: #f8f9fa;
     }
 
     @@media (max-width: 991.98px) {
-        .navbar .container-fluid {
+        .navbar .container {
             gap: 8px;
         }
 
@@ -170,7 +127,6 @@
             border-top: 1px solid #f1f1f1;
             margin-top: 8px;
             padding-top: 8px;
-            display: block !important;
         }
 
         #navbarNav .navbar-nav {
