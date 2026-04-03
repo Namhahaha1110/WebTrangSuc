@@ -77,9 +77,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpContextAccessor();
 
-// ✅ Đăng ký BankService để CartModel có thể sử dụng
-builder.Services.AddScoped<IBankService, BankService>();
-
 builder.Services.AddSingleton<IBotService, SimpleBotService>();
 builder.Services.AddSignalR();
 

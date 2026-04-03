@@ -7,14 +7,12 @@ using System.Linq;
 using System.Security.Claims;
 using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace SportsStore.Pages
 {
     public class CartModel : PageModel
     {
         private readonly IStoreRepository repository;
-        private readonly IBankService bankService;
         private readonly UserManager<ApplicationUser> userManager;
 
         // Tránh trùng tên với class Cart
@@ -28,11 +26,10 @@ namespace SportsStore.Pages
         public string PrefillWard { get; private set; } = string.Empty;
         public string PrefillAddressDetail { get; private set; } = string.Empty;
 
-        public CartModel(IStoreRepository repo, Cart cartService, IBankService bankService, UserManager<ApplicationUser> userManager)
+        public CartModel(IStoreRepository repo, Cart cartService, UserManager<ApplicationUser> userManager)
         {
             repository = repo;
             ShoppingCart = cartService;
-            this.bankService = bankService;
             this.userManager = userManager;
         }
 
@@ -161,18 +158,10 @@ namespace SportsStore.Pages
             if (!User.Identity?.IsAuthenticated ?? true)
                 return Redirect("/CustomerAccount/Login");
 
-            // Nếu chọn Bank, kiểm tra thanh toán
-            if (payment == "Bank")
-            {
-                if (!bankService.CheckPayment(ShoppingCart.OrderId, ShoppingCart.ComputeTotalValue()))
-                {
-                    ModelState.AddModelError("PaymentError", "VUI LÒNG THANH TOÁN TRƯỚC KHI ĐẶT ĐƠN HOẶC CHỌN THANH TOÁN KHÁC");
-                    return Page();
-                }
-            }
-
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isVnpay = payment == "VNPAY";
+            var paymentStatus = isVnpay ? "VNPAY_PENDING" : "COD";
 
             var order = new Order
             {
@@ -189,7 +178,7 @@ namespace SportsStore.Pages
                 Store = store,
                 City = city,
                 TotalPrice = ShoppingCart.ComputeTotalValue(),
-                Payment = payment,
+                Payment = paymentStatus,
                 CreatedDate = DateTime.Now
             };
 
@@ -209,23 +198,12 @@ namespace SportsStore.Pages
 
             ShoppingCart.Clear();
 
+            if (isVnpay)
+            {
+                return RedirectToPage("/PaymentPending", new { orderId = order.OrderID });
+            }
+
             return RedirectToPage("/Completed", new { orderId = order.OrderID });
-        }
-    }
-
-    // ======= Service kiểm tra QR thanh toán =======
-    public interface IBankService
-    {
-        bool CheckPayment(string orderId, decimal amount);
-    }
-
-    public class BankService : IBankService
-    {
-        // TODO: Thay bằng kiểm tra thực tế qua DB hoặc API ngân hàng
-        public bool CheckPayment(string orderId, decimal amount)
-        {
-            // Tạm thời trả false => chưa thanh toán
-            return false;
         }
     }
 }

@@ -16,10 +16,6 @@ namespace SportsStore.Models
 
         public string ReturnUrl { get; set; } = "/";
 
-        // ✅ Thêm 2 property cho QR VietQR
-        public string OrderId { get; set; } = Guid.NewGuid().ToString("N"); // mã đơn hàng tạm thời
-        public string QrUrl { get; set; } = string.Empty;
-
         // List sản phẩm trong giỏ
         public List<CartLine> Lines { get; set; } = new List<CartLine>();
 
@@ -75,17 +71,6 @@ namespace SportsStore.Models
 
         // Tính tổng tiền
         public decimal ComputeTotalValue() => Lines.Sum(e => e.Price * e.Quantity);
-
-        // Tạo QR VietQR (dùng frontend hoặc OnGet Razor Page)
-        public void GenerateQrUrl(decimal total)
-        {
-            string bankCode = "ACB";
-            string accountNumber = "21234611";
-            string accountName = "NGUYEN THI YEN NHI";
-
-            QrUrl = $"https://img.vietqr.io/image/{bankCode}-{accountNumber}-compact.png" +
-                    $"?amount={total}&addInfo={OrderId}&accountName={Uri.EscapeDataString(accountName)}";
-        }
     }
 
     // ==================== CARTLINE ====================

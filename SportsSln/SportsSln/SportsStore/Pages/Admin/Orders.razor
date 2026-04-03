@@ -139,6 +139,19 @@
     {
         try
         {
+            if (shipValue)
+            {
+                var order = Repository.Orders.FirstOrDefault(o => o.OrderID == id);
+                var isPaymentPending = order != null
+                    && (order.Payment == "VNPAY_PENDING" || order.Payment == "BANK_PENDING" || order.Payment == "Bank");
+                if (isPaymentPending)
+                {
+                    ErrorMessage = $"Đơn #{id} đang chờ thanh toán online, chưa thể giao hàng.";
+                    StateHasChanged();
+                    return;
+                }
+            }
+
             await Task.Run(() =>
             {
                 Repository.UpdateOrderShippedStatus(id, shipValue);
