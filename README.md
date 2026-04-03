@@ -1,4 +1,4 @@
-# WebTrangSuc - Huong dan chay du an chi tiet
+# WebTrangSuc - Huong dan chay du an
 
 Tai lieu nay huong dan chay du an tu dau tren Windows, dung voi cau truc hien tai trong workspace.
 
