@@ -242,7 +242,7 @@ dotnet run
 Sau đó mở terminal khác và chạy ngrok:
 
 ```bash
-ngrok http http://localhost:5001
+ngrok http 5001
 ```
 
 Bạn sẽ nhận được URL dạng:
