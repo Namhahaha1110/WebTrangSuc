@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Identity;
 using SportsStore.Infrastructure;
 using SportsStore.Models;
 using System.Linq;
 using System.Security.Claims;
 using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace SportsStore.Pages
@@ -13,21 +15,77 @@ namespace SportsStore.Pages
     {
         private readonly IStoreRepository repository;
         private readonly IBankService bankService;
+        private readonly UserManager<ApplicationUser> userManager;
 
         // Tránh trùng tên với class Cart
         public Cart ShoppingCart { get; set; }
         public string ReturnUrl { get; set; } = "/";
+        public string PrefillName { get; private set; } = string.Empty;
+        public string PrefillPhone { get; private set; } = string.Empty;
+        public string PrefillEmail { get; private set; } = string.Empty;
+        public string PrefillProvince { get; private set; } = string.Empty;
+        public string PrefillDistrict { get; private set; } = string.Empty;
+        public string PrefillWard { get; private set; } = string.Empty;
+        public string PrefillAddressDetail { get; private set; } = string.Empty;
 
-        public CartModel(IStoreRepository repo, Cart cartService, IBankService bankService)
+        public CartModel(IStoreRepository repo, Cart cartService, IBankService bankService, UserManager<ApplicationUser> userManager)
         {
             repository = repo;
             ShoppingCart = cartService;
             this.bankService = bankService;
+            this.userManager = userManager;
         }
 
-        public void OnGet(string? returnUrl)
+        public async Task OnGet(string? returnUrl)
         {
             ReturnUrl = returnUrl ?? "/";
+
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return;
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return;
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return;
+            }
+
+            PrefillName = user.FullName ?? string.Empty;
+            PrefillPhone = user.PhoneNumber ?? string.Empty;
+            PrefillEmail = user.Email ?? string.Empty;
+            ParseAddressForPrefill(user.Address);
+        }
+
+        private void ParseAddressForPrefill(string? address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return;
+            }
+
+            var parts = address
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => p.Trim())
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .ToArray();
+
+            if (parts.Length >= 4)
+            {
+                PrefillProvince = parts[^1];
+                PrefillDistrict = parts[^2];
+                PrefillWard = parts[^3];
+                PrefillAddressDetail = string.Join(", ", parts.Take(parts.Length - 3));
+                return;
+            }
+
+            PrefillAddressDetail = address.Trim();
         }
 
         // Thêm sản phẩm
