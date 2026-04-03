@@ -589,19 +589,55 @@
             .catch(err => console.error("[v0] Error loading stores:", err));
     }
 
+    function getCityStoreConfig(city) {
+        if(!city || !storesData || !storesData[city]) return null;
+
+        const rawCityData = storesData[city];
+
+        // Schema mới: { districts: [...], branches: { district: [address, ...] } }
+        if(rawCityData && rawCityData.districts && rawCityData.branches) {
+            return {
+                districts: rawCityData.districts,
+                getStoresByDistrict: function(district) {
+                    const addresses = rawCityData.branches[district] || [];
+                    return addresses.map((address, index) => ({
+                        id: `${city}-${district}-${index + 1}`,
+                        name: `Chi nhánh ${index + 1}`,
+                        address: address
+                    }));
+                }
+            };
+        }
+
+        // Schema cũ: [ { id, district, name, address }, ... ]
+        if(Array.isArray(rawCityData)) {
+            return {
+                districts: [...new Set(rawCityData.map(s => s.district))],
+                getStoresByDistrict: function(district) {
+                    return rawCityData.filter(s => s.district === district);
+                }
+            };
+        }
+
+        return null;
+    }
+
     function onCityChange() {
         const city = $("#citySelect").val();
         const districtSelect = $("#districtSelect");
+        const storeSelect = $("#storeSelect");
         districtSelect.html('<option value="">-- Chọn Quận/Huyện --</option>');
-        $("#storeSelect").html('<option value="">-- Chọn Cửa Hàng --</option>');
+        storeSelect.html('<option value="">-- Chọn Cửa Hàng --</option>');
+        storeSelect.prop('disabled', true);
 
-        if(!city || !storesData[city]) {
+        const cityStoreConfig = getCityStoreConfig(city);
+
+        if(!cityStoreConfig) {
             districtSelect.prop('disabled', true);
             return;
         }
 
-        const districts = [...new Set(storesData[city].map(s => s.district))];
-        districts.forEach(district => {
+        cityStoreConfig.districts.forEach(district => {
             districtSelect.append(`<option value="${district}">${district}</option>`);
         });
 
@@ -614,17 +650,23 @@
         const storeSelect = $("#storeSelect");
         storeSelect.html('<option value="">-- Chọn Cửa Hàng --</option>');
 
-        if(!city || !district || !storesData[city]) {
+        const cityStoreConfig = getCityStoreConfig(city);
+
+        if(!district || !cityStoreConfig) {
             storeSelect.prop('disabled', true);
             return;
         }
 
-        const stores = storesData[city].filter(s => s.district === district);
+        const stores = cityStoreConfig.getStoresByDistrict(district);
         stores.forEach(store => {
-            storeSelect.append(`<option value="${store.id}" data-address="${store.address}">${store.name}</option>`);
+            const optionValue = store.address || store.id || "";
+            const optionLabel = store.address
+                ? `${store.name} - ${store.address}`
+                : (store.name || optionValue);
+            storeSelect.append(`<option value="${optionValue}" data-address="${store.address || ''}">${optionLabel}</option>`);
         });
 
-        storeSelect.prop('disabled', false);
+        storeSelect.prop('disabled', stores.length === 0);
     }
 
     // Hàm cập nhật tổng tiền + QR
