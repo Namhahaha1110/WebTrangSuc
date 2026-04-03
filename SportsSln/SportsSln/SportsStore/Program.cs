@@ -139,6 +139,7 @@ app.MapHub<ChatHub>("/chathub");
 // Razor Pages + Blazor
 app.MapRazorPages();
 app.MapBlazorHub();
+app.MapFallbackToPage("/admin/{*path:nonfile}", "/Admin/Index");
 
 // ------------------ SEED DỮ LIỆU ------------------
 SeedData.EnsurePopulated(app);
