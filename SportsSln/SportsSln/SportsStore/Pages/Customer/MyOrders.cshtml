@@ -37,7 +37,7 @@
                     <tr>
                         <td>@order.OrderID</td>
                         <td>@order.CreatedDate.ToString("dd/MM/yyyy")</td>
-                        <td>@order.Lines.Sum(l => l.Quantity * l.Product.Price):VND</td>
+                        <td>@(order.Lines.Sum(l => l.Quantity * l.Product.Price).ToString("N0")) đ</td>
                         <td>
                             @if (order.Shipped)
                             {
@@ -113,8 +113,8 @@
                                                     </td>
                                                     <td>@line.Product.Name</td>
                                                     <td>@line.Quantity</td>
-                                                    <td>@line.Product.Price:VND</td>
-                                                    <td>@(line.Quantity * line.Product.Price):VND</td>
+                                                    <td>@(line.Product.Price.ToString("N0")) đ</td>
+                                                    <td>@((line.Quantity * line.Product.Price).ToString("N0")) đ</td>
                                                 </tr>
                                             }
                                         </tbody>

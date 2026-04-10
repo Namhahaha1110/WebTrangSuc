@@ -71,12 +71,12 @@
                                 </td>
 
                                 <td class="align-middle text-center">@line.Quantity</td>
-                                <td class="align-middle text-end">@string.Format("{0:VND}", line.Product?.Price ?? 0)₫</td>
+                                <td class="align-middle text-end">@((line.Product?.Price ?? 0).ToString("N0")) đ</td>
 
                                 @if (linesList.IndexOf(line) == 0)
                                 {
                                     <td rowspan="@order.Lines.Count" class="align-middle text-end fw-bold text-success">
-                                        @string.Format("{0:VND}", order.TotalPrice)₫
+                                        @order.TotalPrice.ToString("N0") đ
                                     </td>
                                     <td rowspan="@order.Lines.Count" class="align-middle text-center">
                                         @if (order.Shipped)
