@@ -1,9 +1,16 @@
 ﻿@model IEnumerable<Category>
 
+@{
+    var selectedCategory = Context?.Request.Query["category"].ToString().Trim().ToLowerInvariant() ?? string.Empty;
+}
+
 @foreach (var cat in Model)
 {
-    <a href="/?category=@cat.Name.ToLower().Replace(" ", "-")"
-       class="btn btn-outline-dark mx-1">
+    var categorySlug = cat.Name.ToLowerInvariant().Replace(" ", "-");
+    var buttonClass = selectedCategory == categorySlug ? "btn btn-outline-dark mx-1 active" : "btn btn-outline-dark mx-1";
+
+    <a href="/?category=@categorySlug"
+       class="@buttonClass">
         @cat.Name
     </a>
 }

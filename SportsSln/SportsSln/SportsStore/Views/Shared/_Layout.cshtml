@@ -594,10 +594,11 @@
 }
     @if (currentPath == "/")
     {
+        var currentCategory = Context.Request.Query["category"].ToString();
         <div class="container my-4">
             <!-- Thanh phân loại nằm ngang -->
             <div id="categories" class="category-bar d-flex flex-wrap justify-content-center gap-3 mb-4">
-                <a href="/" class="btn btn-outline-dark @(ViewBag.CurrentCategory == null ? "active" : "")">Tất cả</a>
+                <a href="/" class="btn btn-outline-dark @(string.IsNullOrWhiteSpace(currentCategory) ? "active" : "")">Tất cả</a>
                 @await Component.InvokeAsync("CategoryMenu")
             </div>
 
