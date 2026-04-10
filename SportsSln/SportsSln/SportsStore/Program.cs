@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SportsStore.Models;
 using Microsoft.OpenApi.Models;
@@ -29,7 +30,14 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<Cart>(sp => SessionCart.GetCart(sp));
 
 // Blazor Server
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
+        options.HandshakeTimeout = TimeSpan.FromSeconds(30);
+        options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+        options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    });
 builder.Services.AddAuthorizationCore();
 
 // --- Database cho sản phẩm ---

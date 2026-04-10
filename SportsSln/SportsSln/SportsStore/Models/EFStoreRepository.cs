@@ -15,6 +15,7 @@ namespace SportsStore.Models
 
         public IQueryable<Product> Products => _context.Products;
         public IQueryable<Category> Categories => _context.Categories;
+        public IQueryable<Banner> Banners => _context.Banners;
 
         // ---------------- SẢN PHẨM ----------------
 
@@ -70,6 +71,39 @@ namespace SportsStore.Models
         public async Task DeleteCategory(Category c)
         {
             _context.Categories.Remove(c);
+            await _context.SaveChangesAsync();
+        }
+
+        // ---------------- BANNER ----------------
+
+        public async Task CreateBanner(Banner b)
+        {
+            _context.Banners.Add(b);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveBanner(Banner b)
+        {
+            var existing = await _context.Banners
+                .FirstOrDefaultAsync(x => x.BannerID == b.BannerID);
+
+            if (existing != null)
+            {
+                existing.Title = b.Title;
+                existing.ImageUrl = b.ImageUrl;
+                existing.RedirectUrl = b.RedirectUrl;
+                existing.DisplayOrder = b.DisplayOrder;
+                existing.FocusX = b.FocusX;
+                existing.FocusY = b.FocusY;
+                existing.IsActive = b.IsActive;
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteBanner(Banner b)
+        {
+            _context.Banners.Remove(b);
             await _context.SaveChangesAsync();
         }
 
