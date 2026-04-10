@@ -87,6 +87,44 @@ namespace SportsStore.Models
                 context.Products.AddRange(products);
                 context.SaveChanges();
             }
+
+            // --- Seed Banners ---
+            if (!context.Banners.Any())
+            {
+                var banners = new List<Banner>
+                {
+                    new Banner
+                    {
+                        Title = "Jewelry Banner 1",
+                        ImageUrl = "https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress",
+                        DisplayOrder = 1,
+                        FocusX = 50,
+                        FocusY = 50,
+                        IsActive = true
+                    },
+                    new Banner
+                    {
+                        Title = "Jewelry Banner 2",
+                        ImageUrl = "https://i.pinimg.com/1200x/d3/c8/02/d3c802f56a5f1941ad0e46ec7cf59671.jpg",
+                        DisplayOrder = 2,
+                        FocusX = 50,
+                        FocusY = 50,
+                        IsActive = true
+                    },
+                    new Banner
+                    {
+                        Title = "Jewelry Banner 3",
+                        ImageUrl = "https://i.pinimg.com/1200x/d6/ea/4c/d6ea4c929ed5fb89d5966758e841ff47.jpg",
+                        DisplayOrder = 3,
+                        FocusX = 50,
+                        FocusY = 50,
+                        IsActive = true
+                    }
+                };
+
+                context.Banners.AddRange(banners);
+                context.SaveChanges();
+            }
         }
     }
 }

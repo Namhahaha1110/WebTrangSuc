@@ -7,6 +7,7 @@ namespace SportsStore.Models
     {
         IQueryable<Product> Products { get; }
         IQueryable<Category> Categories { get; }
+        IQueryable<Banner> Banners { get; }
      
     
         Task CreateProduct(Product p);
@@ -16,5 +17,9 @@ namespace SportsStore.Models
         Task CreateCategory(Category c);
         Task SaveCategory(Category c);
         Task DeleteCategory(Category c);
+
+        Task CreateBanner(Banner b);
+        Task SaveBanner(Banner b);
+        Task DeleteBanner(Banner b);
     }
 }

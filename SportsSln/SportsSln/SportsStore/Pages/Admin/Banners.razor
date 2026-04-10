@@ -1,0 +1,111 @@
+@page "/admin/banners"
+@using Microsoft.JSInterop
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="mb-3" style="color:#6b4e16;">Quản lý banner trang chủ</h3>
+<NavLink class="btn btn-sm mt-3"
+         style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+         href="/admin/banners/create">
+    <i class="bi bi-plus-circle"></i> Thêm banner
+</NavLink>
+<p></p>
+
+@if (BannerData == null)
+{
+    <div class="alert alert-info">Đang tải dữ liệu...</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle table-hover"
+               style="border:1px solid #f3e5ab; background-color:#fff8e1; border-collapse: collapse; table-layout: fixed; width:100%;">
+            <thead class="text-center" style="background-color:#fff3b0; color:#6b4e16; font-weight:600; border-bottom:2px solid #f3e5ab;">
+                <tr>
+                    <th style="border-right:1px solid #f3e5ab; width:70px;">ID</th>
+                    <th style="border-right:1px solid #f3e5ab; width:140px;">Ảnh</th>
+                    <th style="border-right:1px solid #f3e5ab;">Tiêu đề</th>
+                    <th style="border-right:1px solid #f3e5ab; width:120px;">Thứ tự</th>
+                    <th style="border-right:1px solid #f3e5ab; width:120px;">Trạng thái</th>
+                    <th style="width:220px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (BannerData.Any())
+                {
+                    @foreach (var b in BannerData)
+                    {
+                        <tr style="transition: background 0.3s;"
+                            onmouseover="this.style.background='#fff4c2';"
+                            onmouseout="this.style.background='transparent';">
+
+                            <td style="border-right:1px solid #f3e5ab;">@b.BannerID</td>
+                            <td style="border-right:1px solid #f3e5ab;" class="text-center">
+                                <img src="@b.ImageUrl" alt="@b.Title"
+                                     style="width:110px; height:62px; object-fit:cover; border:1px solid #f3e5ab; border-radius:4px;" />
+                            </td>
+                            <td style="border-right:1px solid #f3e5ab;">@b.Title</td>
+                            <td style="border-right:1px solid #f3e5ab; text-align:center;">@b.DisplayOrder</td>
+                            <td style="border-right:1px solid #f3e5ab; text-align:center;">
+                                @if (b.IsActive)
+                                {
+                                    <span class="badge bg-success">Đang hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Đã ẩn</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <NavLink class="btn btn-sm me-1 mb-1"
+                                         style="background: linear-gradient(45deg, #ffd700, #ffec8b); color:#6b4e16; font-weight:500; border:none;"
+                                         href="@($"/admin/banners/edit/{b.BannerID}")">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </NavLink>
+                                <button class="btn btn-sm mb-1"
+                                        style="background: #d9534f; color: white; border:none;"
+                                        @onclick="() => DeleteBannerAsync(b)">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Chưa có banner nào</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    public IStoreRepository Repository => Service;
+    public IEnumerable<Banner> BannerData { get; set; } = Enumerable.Empty<Banner>();
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateData();
+    }
+
+    private async Task UpdateData()
+    {
+        BannerData = await Repository.Banners
+            .OrderBy(b => b.DisplayOrder)
+            .ThenBy(b => b.BannerID)
+            .ToListAsync();
+    }
+
+    private async Task DeleteBannerAsync(Banner banner)
+    {
+        if (await JS.InvokeAsync<bool>("confirm", $"Bạn có chắc muốn xóa banner '{banner.Title}' không?"))
+        {
+            await Repository.DeleteBanner(banner);
+            await UpdateData();
+        }
+    }
+}

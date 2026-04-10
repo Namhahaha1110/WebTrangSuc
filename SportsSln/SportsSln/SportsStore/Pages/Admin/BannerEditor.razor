@@ -1,0 +1,273 @@
+@page "/admin/banners/edit/{Id:long}"
+@page "/admin/banners/create"
+@using Microsoft.AspNetCore.Components.Forms
+@inherits OwningComponentBase<IStoreRepository>
+
+<h3 class="gold-header text-center py-2 mb-3">
+    @(Id == 0 ? "Thêm banner" : "Chỉnh sửa banner")
+</h3>
+
+<div class="card gold-card p-4">
+    <EditForm Model="BannerModel" OnValidSubmit="SaveBanner">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @if (BannerModel.BannerID != 0)
+        {
+            <div class="mb-3">
+                <label class="form-label">ID</label>
+                <input class="form-control" disabled value="@BannerModel.BannerID" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Tiêu đề</label>
+            <InputText class="form-control" @bind-Value="BannerModel.Title" />
+            <ValidationMessage For="@(() => BannerModel.Title)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">URL ảnh banner</label>
+            <InputText class="form-control" @bind-Value="BannerModel.ImageUrl" />
+            <small class="text-muted">Bạn có thể dán URL hoặc upload ảnh trực tiếp bên dưới.</small>
+            <ValidationMessage For="@(() => BannerModel.ImageUrl)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Upload ảnh trực tiếp</label>
+            <InputFile OnChange="OnFileSelected" accept="image/png,image/jpeg,image/webp" />
+            <small class="d-block text-muted">Định dạng hỗ trợ: JPG, JPEG, PNG, WEBP. Tối đa 5MB.</small>
+            @if (!string.IsNullOrWhiteSpace(SelectedFileName))
+            {
+                <div class="text-success mt-2">Đã chọn file: @SelectedFileName</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(UploadError))
+            {
+                <div class="text-danger mt-2">@UploadError</div>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(BannerModel.ImageUrl) && !BannerModel.ImageUrl.StartsWith("__uploading__"))
+        {
+            <div class="mb-3">
+                <label class="form-label">Xem trước</label>
+                <div>
+                    <img src="@BannerModel.ImageUrl" alt="@BannerModel.Title"
+                         style="width: 320px; max-width: 100%; height: 170px; object-fit: cover; object-position:@(BannerModel.FocusX)% @(BannerModel.FocusY)%; border-radius: 8px; border: 1px solid #e9d8a6;" />
+                </div>
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Cắt ảnh ngang (trái-phải): @BannerModel.FocusX%</label>
+            <input type="range" min="0" max="100" step="1" class="form-range" @bind="BannerModel.FocusX" />
+            <small class="text-muted">0% là lệch trái, 100% là lệch phải.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Cắt ảnh dọc (trên-dưới): @BannerModel.FocusY%</label>
+            <input type="range" min="0" max="100" step="1" class="form-range" @bind="BannerModel.FocusY" />
+            <small class="text-muted">0% là lệch lên trên, 100% là lệch xuống dưới.</small>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(SaveError))
+        {
+            <div class="alert alert-danger">@SaveError</div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Link điều hướng (tuỳ chọn)</label>
+            <InputText class="form-control" @bind-Value="BannerModel.RedirectUrl" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Thứ tự hiển thị</label>
+            <InputNumber class="form-control" @bind-Value="BannerModel.DisplayOrder" />
+        </div>
+
+        <div class="form-check mb-4">
+            <InputCheckbox class="form-check-input" @bind-Value="BannerModel.IsActive" />
+            <label class="form-check-label">Hiển thị banner này trên trang chủ</label>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-gold px-4" disabled="@IsSaving">@(IsSaving ? "Đang lưu..." : "Lưu")</button>
+            <NavLink class="btn btn-secondary px-4" href="/admin/banners">Hủy</NavLink>
+        </div>
+    </EditForm>
+</div>
+
+<style>
+    :root {
+        --gold-main: #d4af37;
+        --gold-light: #f6e9c4;
+        --gold-dark: #b7992e;
+    }
+
+    h3.gold-header {
+        background: var(--gold-main);
+        color: white;
+        border-radius: 6px;
+    }
+
+    .gold-card {
+        background: #fffdf7;
+        border: 1px solid var(--gold-light);
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #7a661c;
+    }
+
+    input.form-control,
+    select.form-select {
+        border: 1px solid var(--gold-light);
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    input.form-control:focus,
+    select.form-select:focus {
+        border-color: var(--gold-main);
+        box-shadow: 0 0 4px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn-gold {
+        background: var(--gold-main);
+        color: white;
+        border-radius: 8px;
+        border: none;
+    }
+
+    .btn-gold:hover {
+        background: var(--gold-dark);
+        color: white;
+    }
+</style>
+
+@code {
+    public IStoreRepository Repository => Service;
+
+    [Inject] public NavigationManager NavManager { get; set; } = default!;
+    [Inject] public IWebHostEnvironment WebHostEnvironment { get; set; } = default!;
+
+    [Parameter] public long Id { get; set; }
+
+    public Banner BannerModel { get; set; } = new();
+    private IBrowserFile? UploadedFile { get; set; }
+    private string? SelectedFileName { get; set; }
+    private string? UploadError { get; set; }
+    private string? SaveError { get; set; }
+    private bool IsSaving { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            BannerModel = await Repository.Banners.FirstOrDefaultAsync(b => b.BannerID == Id) ?? new Banner();
+        }
+    }
+
+    private Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        SaveError = null;
+        UploadError = null;
+        UploadedFile = null;
+        SelectedFileName = null;
+
+        var file = e.File;
+        var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+        if (!allowedExtensions.Contains(extension))
+        {
+            UploadError = "Chỉ chấp nhận file JPG, JPEG, PNG hoặc WEBP.";
+            return Task.CompletedTask;
+        }
+
+        if (file.Size > 5 * 1024 * 1024)
+        {
+            UploadError = "Kích thước file tối đa là 5MB.";
+            return Task.CompletedTask;
+        }
+
+        UploadedFile = file;
+        SelectedFileName = file.Name;
+
+        // OnValidSubmit requires ImageUrl to be non-empty before SaveBanner runs.
+        // Assign a temporary token until the file is persisted and real path is set.
+        if (string.IsNullOrWhiteSpace(BannerModel.ImageUrl))
+        {
+            BannerModel.ImageUrl = $"__uploading__/{file.Name}";
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public async Task SaveBanner()
+    {
+        SaveError = null;
+        IsSaving = true;
+
+        try
+        {
+            if (UploadedFile != null)
+            {
+                var extension = Path.GetExtension(UploadedFile.Name).ToLowerInvariant();
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                var bannerFolder = Path.Combine(WebHostEnvironment.WebRootPath, "images", "banners");
+
+                Directory.CreateDirectory(bannerFolder);
+
+                var filePath = Path.Combine(bannerFolder, fileName);
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await UploadedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream);
+
+                BannerModel.ImageUrl = $"/images/banners/{fileName}";
+            }
+
+            if (string.IsNullOrWhiteSpace(BannerModel.ImageUrl))
+            {
+                SaveError = "Vui lòng nhập URL ảnh hoặc chọn file ảnh để upload.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(BannerModel.RedirectUrl))
+            {
+                BannerModel.RedirectUrl = null;
+            }
+            else
+            {
+                BannerModel.RedirectUrl = BannerModel.RedirectUrl.Trim();
+                if (!BannerModel.RedirectUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                    && !BannerModel.RedirectUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                    && !BannerModel.RedirectUrl.StartsWith("/"))
+                {
+                    BannerModel.RedirectUrl = $"https://{BannerModel.RedirectUrl}";
+                }
+            }
+
+            if (Id == 0)
+            {
+                await Repository.CreateBanner(BannerModel);
+            }
+            else
+            {
+                await Repository.SaveBanner(BannerModel);
+            }
+
+            NavManager.NavigateTo("/admin/banners");
+        }
+        catch (Exception ex)
+        {
+            SaveError = $"Lưu banner thất bại: {ex.Message}";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+}

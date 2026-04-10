@@ -1,4 +1,5 @@
 ﻿@* Pages/Shared/_Layout.cshtml *@
+@inject SportsStore.Models.IStoreRepository StoreRepository
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -110,13 +111,19 @@
             object-fit: cover;
             opacity: 0;
             transform: scale(1.02);
+            pointer-events: none;
             transition: opacity 1s ease-in-out, transform 8s linear;
         }
 
             .sliding-image.active {
                 opacity: 1;
                 transform: scale(1);
+                pointer-events: auto;
             }
+
+        .sliding-image.clickable {
+            cursor: pointer;
+        }
 
         .controls {
             position: absolute;
@@ -577,15 +584,49 @@
     <!-- SLIDESHOW -->
     @if (Context.Request.Path == "/" || Context.Request.Path.ToString().ToLower() == "/home/index")
     {
+        var homeBanners = StoreRepository.Banners
+            .Where(b => b.IsActive)
+            .OrderBy(b => b.DisplayOrder)
+            .ThenBy(b => b.BannerID)
+            .ToList();
+
         <div class="image-container" id="mainSlideshow">
-            <img src="https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress" class="sliding-image active" alt="Jewelry Banner 1" />
-            <img src="https://i.pinimg.com/1200x/d3/c8/02/d3c802f56a5f1941ad0e46ec7cf59671.jpg" class="sliding-image" alt="Jewelry Banner 2" />
-            <img src="https://i.pinimg.com/1200x/d6/ea/4c/d6ea4c929ed5fb89d5966758e841ff47.jpg" class="sliding-image" alt="Jewelry Banner 3" />
+            @for (var i = 0; i < homeBanners.Count; i++)
+            {
+                var banner = homeBanners[i];
+                var redirectUrl = banner.RedirectUrl?.Trim();
+                if (!string.IsNullOrWhiteSpace(redirectUrl)
+                    && !redirectUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                    && !redirectUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                    && !redirectUrl.StartsWith("/"))
+                {
+                    redirectUrl = $"https://{redirectUrl}";
+                }
+
+                var isClickable = !string.IsNullOrWhiteSpace(redirectUrl);
+                var imageClass = i == 0
+                    ? (isClickable ? "sliding-image active clickable" : "sliding-image active")
+                    : (isClickable ? "sliding-image clickable" : "sliding-image");
+                var imagePosition = $"object-position:{banner.FocusX}% {banner.FocusY}%;";
+
+                if (isClickable)
+                {
+                    <a href="@redirectUrl">
+                        <img src="@banner.ImageUrl" class="@imageClass" style="@imagePosition" alt="@banner.Title" />
+                    </a>
+                }
+                else
+                {
+                    <img src="@banner.ImageUrl" class="@imageClass" style="@imagePosition" alt="@banner.Title" />
+                }
+            }
 
             <div class="controls">
-                <button class="button active" data-index="0"></button>
-                <button class="button" data-index="1"></button>
-                <button class="button" data-index="2"></button>
+                @for (var i = 0; i < homeBanners.Count; i++)
+                {
+                    var buttonClass = i == 0 ? "button active" : "button";
+                    <button class="@buttonClass" data-index="@i"></button>
+                }
             </div>
         </div>
     }
@@ -748,6 +789,7 @@
             if (!container) return;
             const slides = Array.from(container.querySelectorAll('.sliding-image'));
             const buttons = Array.from(container.querySelectorAll('.controls .button'));
+            if (slides.length === 0 || buttons.length === 0) return;
             let index = 0;
             let timer;
 
