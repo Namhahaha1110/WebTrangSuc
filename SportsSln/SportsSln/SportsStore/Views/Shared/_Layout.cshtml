@@ -1,541 +1,1050 @@
-﻿@* Pages/Shared/_Layout.cshtml *@
+@* Views/Shared/_Layout.cshtml — Flower Jewelry Luxury Redesign *@
 @inject SportsStore.Models.IStoreRepository StoreRepository
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Flower Jewelry — Trang sức tinh xảo, chất lượng cao cấp, thiết kế sang trọng." />
     <title>@ViewData["Title"] - Flower Jewelry</title>
+
+    <!-- PRELOAD critical font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
-    <!-- GOOGLE FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+    <!-- GOOGLE FONTS — Cormorant (heading) + Montserrat (body) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     <style>
+        /* ============================================================
+           DESIGN TOKENS — Flower Jewelry Luxury System
+           ============================================================ */
         :root {
-            --jewel-gold: #d4af37;
-            --jewel-pink: #f8e1e7;
-            --jewel-dark: #2a2a2a;
-            --jewel-white: #ffffff;
+            /* Brand Colors */
+            --color-primary:        #1C1917;
+            --color-on-primary:     #FFFFFF;
+            --color-secondary:      #44403C;
+            --color-accent:         #A16207;
+            --color-accent-light:   #D4AF37;
+            --color-accent-hover:   #B8961F;
+            --color-background:     #FAFAF9;
+            --color-surface:        rgba(255, 255, 255, 0.90);
+            --color-foreground:     #0C0A09;
+            --color-muted:          #E8ECF0;
+            --color-border:         #D6D3D1;
+            --color-border-subtle:  #EDEBE9;
+            --color-destructive:    #DC2626;
+            --color-text-secondary: #78716C;
+
+            /* Typography */
+            --font-heading: 'Cormorant', Georgia, 'Times New Roman', serif;
+            --font-body:    'Montserrat', system-ui, -apple-system, sans-serif;
+
+            /* Spacing — 4dp base scale */
+            --space-1:  4px;
+            --space-2:  8px;
+            --space-3:  12px;
+            --space-4:  16px;
+            --space-5:  20px;
+            --space-6:  24px;
+            --space-8:  32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-20: 80px;
+
+            /* Border Radius */
+            --radius-sm:   4px;
+            --radius-md:   8px;
+            --radius-lg:   12px;
+            --radius-xl:   20px;
+            --radius-full: 9999px;
+
+            /* Elevation */
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg:  0 8px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+            --shadow-xl:  0 20px 60px rgba(0,0,0,0.14);
+            --shadow-gold: 0 4px 20px rgba(161, 98, 7, 0.25);
+
+            /* Z-Index Scale */
+            --z-base:    0;
+            --z-card:   10;
+            --z-overlay: 20;
+            --z-sticky:  40;
+            --z-modal:  100;
+            --z-toast: 1000;
+
+            /* Motion */
+            --dur-fast:   150ms;
+            --dur-normal: 250ms;
+            --dur-slow:   400ms;
+            --ease-out:   cubic-bezier(0.16, 1, 0.30, 1);
+            --ease-in:    cubic-bezier(0.70, 0, 0.84, 0);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+
+        /* ============================================================
+           REDUCED MOTION — Respect user preference
+           ============================================================ */
+        @@media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration:       0.01ms !important;
+                animation-iteration-count: 1     !important;
+                transition-duration:      0.01ms !important;
+            }
+        }
+
+        /* ============================================================
+           BASE
+           ============================================================ */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--jewel-white);
-            color: var(--jewel-dark);
-            margin: 0;
+            font-family:      var(--font-body);
+            font-size:        16px;
+            line-height:      1.6;
+            background-color: var(--color-background);
+            color:            var(--color-foreground);
+            margin:           0;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ---------- HEADER ---------- */
-        .site-navbar {
-            background: var(--jewel-white);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-            .site-navbar .navbar-brand {
-                font-family: 'Playfair Display', serif;
-                font-size: 32px;
-                color: var(--jewel-gold);
-                letter-spacing: 1px;
-            }
-
-            .site-navbar .nav-link {
-                color: #333 !important;
-                font-weight: 500;
-                text-transform: uppercase;
-                transition: 0.3s;
-            }
-
-                .site-navbar .nav-link:hover {
-                    color: var(--jewel-gold) !important;
-                }
-
-        /* ---------- CART ICON ---------- */
-        .cart-icon {
-            color: var(--jewel-gold);
-            font-size: 22px;
-            margin-left: 20px;
-            transition: 0.3s;
-        }
-
-        .mobile-account {
-            display: none;
-        }
-
-        .mobile-account .btn {
-            border-color: rgba(212, 175, 55, 0.6);
-            color: #6b4e16;
-            font-weight: 500;
-            background: #fff9eb;
-        }
-
-        .mobile-account .btn:focus {
-            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.22);
-        }
-
-        .mobile-account .dropdown-menu {
-            width: max-content;
-            max-width: calc(100vw - 16px);
-            overflow-x: hidden;
-        }
-
-        .mobile-account .dropdown-item {
-            white-space: nowrap;
-        }
-
-            .cart-icon:hover {
-                color: #b9972f;
-                transform: scale(1.1);
-            }
-
-        /* ---------- SLIDESHOW ---------- */
-        .image-container {
-            width: 100%;
-            height: 420px;
-            position: relative;
-            overflow: hidden;
-            background: #fff6fa;
-        }
-
-        .sliding-image {
+        /* Skip link for keyboard nav */
+        .skip-link {
             position: absolute;
-            inset: 0;
-            width: 100%;
+            top: -100%;
+            left: var(--space-4);
+            background: var(--color-primary);
+            color: var(--color-on-primary);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            z-index: var(--z-toast);
+            transition: top var(--dur-fast);
+        }
+        .skip-link:focus { top: var(--space-2); }
+
+        /* ============================================================
+           ANNOUNCEMENT BAR
+           ============================================================ */
+        .announcement-bar {
+            background: var(--color-primary);
+            color:       var(--color-accent-light);
+            text-align:  center;
+            font-family: var(--font-body);
+            font-size:   12px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            padding: var(--space-2) var(--space-4);
+            line-height: 1.4;
+            transition: transform var(--dur-normal) var(--ease-in),
+                        opacity  var(--dur-normal) var(--ease-in);
+            overflow: hidden;
+        }
+        .announcement-bar.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            height: 0;
+            padding: 0;
+        }
+        .announcement-bar span { display: inline; }
+
+        /* ============================================================
+           NAVBAR — Unified Sticky
+           ============================================================ */
+        .site-navbar {
+            position:      sticky;
+            top:           0;
+            z-index:       var(--z-sticky);
+            background:    rgba(250, 250, 249, 0.88);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border-bottom: 1px solid var(--color-border-subtle);
+            transition:    box-shadow var(--dur-normal) var(--ease-out);
+        }
+        .site-navbar.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Logo */
+        .site-navbar .navbar-brand {
+            font-family:    var(--font-heading);
+            font-size:      28px;
+            font-weight:    700;
+            color:          var(--color-accent-light) !important;
+            letter-spacing: 1px;
+            line-height:    1;
+            text-decoration: none;
+            flex-shrink:    0;
+        }
+        .site-navbar .brand-logo-img {
+            height: 42px;
+            width:  auto;
+            object-fit: contain;
+        }
+
+        /* Nav links */
+        .site-navbar .nav-link {
+            font-family:    var(--font-body);
+            font-size:      13px;
+            font-weight:    500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color:          var(--color-secondary) !important;
+            padding:        var(--space-2) var(--space-3) !important;
+            border-radius:  var(--radius-sm);
+            transition:     color var(--dur-fast) var(--ease-out),
+                            background var(--dur-fast) var(--ease-out);
+            position: relative;
+        }
+        .site-navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%; right: 50%;
+            height: 1.5px;
+            background: var(--color-accent-light);
+            transition: left var(--dur-normal) var(--ease-out),
+                        right var(--dur-normal) var(--ease-out);
+        }
+        .site-navbar .nav-link:hover,
+        .site-navbar .nav-link[aria-current="page"] {
+            color: var(--color-accent) !important;
+        }
+        .site-navbar .nav-link:hover::after,
+        .site-navbar .nav-link[aria-current="page"]::after {
+            left: var(--space-3);
+            right: var(--space-3);
+        }
+
+        /* Utility items (search, user, cart) */
+        .navbar-utils {
+            display:     flex;
+            align-items: center;
+            gap:         var(--space-1);
+            flex-shrink: 0;
+        }
+        .navbar-util-btn {
+            display:         flex;
+            align-items:     center;
+            justify-content: center;
+            width:  44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            background:    transparent;
+            border:        none;
+            color:         var(--color-secondary);
+            cursor:        pointer;
+            transition:    color       var(--dur-fast) var(--ease-out),
+                           background  var(--dur-fast) var(--ease-out),
+                           transform   var(--dur-fast) var(--ease-out);
+            text-decoration: none;
+            position: relative;
+        }
+        .navbar-util-btn:hover {
+            color:      var(--color-accent);
+            background: rgba(161, 98, 7, 0.06);
+            transform:  translateY(-1px);
+        }
+        .navbar-util-btn:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 2px;
+        }
+        .navbar-util-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* Cart badge */
+        .cart-badge {
+            position: absolute;
+            top: 6px; right: 6px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            width: 16px; height: 16px;
+            border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1;
+        }
+
+        /* Account dropdown */
+        .account-dropdown .dropdown-menu {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: var(--space-2);
+            min-width: 200px;
+            animation: fadeDown var(--dur-normal) var(--ease-out);
+        }
+        .account-dropdown .dropdown-item {
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            padding: var(--space-2) var(--space-3);
+            color: var(--color-foreground);
+            transition: background var(--dur-fast) var(--ease-out),
+                        color      var(--dur-fast) var(--ease-out);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        .account-dropdown .dropdown-item:hover {
+            background: rgba(212, 175, 55, 0.08);
+            color: var(--color-accent);
+        }
+        .account-dropdown .dropdown-item.text-danger { color: var(--color-destructive) !important; }
+        .account-dropdown .dropdown-item.text-danger:hover { background: rgba(220, 38, 38, 0.06); }
+        .account-dropdown .dropdown-divider { border-color: var(--color-border-subtle); margin: var(--space-1) 0; }
+
+        /* Navbar toggler */
+        .site-navbar .navbar-toggler {
+            border:  1px solid var(--color-border);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            width:  44px; height: 44px;
+        }
+        .site-navbar .navbar-toggler:focus { box-shadow: 0 0 0 2px var(--color-accent-light); }
+
+        /* Mobile collapse */
+        @@media (max-width: 991.98px) {
+            .site-navbar .navbar-collapse {
+                background:    rgba(250, 250, 249, 0.97);
+                border-radius: var(--radius-lg);
+                margin-top:    var(--space-3);
+                padding:       var(--space-3);
+                box-shadow:    var(--shadow-lg);
+                border:        1px solid var(--color-border-subtle);
+            }
+            .site-navbar .navbar-nav { gap: var(--space-1); }
+            .site-navbar .nav-link::after { display: none; }
+        }
+
+        /* Dropdown sản phẩm */
+        .site-navbar .dropdown-menu {
+            border:        1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow:    var(--shadow-lg);
+            padding:       var(--space-3);
+            min-width:     220px;
+            animation:     fadeDown var(--dur-normal) var(--ease-out);
+        }
+        .site-navbar .dropdown-item {
+            border-radius: var(--radius-md);
+            font-size:     14px;
+            padding:       var(--space-2) var(--space-3);
+            color:         var(--color-foreground);
+            transition:    background var(--dur-fast) var(--ease-out),
+                           color      var(--dur-fast) var(--ease-out),
+                           transform  var(--dur-fast) var(--ease-out);
+        }
+        .site-navbar .dropdown-item:hover {
+            background: rgba(212, 175, 55, 0.08);
+            color:      var(--color-accent);
+            transform:  translateX(4px);
+        }
+        .site-navbar .dropdown-divider { border-color: var(--color-border-subtle); }
+
+        @@ keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Utility top bar (desktop only) */
+        .top-utility-bar {
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        @@media (max-width: 991.98px) {
+            .top-utility-bar { display: none; }
+        }
+
+        /* ============================================================
+           HERO SLIDESHOW
+           ============================================================ */
+        .hero-section {
+            position:    relative;
+            aspect-ratio: 16 / 6.5;
+            min-height:  280px;
+            max-height:  640px;
+            overflow:    hidden;
+            background:  #1C1917;
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset:    0;
+            width:  100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0;
-            transform: scale(1.02);
+            object-position: center;
+            opacity:   0;
+            transform: scale(1.03);
             pointer-events: none;
-            transition: opacity 1s ease-in-out, transform 8s linear;
+            transition: opacity   0.9s var(--ease-out),
+                        transform 8s   linear;
         }
-
-            .sliding-image.active {
-                opacity: 1;
-                transform: scale(1);
-                pointer-events: auto;
-            }
-
-        .sliding-image.clickable {
-            cursor: pointer;
+        .hero-slide.active {
+            opacity:       1;
+            transform:     scale(1);
+            pointer-events: auto;
         }
+        .hero-slide.clickable { cursor: pointer; }
 
-        .controls {
+        /* Gradient overlay for text legibility */
+        .hero-overlay {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
+            inset:    0;
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(28, 25, 23, 0.55) 100%
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Hero dots */
+        .hero-controls {
+            position:  absolute;
+            bottom:    var(--space-5);
+            left:      50%;
             transform: translateX(-50%);
+            display:   flex;
+            gap:       var(--space-2);
+            z-index:   2;
+        }
+        .hero-dot {
+            /* Visual size */
+            width:  10px;
+            height: 10px;
+            border-radius: var(--radius-full);
+            background:    rgba(255, 255, 255, 0.5);
+            border:        none;
+            cursor:        pointer;
+            /* Hit area via padding — achieves 44px touch target */
+            padding: 17px;
+            margin:  -17px;
+            background-clip: content-box;
+            transition: background var(--dur-fast) var(--ease-out),
+                        transform  var(--dur-fast) var(--ease-out);
+        }
+        .hero-dot.active {
+            background: var(--color-accent-light);
+            transform:  scale(1.3);
+        }
+        .hero-dot:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 4px;
+        }
+
+        /* Hero prev/next arrows */
+        .hero-arrow {
+            position:  absolute;
+            top:       50%;
+            transform: translateY(-50%);
+            z-index:   2;
+            width:  44px; height: 44px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border:  1px solid rgba(255, 255, 255, 0.25);
+            color:   white;
+            cursor:  pointer;
             display: flex;
-            gap: 10px;
-            z-index: 10;
+            align-items: center; justify-content: center;
+            transition: background var(--dur-fast) var(--ease-out),
+                        transform  var(--dur-fast) var(--ease-out);
+        }
+        .hero-arrow:hover {
+            background: rgba(212, 175, 55, 0.4);
+            transform:  translateY(-50%) scale(1.05);
+        }
+        .hero-arrow:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 2px;
+        }
+        .hero-arrow--prev { left:  var(--space-4); }
+        .hero-arrow--next { right: var(--space-4); }
+        .hero-arrow svg { width: 18px; height: 18px; }
+
+        @@media (max-width: 767.98px) {
+            .hero-section { aspect-ratio: 16 / 9; }
+            .hero-arrow { display: none; }
         }
 
-            .controls .button {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.6);
-                border: 1px solid rgba(0, 0, 0, 0.15);
-                cursor: pointer;
-            }
-
-                .controls .button.active {
-                    background: var(--jewel-gold);
-                }
-
-        /* ---------- MAIN CONTENT ---------- */
-        .main-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 30px 40px;
+        /* ============================================================
+           CATEGORY BAR
+           ============================================================ */
+        .category-section {
+            padding: var(--space-5) 0 var(--space-4);
+            position: sticky;
+            top: 58px; /* below navbar */
+            z-index: var(--z-overlay);
+            background: rgba(250, 250, 249, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border-subtle);
         }
-
-        #categories {
-            flex: 0 0 250px;
-            background: var(--jewel-pink);
-            border-radius: 10px;
-            padding: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            height: fit-content;
-        }
-
-        .main-content {
-            flex: 1;
-            padding-left: 40px;
-        }
-
-        /* ---------- WHY CHOOSE ---------- */
-        .why-choose {
-            background: #fff8fb;
-            border-top: 3px solid var(--jewel-gold);
-            border-bottom: 3px solid var(--jewel-gold);
-            padding: 50px 0;
-        }
-
-            .why-choose h3 {
-                text-align: center;
-                font-weight: 700;
-                margin-bottom: 40px;
-                color: var(--jewel-dark);
-                font-family: 'Playfair Display', serif;
-            }
-
-        .why-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-            transition: 0.3s;
-        }
-
-            .why-card:hover {
-                transform: scale(1.05);
-            }
-
-            .why-card i {
-                font-size: 30px;
-                color: var(--jewel-gold);
-                margin-bottom: 10px;
-            }
-
-        /* ---------- FOOTER ---------- */
-        footer {
-            background: var(--jewel-dark);
-            color: #fff;
-            text-align: center;
-            padding: 14px 0;
-        }
-
-        @@media (max-width: 768px) {
-            .main-wrapper {
-                flex-direction: column;
-                padding: 20px;
-            }
-
-            .main-content {
-                padding-left: 0;
-                margin-top: 20px;
-            }
-
-            #categories {
-                width: 100%;
-            }
-        }
-
-
-
-        footer {
-            background-color: #f9f9f9 !important;
-            color: #222 !important;
-        }
-
-            footer h6,
-            footer .fw-bold {
-                color: var(--jewel-gold) !important;
-            }
-
-            footer a {
-                color: #333 !important;
-                transition: color 0.3s;
-            }
-
-                footer a:hover {
-                    color: var(--jewel-gold) !important;
-                }
-
-
-        /* ======= MEGA MENU SẢN PHẨM ======= */
-        .navbar .dropdown-menu.mega-menu {
-            display: none;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 1200px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 10px;
-            background-color: #fff;
-            padding: 30px 50px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            z-index: 999;
-        }
-
-        .navbar .dropdown:hover .dropdown-menu.mega-menu,
-        .navbar .dropdown.show .dropdown-menu.mega-menu {
-            display: block;
-        }
-
-        .mega-menu .col-md-3 {
-            padding: 10px 25px;
-        }
-
-        .mega-menu .dropdown-header {
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--jewel-gold);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-
-        .mega-menu .dropdown-item {
-            color: #222;
-            font-size: 16px;
-            line-height: 1.8;
-            font-weight: 400;
-            padding: 3px 0;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-        }
-
-            .mega-menu .dropdown-item:hover {
-                color: var(--jewel-gold);
-                background: transparent;
-                transform: translateX(5px);
-            }
-        /* Tùy chỉnh đẹp hơn cho dropdown sản phẩm */
-        .dropdown-menu {
-            animation: fadeDown 0.25s ease-in-out;
-        }
-
-        @@keyframes fadeDown {
-            from
-
-        {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        }
-
-        .dropdown-item {
-            padding: 8px 15px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-            .dropdown-item:hover {
-                background-color: #f8e1e7;
-                color: #d4af37 !important;
-            }
-
-
- 
-        .category-bar a {
-            border-radius: 25px;
-            font-weight: 500;
-            transition: all 0.3s;
-            padding: 8px 18px;
-        }
-
-        .category-bar a:hover,
-        .category-bar a.active {
-            background-color: #d4af37;
-            color: white !important;
-            border-color: #d4af37;
-        }
-
         .category-bar {
+            display:  flex;
+            gap:      var(--space-2);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
+            scrollbar-width: none;
+            padding-bottom: var(--space-1);
+        }
+        .category-bar::-webkit-scrollbar { display: none; }
+
+        .cat-pill {
+            display:       inline-flex;
+            align-items:   center;
+            gap:           var(--space-1);
+            padding:       var(--space-2) var(--space-5);
+            min-height:    40px;
+            border-radius: var(--radius-full);
+            font-family:   var(--font-body);
+            font-size:     13px;
+            font-weight:   500;
+            letter-spacing: 0.5px;
+            white-space:   nowrap;
+            flex-shrink:   0;
+            text-decoration: none;
+            cursor:        pointer;
+            transition:    background var(--dur-fast) var(--ease-out),
+                           color      var(--dur-fast) var(--ease-out),
+                           box-shadow var(--dur-fast) var(--ease-out),
+                           transform  var(--dur-fast) var(--ease-out);
+            border:        1.5px solid var(--color-border);
+            color:         var(--color-secondary);
+            background:    var(--color-surface);
+        }
+        .cat-pill:hover {
+            border-color: var(--color-accent-light);
+            color:        var(--color-accent);
+            transform:    translateY(-1px);
+            box-shadow:   var(--shadow-sm);
+        }
+        .cat-pill.active,
+        .cat-pill[aria-current="page"] {
+            background:   var(--color-accent-light);
+            border-color: var(--color-accent-light);
+            color:        var(--color-primary);
+            font-weight:  600;
+            box-shadow:   var(--shadow-gold);
+        }
+        .cat-pill:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 2px;
         }
 
-        .category-bar::-webkit-scrollbar {
-            height: 6px;
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .page-content {
+            padding: var(--space-8) 0 var(--space-12);
+            min-height: 40vh;
         }
 
-        .category-bar::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.45);
-            border-radius: 999px;
+        /* ============================================================
+           VALUE / WHY CHOOSE SECTION
+           ============================================================ */
+        .value-section {
+            background:   var(--color-primary);
+            color:        var(--color-on-primary);
+            padding:      var(--space-20) 0;
+            position:     relative;
+            overflow:     hidden;
+        }
+        /* Subtle gold texture overlay */
+        .value-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                ellipse 80% 60% at 50% 0%,
+                rgba(212, 175, 55, 0.07) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
         }
 
-        .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
+        .value-section .section-eyebrow {
+            font-family:    var(--font-body);
+            font-size:      11px;
+            font-weight:    600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color:          var(--color-accent-light);
+            margin-bottom:  var(--space-3);
+            display:        block;
+        }
+        .value-section .section-title {
+            font-family:  var(--font-heading);
+            font-size:    clamp(28px, 4vw, 44px);
+            font-weight:  700;
+            color:        var(--color-on-primary);
+            margin-bottom: var(--space-12);
+            line-height:  1.15;
+        }
+        .value-section .section-title span {
+            color: var(--color-accent-light);
+            font-style: italic;
         }
 
-        @@media (max-width: 991.98px) {
-            .top-utility-bar {
-                display: none;
-            }
+        .value-card {
+            display:  grid;
+            grid-template-columns: 56px 1fr;
+            gap:      var(--space-4);
+            padding:  var(--space-6);
+            border-radius: var(--radius-lg);
+            border:   1px solid rgba(212, 175, 55, 0.12);
+            background: rgba(255, 255, 255, 0.03);
+            transition: transform    var(--dur-normal) var(--ease-out),
+                        background   var(--dur-normal) var(--ease-out),
+                        border-color var(--dur-normal) var(--ease-out),
+                        box-shadow   var(--dur-normal) var(--ease-out);
+        }
+        .value-card:hover {
+            transform:    translateY(-4px);
+            background:   rgba(255, 255, 255, 0.06);
+            border-color: rgba(212, 175, 55, 0.30);
+            box-shadow:   var(--shadow-gold);
+        }
+        .value-icon-wrap {
+            width:  56px; height: 56px;
+            border-radius: var(--radius-lg);
+            background: rgba(212, 175, 55, 0.10);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(212, 175, 55, 0.20);
+        }
+        .value-icon-wrap svg {
+            width: 26px; height: 26px;
+            color: var(--color-accent-light);
+        }
+        .value-card-body { align-self: center; }
+        .value-card h6 {
+            font-family:    var(--font-body);
+            font-size:      13px;
+            font-weight:    600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color:          var(--color-on-primary);
+            margin-bottom:  var(--space-1);
+        }
+        .value-card p {
+            font-size:   14px;
+            line-height: 1.6;
+            color:       rgba(255, 255, 255, 0.62);
+            margin:      0;
+        }
 
-            .mobile-account {
-                display: block;
-            }
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .site-footer {
+            background: #F5F1EB;
+            color:      var(--color-foreground);
+            border-top: 1px solid var(--color-border);
+            padding:    var(--space-16) 0 0;
+            font-size:  14px;
+        }
 
-            .mobile-account .dropdown-menu {
-                min-width: 210px;
-                right: 0;
-                left: auto;
-            }
+        .footer-brand {
+            font-family: var(--font-heading);
+            font-size:   32px;
+            font-weight: 700;
+            color:       var(--color-accent-light);
+            margin-bottom: var(--space-3);
+            display:     block;
+        }
+        .footer-tagline {
+            font-size:   13px;
+            color:       var(--color-text-secondary);
+            line-height: 1.7;
+            max-width:   260px;
+            margin-bottom: var(--space-5);
+        }
+        .footer-social {
+            display: flex;
+            gap:     var(--space-3);
+        }
+        .footer-social-btn {
+            display:         flex;
+            align-items:     center;
+            justify-content: center;
+            width:  40px; height: 40px;
+            border-radius: var(--radius-full);
+            background:    transparent;
+            border:        1.5px solid var(--color-border);
+            color:         var(--color-secondary);
+            text-decoration: none;
+            transition:    color       var(--dur-fast) var(--ease-out),
+                           background  var(--dur-fast) var(--ease-out),
+                           border-color var(--dur-fast) var(--ease-out),
+                           transform   var(--dur-fast) var(--ease-out);
+        }
+        .footer-social-btn:hover {
+            background:   var(--color-accent-light);
+            border-color: var(--color-accent-light);
+            color:        var(--color-primary);
+            transform:    translateY(-2px);
+        }
+        .footer-social-btn svg { width: 16px; height: 16px; }
 
-            .site-navbar .navbar-brand {
-                font-size: 24px;
-            }
+        .footer-col-title {
+            font-family:    var(--font-body);
+            font-size:      11px;
+            font-weight:    600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color:          var(--color-accent);
+            margin-bottom:  var(--space-4);
+            display:        block;
+        }
 
-            .site-navbar .navbar-collapse {
-                background: #fff;
-                margin-top: 10px;
-                border-radius: 10px;
-                padding: 10px 12px;
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-            }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: var(--space-2); }
+        .footer-links a {
+            color:           var(--color-secondary);
+            text-decoration: none;
+            font-size:       14px;
+            transition:      color     var(--dur-fast) var(--ease-out),
+                             transform var(--dur-fast) var(--ease-out);
+            display:         inline-block;
+        }
+        .footer-links a:hover {
+            color:     var(--color-accent);
+            transform: translateX(4px);
+        }
 
-            .site-navbar .navbar-nav {
-                align-items: flex-start;
-                gap: 4px;
-            }
+        .footer-contact-item {
+            display:    flex;
+            align-items: flex-start;
+            gap:         var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        .footer-contact-icon {
+            width:  38px; height: 38px;
+            border-radius: var(--radius-full);
+            background:    var(--color-primary);
+            color:         var(--color-accent-light);
+            display:       flex;
+            align-items:   center; justify-content: center;
+            flex-shrink:   0;
+        }
+        .footer-contact-icon svg { width: 16px; height: 16px; }
+        .footer-contact-label {
+            font-size:   11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color:       var(--color-text-secondary);
+            margin-bottom: 2px;
+        }
+        .footer-contact-value {
+            font-family: var(--font-heading);
+            font-size:   20px;
+            font-weight: 600;
+            color:       var(--color-foreground);
+        }
+        .footer-contact-value a {
+            color: inherit; text-decoration: none;
+            transition: color var(--dur-fast);
+        }
+        .footer-contact-value a:hover { color: var(--color-accent); }
+        .footer-contact-sub {
+            font-size: 12px;
+            color:     var(--color-text-secondary);
+        }
 
-            .site-navbar .navbar-nav .dropdown-menu {
-                width: 100%;
-                min-width: 0 !important;
-            }
+        .footer-showroom-img {
+            width:  100%;
+            border-radius: var(--radius-lg);
+            object-fit:    cover;
+            aspect-ratio:  3 / 2;
+            transition:    transform var(--dur-slow) var(--ease-out);
+        }
+        .footer-showroom-link:hover .footer-showroom-img { transform: scale(1.03); }
+        .footer-showroom-link { overflow: hidden; border-radius: var(--radius-lg); display: block; }
 
-            .site-navbar .cart-icon {
-                margin-left: 0;
-            }
+        /* Copyright strip */
+        .footer-bottom {
+            background:    var(--color-primary);
+            color:         rgba(255, 255, 255, 0.55);
+            text-align:    center;
+            font-size:     12px;
+            padding:       var(--space-4) var(--space-4);
+            margin-top:    var(--space-12);
+        }
+        .footer-bottom strong { color: var(--color-accent-light); }
+        .footer-bottom .footer-legal {
+            max-width: 800px; margin: 0 auto;
+            line-height: 1.7;
         }
 
         @@media (max-width: 767.98px) {
-            .image-container {
-                height: 250px;
-            }
-
-            .controls {
-                bottom: 12px;
-            }
-
-            .controls .button {
-                width: 10px;
-                height: 10px;
-            }
-
-            .category-bar {
-                justify-content: flex-start !important;
-                flex-wrap: nowrap !important;
-                gap: 10px !important;
-                padding-inline: 4px;
-            }
-
-            .category-bar a {
-                white-space: nowrap;
-                flex: 0 0 auto;
-            }
-
-            footer {
-                font-size: 14px !important;
-            }
-
-            footer .text-end {
-                text-align: left !important;
-            }
-
-            footer img[style*='float:right'] {
-                float: none !important;
-                display: block;
-                margin-left: 0;
-            }
-
-            .chat-widget #chatIcon {
-                width: 58px !important;
-                height: 58px !important;
-                border-radius: 50% !important;
-                padding: 0 !important;
-                gap: 0 !important;
-            }
-
-            .chat-widget #chatIcon span {
-                display: none !important;
-            }
-
-            .chat-widget #chatBox {
-                width: calc(100vw - 20px) !important;
-                right: 10px !important;
-                bottom: 86px !important;
-            }
-
-            .mobile-account .btn {
-                padding: 0.32rem 0.55rem;
-            }
-
-            .mobile-account .btn span {
-                display: none !important;
-            }
-
-            .site-navbar .navbar-brand {
-                font-size: 22px;
-            }
+            .site-footer { padding-top: var(--space-12); }
+            .footer-tagline { max-width: 100%; }
         }
 
+        /* ============================================================
+           CHAT WIDGET
+           ============================================================ */
+        .chat-widget { position: relative; }
+
+        #chatIcon {
+            position:      fixed;
+            bottom:        var(--space-5);
+            right:         var(--space-5);
+            background:    linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+            color:         white;
+            border:        none;
+            border-radius: var(--radius-full);
+            padding:       0 var(--space-5);
+            height:        52px;
+            min-width:     52px;
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            gap:           var(--space-2);
+            cursor:        pointer;
+            box-shadow:    var(--shadow-gold);
+            z-index:       var(--z-modal);
+            font-family:   var(--font-body);
+            font-size:     13px;
+            font-weight:   600;
+            letter-spacing: 0.3px;
+            transition:    transform    var(--dur-normal) var(--ease-spring),
+                           box-shadow   var(--dur-normal) var(--ease-out),
+                           border-radius var(--dur-normal) var(--ease-out);
+        }
+        #chatIcon:hover {
+            transform:  scale(1.04) translateY(-2px);
+            box-shadow: 0 8px 28px rgba(161, 98, 7, 0.40);
+        }
+        #chatIcon:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 3px;
+        }
+        #chatIcon svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        #chatBox {
+            display:       none;
+            position:      fixed;
+            bottom:        84px;
+            right:         var(--space-5);
+            width:         360px;
+            max-width:     calc(100vw - 40px);
+            background:    white;
+            border-radius: var(--radius-xl);
+            overflow:      hidden;
+            box-shadow:    var(--shadow-xl);
+            z-index:       var(--z-modal);
+            border:        1px solid var(--color-border);
+            animation:     chatSlideUp var(--dur-normal) var(--ease-out);
+        }
+
+        @@keyframes chatSlideUp {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            padding:    var(--space-4);
+            display:    flex;
+            align-items: center;
+            gap:         var(--space-3);
+        }
+        .chat-avatar {
+            width:  44px; height: 44px;
+            border-radius: var(--radius-full);
+            background: white;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+        }
+        .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .chat-header-info { flex: 1; }
+        .chat-header-name {
+            font-size:   15px;
+            font-weight: 700;
+            color:       white;
+            font-family: var(--font-heading);
+        }
+        .chat-header-sub {
+            font-size: 12px;
+            opacity:   0.75;
+            color:     rgba(212, 175, 55, 0.9);
+        }
+        .chat-close-btn {
+            width:  36px; height: 36px;
+            border-radius: var(--radius-full);
+            border:  none;
+            background: rgba(255,255,255,0.12);
+            color:   white;
+            cursor:  pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background var(--dur-fast) var(--ease-out);
+            flex-shrink: 0;
+        }
+        .chat-close-btn:hover { background: rgba(255,255,255,0.22); }
+        .chat-close-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.7); }
+        .chat-close-btn svg { width: 16px; height: 16px; }
+
+        #messagesList {
+            height: 300px;
+            overflow-y: auto;
+            padding:    var(--space-4);
+            background: #FAFAFA;
+            display:    flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        #messagesList::-webkit-scrollbar { width: 4px; }
+        #messagesList::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
+
+        .chat-input-area {
+            padding:      var(--space-3);
+            border-top:   1px solid var(--color-border-subtle);
+            background:   white;
+        }
+        .chat-input-row {
+            display:     flex;
+            align-items: center;
+            gap:         var(--space-2);
+        }
+        #messageInput {
+            flex:          1;
+            border-radius: var(--radius-full);
+            padding:       var(--space-2) var(--space-4);
+            border:        1.5px solid var(--color-border);
+            outline:       none;
+            font-family:   var(--font-body);
+            font-size:     14px;
+            height:        44px;
+            transition:    border-color var(--dur-fast) var(--ease-out);
+        }
+        #messageInput:focus { border-color: var(--color-accent-light); }
+        #sendButton {
+            width:         44px; height: 44px;
+            border-radius: var(--radius-full);
+            border:        none;
+            background:    var(--color-accent-light);
+            color:         var(--color-primary);
+            cursor:        pointer;
+            display:       flex;
+            align-items:   center; justify-content: center;
+            flex-shrink:   0;
+            transition:    background var(--dur-fast) var(--ease-out),
+                           transform  var(--dur-fast) var(--ease-spring);
+        }
+        #sendButton:hover { background: var(--color-accent-hover); transform: scale(1.05); }
+        #sendButton:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 2px; }
+        #sendButton svg { width: 18px; height: 18px; }
+
+        .chat-footer-note {
+            text-align: center;
+            font-size:  11px;
+            color:      var(--color-text-secondary);
+            padding:    var(--space-2) 0 var(--space-1);
+        }
+
+        @@media (max-width: 767.98px) {
+            #chatIcon .chat-label { display: none; }
+            #chatIcon { width: 52px; border-radius: var(--radius-full); padding: 0; }
+        }
+
+        /* ============================================================
+           UTILS
+           ============================================================ */
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--color-accent-light);
+            outline-offset: 2px;
+        }
 
     </style>
 </head>
 <body>
-    <!-- HEADER -->
+    <!-- Skip navigation — Accessibility -->
+    <a href="#main-content" class="skip-link">Bỏ qua điều hướng</a>
+
+    <!-- ANNOUNCEMENT BAR -->
+    <div class="announcement-bar" id="announcementBar" role="banner" aria-label="Thông báo khuyến mãi">
+        <span>✦ Miễn phí giao hàng đơn từ 500K &nbsp;·&nbsp; Đổi trả linh hoạt trong 7 ngày &nbsp;·&nbsp; Hỗ trợ 24/7: 1900 888 999 ✦</span>
+    </div>
+
+    <!-- TOP UTILITY BAR (desktop) -->
     <div class="top-utility-bar">
         @await Html.PartialAsync("_NavbarLogo")
     </div>
 
-    <header class="site-navbar">
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">FLOWER JEWELRY</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+    <!-- MAIN NAVBAR -->
+    <header class="site-navbar" id="siteNavbar" role="banner">
+        <nav class="navbar navbar-expand-lg" aria-label="Điều hướng chính">
+            <div class="container-fluid px-4">
+                <!-- Logo -->
+                <a class="navbar-brand d-flex align-items-center gap-2" href="/" aria-label="Flower Jewelry — Trang chủ">
+                    <img src="https://i.pinimg.com/736x/73/fb/de/73fbde1145fa156318b20b494536e34f.jpg"
+                         alt="" aria-hidden="true"
+                         class="brand-logo-img"
+                         width="42" height="42" />
+                    <span>FLOWER JEWELRY</span>
+                </a>
+
+                <!-- Mobile toggle -->
+                <button class="navbar-toggler ms-auto me-2" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false"
+                        aria-label="Mở / đóng menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                <!-- Nav links (center) -->
                 <div class="collapse navbar-collapse justify-content-center" id="mainNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav gap-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Products" asp-action="Index">Trang chủ</a>
+                            <a class="nav-link" asp-controller="Products" asp-action="Index"
+                               @(Context.Request.Path == "/" ? "aria-current=page" : "")>Trang chủ</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="GioiThieu" asp-action="Index">Giới thiệu</a>
                         </li>
 
-                        <!-- Dropdown SẢN PHẨM -->
+                        <!-- Sản phẩm dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#"
+                               id="productDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
                                 Sản phẩm
                             </a>
-
-                            <ul class="dropdown-menu dropdown-menu-center p-3 shadow-lg border-0"
-                                aria-labelledby="navbarDropdown"
-                                style="min-width: 250px; border-radius: 12px; font-size: 15px;">
-                                <li><a class="dropdown-item fw-bold text-center" href="/Products">Tất cả</a></li>
+                            <ul class="dropdown-menu shadow-lg border-0"
+                                aria-labelledby="productDropdown">
+                                <li>
+                                    <a class="dropdown-item fw-semibold" href="/Products">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;opacity:0.7"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                        Tất cả sản phẩm
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider" /></li>
-
                                 @await Component.InvokeAsync("CategoryDropdown")
                             </ul>
-
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="TinTuc" asp-action="Index">Tin tức</a>
                         </li>
 
-                        <!-- Add My Orders link - only show when logged in -->
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" href="/customer/my-orders">Đơn hàng của tôi</a>
+                                <a class="nav-link" href="/customer/my-orders">Đơn hàng</a>
                             </li>
                         }
 
@@ -545,43 +1054,76 @@
                     </ul>
                 </div>
 
-
-                <!-- Cart Icon -->
-                <div class="d-flex align-items-center pe-3 gap-2">
-                    <div class="dropdown mobile-account">
-                        <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-user"></i>
-                            <span class="ms-1 d-none d-sm-inline">Tài khoản</span>
+                <!-- Utils: account + cart -->
+                <div class="navbar-utils">
+                    <!-- Account -->
+                    <div class="account-dropdown dropdown">
+                        <button class="navbar-util-btn dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-label="Tài khoản">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                            </svg>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             @if (User.Identity?.IsAuthenticated ?? false)
                             {
-                                <li><a class="dropdown-item" href="/CustomerAccount/MyAccount"><i class="fa-regular fa-user me-2"></i>Tài khoản của tôi</a></li>
-                                <li><a class="dropdown-item" href="/customer/my-orders"><i class="fa-solid fa-box me-2"></i>Đơn hàng của tôi</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="/CustomerAccount/MyAccount">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                        Tài khoản của tôi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/customer/my-orders">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M5 12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2"/><path d="M5 12a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2"/></svg>
+                                        Đơn hàng của tôi
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
                                     <form method="post" asp-controller="CustomerAccount" asp-action="Logout" class="m-0">
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                            Đăng xuất
                                         </button>
                                     </form>
                                 </li>
                             }
                             else
                             {
-                                <li><a class="dropdown-item" href="/CustomerAccount/Login"><i class="fa-solid fa-right-to-bracket me-2"></i>Đăng nhập</a></li>
-                                <li><a class="dropdown-item" href="/CustomerAccount/Register"><i class="fa-solid fa-user-plus me-2"></i>Đăng ký</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="/CustomerAccount/Login">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                        Đăng nhập
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/CustomerAccount/Register">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                                        Đăng ký
+                                    </a>
+                                </li>
                             }
                         </ul>
                     </div>
-                    <a href="/Cart" class="cart-icon"><i class="fa-solid fa-shopping-cart"></i></a>
+
+                    <!-- Cart -->
+                    <a href="/Cart" class="navbar-util-btn" aria-label="Giỏ hàng">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- SLIDESHOW -->
+    <!-- HERO SLIDESHOW (trang chủ only) -->
     @if (Context.Request.Path == "/" || Context.Request.Path.ToString().ToLower() == "/home/index")
     {
         var homeBanners = StoreRepository.Banners
@@ -590,234 +1132,414 @@
             .ThenBy(b => b.BannerID)
             .ToList();
 
-        <div class="image-container" id="mainSlideshow">
-            @for (var i = 0; i < homeBanners.Count; i++)
-            {
-                var banner = homeBanners[i];
-                var redirectUrl = banner.RedirectUrl?.Trim();
-                if (!string.IsNullOrWhiteSpace(redirectUrl)
-                    && !redirectUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                    && !redirectUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-                    && !redirectUrl.StartsWith("/"))
-                {
-                    redirectUrl = $"https://{redirectUrl}";
-                }
-
-                var isClickable = !string.IsNullOrWhiteSpace(redirectUrl);
-                var imageClass = i == 0
-                    ? (isClickable ? "sliding-image active clickable" : "sliding-image active")
-                    : (isClickable ? "sliding-image clickable" : "sliding-image");
-                var imagePosition = $"object-position:{banner.FocusX}% {banner.FocusY}%;";
-
-                if (isClickable)
-                {
-                    <a href="@redirectUrl">
-                        <img src="@banner.ImageUrl" class="@imageClass" style="@imagePosition" alt="@banner.Title" />
-                    </a>
-                }
-                else
-                {
-                    <img src="@banner.ImageUrl" class="@imageClass" style="@imagePosition" alt="@banner.Title" />
-                }
-            }
-
-            <div class="controls">
+        if (homeBanners.Any())
+        {
+            <section class="hero-section" id="heroSlideshow" aria-label="Banner hình ảnh">
                 @for (var i = 0; i < homeBanners.Count; i++)
                 {
-                    var buttonClass = i == 0 ? "button active" : "button";
-                    <button class="@buttonClass" data-index="@i"></button>
+                    var banner = homeBanners[i];
+                    var redirectUrl = banner.RedirectUrl?.Trim();
+                    if (!string.IsNullOrWhiteSpace(redirectUrl)
+                        && !redirectUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                        && !redirectUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                        && !redirectUrl.StartsWith("/"))
+                    {
+                        redirectUrl = $"https://{redirectUrl}";
+                    }
+
+                    var isClickable   = !string.IsNullOrWhiteSpace(redirectUrl);
+                    var slideClass    = i == 0 ? "hero-slide active" : "hero-slide";
+                    if (isClickable) slideClass += " clickable";
+                    var imgPos        = $"object-position:{banner.FocusX}% {banner.FocusY}%;";
+                    var loading       = i == 0 ? "eager" : "lazy";
+
+                    if (isClickable)
+                    {
+                        <a href="@redirectUrl" tabindex="-1" aria-label="@banner.Title">
+                            <img src="@banner.ImageUrl"
+                                 class="@slideClass"
+                                 style="@imgPos"
+                                 alt="@banner.Title"
+                                 width="1920" height="640"
+                                 loading="@loading" />
+                        </a>
+                    }
+                    else
+                    {
+                        <img src="@banner.ImageUrl"
+                             class="@slideClass"
+                             style="@imgPos"
+                             alt="@banner.Title"
+                             width="1920" height="640"
+                             loading="@loading" />
+                    }
                 }
-            </div>
-        </div>
+
+                <!-- Gradient overlay -->
+                <div class="hero-overlay" aria-hidden="true"></div>
+
+                <!-- Prev / Next arrows -->
+                @if (homeBanners.Count > 1)
+                {
+                    <button class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Ảnh trước">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Ảnh tiếp theo">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                }
+
+                <!-- Dot controls -->
+                <div class="hero-controls" role="group" aria-label="Chuyển slide">
+                    @for (var i = 0; i < homeBanners.Count; i++)
+                    {
+                        <button class="hero-dot @(i == 0 ? "active" : "")"
+                                data-index="@i"
+                                aria-label="Ảnh @(i+1) / @homeBanners.Count"
+                                aria-pressed="@(i == 0 ? "true" : "false")">
+                        </button>
+                    }
+                </div>
+            </section>
+        }
     }
-   @{
-    var currentPath = Context.Request.Path.ToString().ToLower();
-}
-    @if (currentPath == "/")
-    {
-        var currentCategory = Context.Request.Query["category"].ToString();
-        <div class="container my-4">
-            <!-- Thanh phân loại nằm ngang -->
-            <div id="categories" class="category-bar d-flex flex-wrap justify-content-center gap-3 mb-4">
-                <a href="/" class="btn btn-outline-dark @(string.IsNullOrWhiteSpace(currentCategory) ? "active" : "")">Tất cả</a>
-                @await Component.InvokeAsync("CategoryMenu")
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+        @{
+            var currentPath = Context.Request.Path.ToString().ToLower();
+        }
+
+        @if (currentPath == "/")
+        {
+            var currentCategory = Context.Request.Query["category"].ToString();
+
+            <!-- Category filter bar (trang chủ only) -->
+            <div class="category-section">
+                <div class="container">
+                    <nav class="category-bar" role="navigation" aria-label="Lọc theo danh mục">
+                        <a href="/"
+                           class="cat-pill @(string.IsNullOrWhiteSpace(currentCategory) ? "active" : "")"
+                           @(string.IsNullOrWhiteSpace(currentCategory) ? "aria-current=page" : "")>
+                            Tất cả
+                        </a>
+                        @await Component.InvokeAsync("CategoryMenu")
+                    </nav>
+                </div>
             </div>
 
-            <div>
-                @RenderBody()
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="container mt-4">
-            @RenderBody()
-        </div>
-    }
-    <!-- WHY CHOOSE -->
-    <section class="why-choose">
-        <div class="container">
-            <h3>TẠI SAO CHỌN <span style="color:var(--jewel-gold)">FLOWER JEWELRY?</span></h3>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-3 col-sm-6">
-                    <div class="why-card">
-                        <i class="fa-solid fa-gem"></i>
-                        <h6>CHẤT LƯỢNG CAO CẤP</h6>
-                        <p>Trang sức tinh xảo, được chế tác từ nguyên liệu chọn lọc.</p>
-                    </div>
+            <section class="page-content">
+                <div class="container">
+                    @RenderBody()
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="why-card">
-                        <i class="fa-solid fa-gift"></i>
-                        <h6>MẪU MÃ ĐA DẠNG</h6>
-                        <p>Phù hợp cho mọi dịp, quà tặng đến sự kiện đặc biệt.</p>
-                    </div>
+            </section>
+        }
+        else
+        {
+            <section class="page-content">
+                <div class="container">
+                    @RenderBody()
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="why-card">
-                        <i class="fa-solid fa-rotate"></i>
-                        <h6>ĐỔI TRẢ LINH HOẠT</h6>
-                        <p>Đổi trả trong 7 ngày nếu sản phẩm không như mong đợi.</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="why-card">
-                        <i class="fa-solid fa-headset"></i>
-                        <h6>HỖ TRỢ 24/7</h6>
-                        <p>Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            </section>
+        }
 
-    <!-- FOOTER (chuẩn Huy Thanh Jewelry style) -->
-    <footer style="background-color:#fff; color:#000; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.7; padding:50px 0 10px;">
+        <!-- VALUE / WHY CHOOSE SECTION -->
+        <section class="value-section" aria-labelledby="valueTitle">
+            <div class="container position-relative">
+                <div class="text-center mb-5">
+                    <span class="section-eyebrow">Cam kết của chúng tôi</span>
+                    <h2 class="section-title" id="valueTitle">
+                        Tại sao chọn <span>Flower Jewelry?</span>
+                    </h2>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="value-card">
+                            <div class="value-icon-wrap" aria-hidden="true">
+                                <!-- Gem icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="6 3 18 3 22 9 12 22 2 9"/><line x1="2" y1="9" x2="22" y2="9"/>
+                                    <line x1="12" y1="3" x2="6" y2="9"/><line x1="12" y1="3" x2="18" y2="9"/>
+                                </svg>
+                            </div>
+                            <div class="value-card-body">
+                                <h6>Chất lượng cao cấp</h6>
+                                <p>Trang sức tinh xảo, được chế tác từ nguyên liệu chọn lọc kỹ càng.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="value-card">
+                            <div class="value-icon-wrap" aria-hidden="true">
+                                <!-- Gift icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/>
+                                    <line x1="12" y1="22" x2="12" y2="7"/>
+                                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                                </svg>
+                            </div>
+                            <div class="value-card-body">
+                                <h6>Mẫu mã đa dạng</h6>
+                                <p>Phù hợp cho mọi dịp — từ quà tặng đến các sự kiện đặc biệt.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="value-card">
+                            <div class="value-icon-wrap" aria-hidden="true">
+                                <!-- Return/refresh icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                                </svg>
+                            </div>
+                            <div class="value-card-body">
+                                <h6>Đổi trả linh hoạt</h6>
+                                <p>Đổi trả dễ dàng trong 7 ngày nếu sản phẩm không như mong đợi.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="value-card">
+                            <div class="value-icon-wrap" aria-hidden="true">
+                                <!-- Headset icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+                                </svg>
+                            </div>
+                            <div class="value-card-body">
+                                <h6>Hỗ trợ 24/7</h6>
+                                <p>Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn mọi lúc mọi nơi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" aria-label="Footer">
         <div class="container">
-            <div class="row">
-                <!-- CỘT 1: HOTLINE -->
-                <div class="col-md-4 col-sm-12 mb-4" style="text-align: left;">
-                    <div class="d-flex align-items-start mb-4">
-                        <div style="background-color:#000; color:#fff; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-right:15px;">
-                            <i class="fa-solid fa-phone"></i>
+            <div class="row g-5">
+                <!-- Col 1: Brand + Social -->
+                <div class="col-lg-3 col-md-6">
+                    <span class="footer-brand">FLOWER JEWELRY</span>
+                    <p class="footer-tagline">
+                        Trang sức tinh xảo, chế tác từ trái tim — mang vẻ đẹp sang trọng đến mọi khoảnh khắc của bạn.
+                    </p>
+                    <div class="footer-social" aria-label="Mạng xã hội">
+                        <a href="#" class="footer-social-btn" aria-label="Facebook Flower Jewelry">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="footer-social-btn" aria-label="Instagram Flower Jewelry">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="#" class="footer-social-btn" aria-label="YouTube Flower Jewelry">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 1.97C5.12 20 12 20 12 20s6.88 0 8.6-.45a2.78 2.78 0 0 0 1.94-1.97A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+                        </a>
+                        <a href="#" class="footer-social-btn" aria-label="TikTok Flower Jewelry">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick links -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <span class="footer-col-title">Khám phá</span>
+                    <ul class="footer-links">
+                        <li><a asp-controller="GioiThieu" asp-action="Index">Giới thiệu</a></li>
+                        <li><a href="/Products">Sản phẩm</a></li>
+                        <li><a asp-controller="TinTuc" asp-action="Index">Tin tức</a></li>
+                        <li><a asp-controller="CuaHang" asp-action="Index">Hệ thống cửa hàng</a></li>
+                        <li><a href="/LienHe/Index">Liên hệ</a></li>
+                        <li><a asp-controller="QuanHeCoDong" asp-action="Index">Quan hệ cổ đông</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Hotline -->
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <span class="footer-col-title">Liên hệ</span>
+                    <div class="footer-contact-item">
+                        <div class="footer-contact-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1.18l3-.01a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.89-.89a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                         </div>
                         <div>
-                            <p class="mb-1" style="font-weight:600; margin:0;">
-                                GỌI MUA HÀNG (Phím 1)
-                                <span style="font-weight:400;">(8:00 - 21:00)</span>
-                            </p>
-                            <p class="mb-1" style="font-size:22px; font-weight:500; margin:0;">
-                                <a href="tel:1900888999" style="color:#000; text-decoration:none;">1900 888 999</a>
-                            </p>
-                            <small>Tất cả các ngày trong tuần</small>
+                            <div class="footer-contact-label">Gọi mua hàng (Phím 1) — 8:00–21:00</div>
+                            <div class="footer-contact-value"><a href="tel:1900888999">1900 888 999</a></div>
+                            <div class="footer-contact-sub">Tất cả các ngày trong tuần</div>
                         </div>
                     </div>
-
-                    <div class="d-flex align-items-start">
-                        <div style="background-color:#000; color:#fff; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-right:15px;">
-                            <i class="fa-solid fa-phone"></i>
+                    <div class="footer-contact-item">
+                        <div class="footer-contact-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1.18l3-.01a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6.29 6.29l.89-.89a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                         </div>
                         <div>
-                            <p class="mb-1" style="font-weight:600; margin:0;">
-                                GÓP Ý, KHIẾU NẠI (Phím 3)
-                                <span style="font-weight:400;">(8:00 - 21:00)</span>
-                            </p>
-                            <p class="mb-1" style="font-size:22px; font-weight:500; margin:0;">
-                                <a href="tel:1900246864" style="color:#000; text-decoration:none;">1900 246 864</a>
-                            </p>
-                            <small>Tất cả các ngày trong tuần</small>
+                            <div class="footer-contact-label">Góp ý, khiếu nại (Phím 3) — 8:00–21:00</div>
+                            <div class="footer-contact-value"><a href="tel:1900246864">1900 246 864</a></div>
+                            <div class="footer-contact-sub">Tất cả các ngày trong tuần</div>
+                        </div>
+                    </div>
+                    <div class="footer-contact-item">
+                        <div class="footer-contact-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <div>
+                            <div class="footer-contact-label">Email</div>
+                            <div class="footer-contact-value" style="font-size:15px;"><a href="mailto:cskh@FlowerJewelry.vn">cskh@FlowerJewelry.vn</a></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CỘT 2: SHOWROOM -->
-                <div class="col-md-4 col-sm-12 mb-4 text-center">
-                    <a class="nav-link" asp-controller="CuaHang" asp-action="Index"
-                       style="display:inline-block; text-decoration:none; color:inherit;">
-                        <p style="font-weight:600; text-transform:uppercase; margin-bottom:10px; transition:color 0.3s;">
-                            HỆ THỐNG SHOWROOM
-                        </p>
+                <!-- Col 4: Showroom -->
+                <div class="col-lg-4 col-md-6">
+                    <span class="footer-col-title">Hệ thống showroom</span>
+                    <a class="footer-showroom-link mb-3" asp-controller="CuaHang" asp-action="Index" aria-label="Xem hệ thống showroom Flower Jewelry">
                         <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/ft_showroom_image_custom.webp"
-                             alt="Hệ thống cửa hàng"
-                             class="img-fluid"
-                             style="border-radius:4px; transition:transform 0.3s;">
+                             alt="Hệ thống cửa hàng Flower Jewelry"
+                             class="footer-showroom-img"
+                             loading="lazy"
+                             width="400" height="267" />
                     </a>
-                </div>
-
-                <!-- CỘT 3: FANPAGE -->
-                <div class="col-md-4 col-sm-12 mb-4 text-center">
-                    <p style="font-weight:600; text-transform:uppercase; margin-bottom:10px;">FANPAGE CỦA CHÚNG TÔI</p>
-                    <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/footer-fanpage-custom-image.webp"
-                         alt="Fanpage Flower Jewelry"
-                         class="img-fluid"
-                         style="border-radius:4px; margin-bottom:15px;">
-                    <div class="d-flex justify-content-center gap-4">
-                        <a href="#" style="color:#000;"><i class="fab fa-facebook-f fa-lg"></i></a>
-                        <a href="#" style="color:#000;"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" style="color:#000;"><i class="fab fa-youtube fa-lg"></i></a>
-                        <a href="#" style="color:#000;"><i class="fab fa-tiktok fa-lg"></i></a>
-                    </div>
+                    <p style="font-size:13px; color:var(--color-text-secondary); margin-top:var(--space-3); line-height:1.7;">
+                        <strong style="color:var(--color-foreground);">Trụ sở:</strong> 828 Sư Vạn Hạnh, P. Hòa Hưng, TP. HCM<br />
+                        <strong style="color:var(--color-foreground);">Tel:</strong> 0123 456 789
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- THÔNG TIN CÔNG TY -->
-            <div class="text-end mt-4" style="color:#555; font-size:11px; text-align:right;">
-                <p class="fw-bold mb-1" style="color:#2d2d2d;">CÔNG TY TNHH VÀNG BẠC ĐÁ QUÝ FLOWER JEWELRY</p>
-                <p class="mb-1">Trụ sở chính: 828 Sư Vạn Hạnh, Phường Hòa Hưng, TP. HCM, Việt Nam.</p>
-                <p class="mb-1">
-                    Điện thoại: 0123456789 - Fax: 0987654321 - Email: cskh@FlowerJewelry.vn
-                </p>
-                <p class="mb-1">
-                    Giấy chứng nhận đăng ký doanh nghiệp: 1234567890 do Sở KH&ĐT TP. Hà Nội cấp lần đầu ngày 02/10/2025.
-                </p>
-                <small>© @DateTime.Now.Year - <b>Flower Jewelry</b></small>
-                <img src="https://huythanhjewelry.vn/storage/photos/shares/Footer/logo_bocongthuong.png"
-                     style="height:40px; margin-top:10px; float:right;">
-                
+        <!-- Copyright strip -->
+        <div class="footer-bottom">
+            <div class="footer-legal">
+                <strong>CÔNG TY TNHH VÀNG BẠC ĐÁ QUÝ FLOWER JEWELRY</strong><br />
+                Giấy CNĐKDN: 1234567890 do Sở KH&ĐT TP. Hà Nội cấp lần đầu 02/10/2025<br />
+                <span style="opacity:0.6">© @DateTime.Now.Year <strong>Flower Jewelry</strong>. All rights reserved.</span>
             </div>
         </div>
     </footer>
 
+    <!-- CHAT WIDGET — Đặt trong <body>, trước </body> -->
+    <div class="chat-widget" role="complementary" aria-label="Chat hỗ trợ">
+        <!-- Trigger button -->
+        <button id="chatIcon" aria-label="Mở hộp chat hỗ trợ" aria-expanded="false" aria-controls="chatBox" type="button">
+            <!-- Chat SVG icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span class="chat-label">Chat ngay</span>
+        </button>
+
+        <!-- Chat box -->
+        <div id="chatBox" role="dialog" aria-label="Chat hỗ trợ Flower Jewelry" aria-modal="false">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="chat-avatar">
+                    <img src="https://i.pinimg.com/736x/73/fb/de/73fbde1145fa156318b20b494536e34f.jpg"
+                         alt="Logo Flower Jewelry" width="44" height="44" />
+                </div>
+                <div class="chat-header-info">
+                    <div class="chat-header-name">Flower Jewelry</div>
+                    <div class="chat-header-sub">Hỗ trợ 24/7 — Phản hồi ngay</div>
+                </div>
+                <button class="chat-close-btn" id="closeChat" aria-label="Đóng hộp chat" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div id="messagesList" aria-live="polite" aria-label="Tin nhắn"></div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <div class="chat-input-row">
+                    <label for="messageInput" class="visually-hidden">Nhập tin nhắn</label>
+                    <input type="text" id="messageInput"
+                           placeholder="Nhập tin nhắn..."
+                           autocomplete="off"
+                           aria-label="Nhập tin nhắn" />
+                    <button id="sendButton" type="button" aria-label="Gửi tin nhắn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="chat-footer-note">Được hỗ trợ bởi Flower Jewelry</div>
+            </div>
+        </div>
+    </div>
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Slideshow
+        // ── Announcement bar hide on scroll ──────────────────────────
         (function () {
-            const container = document.getElementById('mainSlideshow');
+            const bar    = document.getElementById('announcementBar');
+            const navbar = document.getElementById('siteNavbar');
+            if (!bar) return;
+            let lastY = 0;
+            window.addEventListener('scroll', function () {
+                const y = window.scrollY;
+                if (y > 80 && y > lastY) {
+                    bar.classList.add('hidden');
+                } else if (y < 40) {
+                    bar.classList.remove('hidden');
+                }
+                lastY = y;
+                // Navbar shadow on scroll
+                if (navbar) navbar.classList.toggle('scrolled', y > 10);
+            }, { passive: true });
+        })();
+
+        // ── Hero Slideshow ────────────────────────────────────────────
+        (function () {
+            const container = document.getElementById('heroSlideshow');
             if (!container) return;
-            const slides = Array.from(container.querySelectorAll('.sliding-image'));
-            const buttons = Array.from(container.querySelectorAll('.controls .button'));
-            if (slides.length === 0 || buttons.length === 0) return;
+
+            const slides  = Array.from(container.querySelectorAll('.hero-slide'));
+            const dots    = Array.from(container.querySelectorAll('.hero-dot'));
+            const btnPrev = document.getElementById('heroPrev');
+            const btnNext = document.getElementById('heroNext');
+            if (!slides.length) return;
+
             let index = 0;
             let timer;
+            const INTERVAL = 4500;
+
+            // Respect reduced motion
+            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             function showSlide(i) {
-                slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
-                buttons.forEach((b, idx) => b.classList.toggle('active', idx === i));
+                slides.forEach((s, idx) => {
+                    s.classList.toggle('active', idx === i);
+                });
+                dots.forEach((d, idx) => {
+                    d.classList.toggle('active', idx === i);
+                    d.setAttribute('aria-pressed', idx === i ? 'true' : 'false');
+                });
                 index = i;
             }
 
-            function next() {
-                showSlide((index + 1) % slides.length);
-            }
+            function next() { showSlide((index + 1) % slides.length); }
+            function prev() { showSlide((index - 1 + slides.length) % slides.length); }
 
             function start() {
+                if (prefersReduced) return; // Don't auto-advance if user prefers reduced motion
                 stop();
-                timer = setInterval(next, 2000);
+                timer = setInterval(next, INTERVAL);
             }
+            function stop() { if (timer) clearInterval(timer); }
 
-            function stop() {
-                if (timer) clearInterval(timer);
-            }
-
-            buttons.forEach((b, i) => {
-                b.addEventListener('click', () => {
-                    showSlide(i);
-                    start();
-                });
+            dots.forEach((d, i) => {
+                d.addEventListener('click', () => { showSlide(i); start(); });
             });
+            if (btnPrev) btnPrev.addEventListener('click', () => { prev(); start(); });
+            if (btnNext) btnNext.addEventListener('click', () => { next(); start(); });
 
             container.addEventListener('mouseenter', stop);
             container.addEventListener('mouseleave', start);
@@ -825,159 +1547,120 @@
             showSlide(0);
             start();
         })();
+
+        // ── Chat Widget ───────────────────────────────────────────────
+        (function () {
+            const icon      = document.getElementById('chatIcon');
+            const box       = document.getElementById('chatBox');
+            const closeBtn  = document.getElementById('closeChat');
+            const sendBtn   = document.getElementById('sendButton');
+            const input     = document.getElementById('messageInput');
+            const msgList   = document.getElementById('messagesList');
+            if (!icon || !box) return;
+
+            let greetingSent = false;
+
+            function openChat() {
+                box.style.display = 'block';
+                icon.setAttribute('aria-expanded', 'true');
+                icon.style.display = 'none';
+                if (!greetingSent) {
+                    renderMessage('Flower Jewelry',
+                        'Flower Jewelry xin chào!\nChúng tôi có thể hỗ trợ gì cho bạn hôm nay?');
+                    greetingSent = true;
+                }
+                input.focus();
+            }
+            function closeChat() {
+                box.style.display = 'none';
+                icon.style.display = 'flex';
+                icon.setAttribute('aria-expanded', 'false');
+                icon.focus();
+            }
+
+            icon.addEventListener('click', openChat);
+            closeBtn.addEventListener('click', closeChat);
+
+            // Escape key to close
+            box.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeChat();
+            });
+
+            function renderMessage(user, message) {
+                const wrap   = document.createElement('div');
+                const bubble = document.createElement('div');
+                const isUser = user === 'Bạn';
+
+                Object.assign(wrap.style, {
+                    display:        'flex',
+                    justifyContent: isUser ? 'flex-end' : 'flex-start',
+                });
+                Object.assign(bubble.style, {
+                    maxWidth:     '75%',
+                    padding:      '10px 14px',
+                    borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    fontSize:     '14px',
+                    lineHeight:   '1.55',
+                    whiteSpace:   'pre-wrap',
+                    background:   isUser ? 'linear-gradient(135deg,#A16207,#D4AF37)' : '#F0EFED',
+                    color:        isUser ? 'white' : '#1C1917',
+                });
+
+                bubble.textContent = message;
+                wrap.appendChild(bubble);
+                msgList.appendChild(wrap);
+                msgList.scrollTop = msgList.scrollHeight;
+            }
+
+            // Send on button click or Enter
+            function sendMsg() {
+                const msg = input.value.trim();
+                if (!msg) return;
+                renderMessage('Bạn', msg);
+                if (typeof connection !== 'undefined') {
+                    connection.invoke('SendMessage', 'Bạn', msg).catch(console.error);
+                }
+                input.value = '';
+                input.focus();
+            }
+
+            sendBtn.addEventListener('click', sendMsg);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+            });
+        })();
+    </script>
+
+    <!-- SIGNALR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('/chathub')
+            .build();
+
+        connection.on('ReceiveMessage', function (user, message) {
+            const msgList = document.getElementById('messagesList');
+            if (!msgList) return;
+            const wrap   = document.createElement('div');
+            const bubble = document.createElement('div');
+            const isUser = user === 'Bạn';
+            Object.assign(wrap.style, { display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' });
+            Object.assign(bubble.style, {
+                maxWidth: '75%', padding: '10px 14px', fontSize: '14px',
+                lineHeight: '1.55', whiteSpace: 'pre-wrap',
+                borderRadius: isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                background: isUser ? 'linear-gradient(135deg,#A16207,#D4AF37)' : '#F0EFED',
+                color: isUser ? 'white' : '#1C1917',
+            });
+            bubble.textContent = message;
+            wrap.appendChild(bubble);
+            msgList.appendChild(wrap);
+            msgList.scrollTop = msgList.scrollHeight;
+        });
+
+        connection.start().catch(err => console.error('SignalR Error:', err));
     </script>
 
     @RenderSection("Scripts", required: false)
 </body>
 </html>
-
-
-<div class="chat-widget">
-<div id="chatIcon"
-    style="position:fixed; bottom:20px; right:20px;
-            width:160px; height:60px;
-            background:#f39a9a; border-radius:30px;
-            display:flex; justify-content:center; align-items:center;
-            cursor:pointer; color:white; font-size:28px;
-            box-shadow:0 4px 12px rgba(0,0,0,0.25); z-index:9999;
-            padding:0 16px; gap:8px;">
-    💬<span style="font-size:14px;">Flower Jewelry</span>
-</div>
-
-
-<!-- CHAT BOX -->
-<div id="chatBox"
-     style="display:none; position:fixed; bottom:90px; right:20px; width:360px;
-            background:white; border-radius:22px; overflow:hidden;
-            box-shadow:0 4px 20px rgba(0,0,0,0.25); z-index:9999;">
-
-
-    <!-- HEADER -->
-    <div style="background:#f39a9a; padding:14px; display:flex; align-items:center;">
-        <div style="width:45px; height:45px; background:white; border-radius:50%;
-                    display:flex; justify-content:center; align-items:center; margin-right:12px;">
-            <img src="https://i.pinimg.com/736x/73/fb/de/73fbde1145fa156318b20b494536e34f.jpg" style="width:28px;">
-        </div>
-
-        <div style="color:white; flex:1;">
-            <div style="font-size:16px; font-weight:700;">Flower Jewelry</div>
-            <div style="font-size:13px; opacity:0.9;">Chúng tôi sẵn sàng trợ giúp. Hãy để lại số điện thoại của bạn nhé! </div>
-        </div>
-
-        <div id="closeChat"
-             style="cursor:pointer; font-size:20px; color:white;">
-            ✕
-        </div>
-    </div>
-
-    <!-- MESSAGE AREA -->
-    <div id="messagesList"
-         style="height:320px; overflow-y:auto; padding:15px;
-                background:#ffffff; display:flex; flex-direction:column; gap:10px;">
-    </div>
-
-    <!-- INPUT AREA -->
-    <div style="padding:12px; border-top:1px solid #eee; background:white;">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <input type="text" id="messageInput" placeholder="Tin nhắn..."
-                   style="flex:1; border-radius:20px; padding:10px 15px;
-                          border:1px solid #ddd; outline:none;">
-
-            <button id="sendButton"
-                    style="background:#f39a9a; border:none; width:42px; height:42px;
-                           border-radius:50%; color:white; font-size:18px;">
-                ➤
-            </button>
-        </div>
-    </div>
-
-    <div style="text-align:center; font-size:12px; color:#888; padding-bottom:10px;">
-        Được phát triển bởi 🐟 Flower Jewelry
-    </div>
-</div>
-
-
-<!-- SIGNALR -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
-
-<script>
-    // Mở chat
-        // Mở chat
-    document.getElementById("chatIcon").onclick = function () {
-        document.getElementById("chatBox").style.display = "block";
-        this.style.display = "none";
-
-        // Hiển thị tin nhắn mặc định từ admin
-        renderMessage("Flower Jewelry", "Flower Jewelry xin chào\nFlower Jewelry có thể hỗ trợ gì cho mình hôm nay không ạ?");
-    };
-
-
-    // Đóng chat
-    document.getElementById("closeChat").onclick = function () {
-        document.getElementById("chatBox").style.display = "none";
-        document.getElementById("chatIcon").style.display = "flex";
-    };
-
-    // SignalR
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chathub")
-        .build();
-
-    const currentUser = "Bạn";
-
-    // Tạo bong bóng chat
-    function renderMessage(user, message) {
-        const container = document.getElementById("messagesList");
-        const wrap = document.createElement("div");
-        const bubble = document.createElement("div");
-
-        bubble.style.maxWidth = "70%";
-        bubble.style.padding = "10px 14px";
-        bubble.style.borderRadius = "16px";
-        bubble.style.fontSize = "14px";
-        bubble.style.whiteSpace = "pre-wrap";
-
-        // Bạn → bên phải
-        if (user === currentUser) {
-            wrap.style.display = "flex";
-            wrap.style.justifyContent = "flex-end";
-            bubble.style.background = "#f39a9a";
-            bubble.style.color = "white";
-        }
-        // Admin → bên trái
-        else {
-            wrap.style.display = "flex";
-            wrap.style.justifyContent = "flex-start";
-            bubble.style.background = "#f0f0f0";
-            bubble.style.color = "#000";
-        }
-
-        bubble.textContent = message;
-        wrap.appendChild(bubble);
-        container.appendChild(wrap);
-
-        container.scrollTop = container.scrollHeight;
-    }
-
-    // Nhận tin nhắn
-    connection.on("ReceiveMessage", (user, message) => {
-        renderMessage(user, message);
-    });
-
-    // Start
-    connection.start().catch(err => console.error(err.toString()));
-
-    // Gửi tin nhắn
-    document.getElementById("sendButton").onclick = function () {
-        const message = document.getElementById("messageInput").value.trim();
-        if (message === "") return;
-
-        connection.invoke("SendMessage", currentUser, message);
-        document.getElementById("messageInput").value = "";
-    };
-</script>
-
-</div>
-
-
-

@@ -1,4 +1,4 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     let revenueChart = null;
@@ -6,9 +6,17 @@
     window.drawRevenueChart = (labels, values, mode) => {
         const ctx = document.getElementById('revenueChart').getContext('2d');
 
+        // Destroy previous instance
         if (revenueChart) {
             revenueChart.destroy();
         }
+
+        // Luxury gradient fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+        gradient.addColorStop(0, 'rgba(212, 175, 55, 0.20)');
+        gradient.addColorStop(1, 'rgba(212, 175, 55, 0.00)');
+
+        const modeLabel = mode === 'day' ? 'ngày' : mode === 'month' ? 'tháng' : 'quý';
 
         revenueChart = new Chart(ctx, {
             type: 'line',
@@ -17,24 +25,87 @@
                 datasets: [{
                     label: 'Doanh thu',
                     data: values,
-                    fill: false,
+                    fill: true,
+                    backgroundColor: gradient,
+                    borderColor: '#D4AF37',
                     borderWidth: 2,
+                    pointBackgroundColor: '#D4AF37',
+                    pointBorderColor: '#1C1917',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.4,
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 plugins: {
+                    legend: {
+                        display: false,
+                    },
                     title: {
                         display: true,
-                        text: "Biểu đồ doanh thu theo " +
-                              (mode === "day" ? "ngày" :
-                               mode === "month" ? "tháng" : "quý")
+                        text: 'Biểu đồ doanh thu theo ' + modeLabel,
+                        color: '#1C1917',
+                        font: {
+                            family: "'Cormorant', Georgia, serif",
+                            size: 18,
+                            weight: '700',
+                        },
+                        padding: { bottom: 20 },
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(28, 25, 23, 0.90)',
+                        titleColor: '#D4AF37',
+                        bodyColor: '#FFFFFF',
+                        borderColor: 'rgba(212, 175, 55, 0.30)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        callbacks: {
+                            label: function (context) {
+                                const val = context.parsed.y;
+                                return ' ' + val.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                            }
+                        }
                     }
                 },
                 scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(214, 211, 209, 0.4)',
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            color: '#78716C',
+                            font: { family: "'Montserrat', sans-serif", size: 12 }
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(214, 211, 209, 0.4)',
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            color: '#78716C',
+                            font: { family: "'Montserrat', sans-serif", size: 12 },
+                            callback: function (value) {
+                                if (value >= 1_000_000) return (value / 1_000_000).toFixed(1) + 'M';
+                                if (value >= 1_000)     return (value / 1_000).toFixed(0) + 'K';
+                                return value;
+                            }
+                        }
                     }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                animation: {
+                    duration: 600,
+                    easing: 'easeOutQuart',
                 }
             }
         });
