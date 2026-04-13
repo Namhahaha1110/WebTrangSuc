@@ -1,142 +1,643 @@
-﻿@model ProductsListViewModel
+@* Views/Products/Index.cshtml — Flower Jewelry | Phase 2: Luxury Product Grid *@
+@model ProductsListViewModel
 
-<!-- DANH SÁCH SẢN PHẨM -->
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-    @foreach (var p in Model.Products)
-    {
-        <div class="col">
-            <!-- 👉 Cả card là 1 link -->
-            <a asp-action="Details" asp-route-id="@p.ProductID"
-               class="text-decoration-none text-dark">
-                <div class="card h-100 text-center shadow-sm border-0 product-card">
-                    <img src="~/images/@p.ImageUrl"
-                         class="card-img-top p-3"
-                         alt="@p.Name"
-                         style="height: 200px; object-fit: contain;">
-
-                    <div class="card-body">
-                        <h6 class="card-title fw-semibold mb-2">@p.Name</h6>
-                        <p class="card-text text-muted small mb-2 text-truncate">@p.Description</p>
-                        <h5 class="text-danger fw-bold">@p.Price.ToString("N0") đ</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
-    }
-</div>
-
-<!-- PHÂN TRANG -->
-@if (Model.PagingInfo.TotalPages > 1)
-{
-    <div class="text-center mt-4">
-        <!-- Nút Previous -->
-        @if (Model.PagingInfo.CurrentPage > 1)
-        {
-            <a asp-action="Index"
-               asp-route-productPage="@(Model.PagingInfo.CurrentPage - 1)"
-               asp-route-category="@Model.CurrentCategory"
-               class="btn btn-outline-warning btn-sm mx-1">
-                ‹ Trước
-            </a>
-        }
-
-        <!-- Nút số trang -->
-        @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
-        {
-            <a asp-action="Index"
-               asp-route-productPage="@i"
-               asp-route-category="@Model.CurrentCategory"
-               class="btn @(i == Model.PagingInfo.CurrentPage ? "btn-warning" : "btn-outline-warning") btn-sm mx-1">
-                @i
-            </a>
-        }
-
-        <!-- Nút Next -->
-        @if (Model.PagingInfo.CurrentPage < Model.PagingInfo.TotalPages)
-        {
-            <a asp-action="Index"
-               asp-route-productPage="@(Model.PagingInfo.CurrentPage + 1)"
-               asp-route-category="@Model.CurrentCategory"
-               class="btn btn-outline-warning btn-sm mx-1">
-                Sau ›
-            </a>
-        }
-    </div>
+@{
+    var hasProducts = Model?.Products?.Any() ?? false;
+    var cultureVN   = new System.Globalization.CultureInfo("vi-VN");
+    var totalItems  = Model?.PagingInfo?.TotalItems ?? 0;
 }
 
+<!-- ════════════════════════════════════════════════════
+     SECTION HEADER — Eyebrow luxury style
+════════════════════════════════════════════════════ -->
+<section class="products-header" aria-label="Tiêu đề danh sách sản phẩm">
+    <div class="products-header__inner">
+        <span class="products-eyebrow">BỘ SƯU TẬP</span>
+        <h1 class="products-heading">
+            @if (!string.IsNullOrWhiteSpace(Model?.CurrentCategory))
+            {
+                @Model.CurrentCategory
+            }
+            else
+            {
+                <span>Trang sức <em>tinh xảo</em></span>
+            }
+        </h1>
+        <div class="products-separator" aria-hidden="true"></div>
+        @if (totalItems > 0)
+        {
+            <p class="products-count">@totalItems sản phẩm</p>
+        }
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════
+     PRODUCT GRID
+════════════════════════════════════════════════════ -->
+@if (!hasProducts)
+{
+    <!-- EMPTY STATE — e-commerce rule: luôn có empty state đẹp -->
+    <div class="empty-state" role="status" aria-live="polite">
+        <div class="empty-state__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="6 3 18 3 22 9 12 22 2 9"/>
+                <line x1="2" y1="9" x2="22" y2="9"/>
+                <line x1="12" y1="3" x2="6" y2="9"/>
+                <line x1="12" y1="3" x2="18" y2="9"/>
+            </svg>
+        </div>
+        <h2 class="empty-state__title">Chưa có sản phẩm nào</h2>
+        <p class="empty-state__desc">Danh mục này đang được cập nhật. Hãy khám phá các bộ sưu tập khác của chúng tôi.</p>
+        <a href="/" class="btn-luxury-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+            </svg>
+            Tiếp tục mua sắm
+        </a>
+    </div>
+}
+else
+{
+    <ul class="product-grid" aria-label="Danh sách sản phẩm">
+        @{int idx = 0;}
+        @foreach (var p in Model!.Products)
+        {
+            var delay = Math.Min(idx * 50, 300);
+            idx++;
+            <li class="product-grid__item" style="--stagger-delay: @(delay)ms">
+                <article class="product-card" aria-label="@p.Name">
+                    <a asp-controller="Products"
+                       asp-action="Details"
+                       asp-route-id="@p.ProductID"
+                       class="product-card__link"
+                       aria-label="Xem chi tiết @p.Name — @p.Price.ToString("N0", cultureVN) VNĐ">
+
+                        <!-- IMAGE WRAPPER — aspect-ratio 1:1, tránh CLS -->
+                        <div class="product-card__image-wrap" aria-hidden="true">
+                            <img src="~/images/@p.ImageUrl"
+                                 alt="@p.Name"
+                                 class="product-card__img"
+                                 width="400" height="400"
+                                 loading="lazy" />
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="product-card__body">
+                            @if (p.Category?.Name is not null)
+                            {
+                                <span class="product-card__cat">@p.Category.Name</span>
+                            }
+
+                            <h2 class="product-card__name">@p.Name</h2>
+
+                            <p class="product-card__desc">@p.Description</p>
+
+                            <div class="product-card__footer">
+                                <span class="product-card__price">
+                                    @p.Price.ToString("N0", cultureVN) VNĐ
+                                </span>
+
+                                <!-- CTA — visible on mobile, hover-only on desktop -->
+                                <span class="product-card__cta" aria-hidden="true">
+                                    Xem chi tiết
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- HOVER OVERLAY -->
+                        <div class="product-card__overlay" aria-hidden="true"></div>
+                    </a>
+                </article>
+            </li>
+        }
+    </ul>
+
+    <!-- PAGINATION — Minimal dot/pill style -->
+    @if (Model.PagingInfo.TotalPages > 1)
+    {
+        <nav class="pagination-wrap" aria-label="Phân trang sản phẩm">
+            <div class="pagination">
+                <!-- Previous -->
+                @if (Model.PagingInfo.CurrentPage > 1)
+                {
+                    <a asp-action="Index"
+                       asp-route-productPage="@(Model.PagingInfo.CurrentPage - 1)"
+                       asp-route-category="@Model.CurrentCategory"
+                       class="page-arrow"
+                       aria-label="Trang trước">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="page-arrow page-arrow--disabled" aria-disabled="true" aria-label="Trang trước (không khả dụng)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </span>
+                }
+
+                <!-- Page numbers -->
+                <div class="page-numbers" role="list">
+                    @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
+                    {
+                        var isCurrent = i == Model.PagingInfo.CurrentPage;
+                        <!-- Hiển thị: trang 1, trang cuối, trang hiện tại ± 1, còn lại dấu ... -->
+                        @if (i == 1 || i == Model.PagingInfo.TotalPages
+                             || Math.Abs(i - Model.PagingInfo.CurrentPage) <= 1)
+                        {
+                            <a asp-action="Index"
+                               asp-route-productPage="@i"
+                               asp-route-category="@Model.CurrentCategory"
+                               class="page-btn @(isCurrent ? "page-btn--active" : "")"
+                               aria-label="Trang @i"
+                               aria-current="@(isCurrent ? "page" : null)"
+                               role="listitem">
+                                @i
+                            </a>
+                        }
+                        else if (i == Model.PagingInfo.CurrentPage - 2
+                              || i == Model.PagingInfo.CurrentPage + 2)
+                        {
+                            <span class="page-ellipsis" aria-hidden="true" role="listitem">···</span>
+                        }
+                    }
+                </div>
+
+                <!-- Next -->
+                @if (Model.PagingInfo.CurrentPage < Model.PagingInfo.TotalPages)
+                {
+                    <a asp-action="Index"
+                       asp-route-productPage="@(Model.PagingInfo.CurrentPage + 1)"
+                       asp-route-category="@Model.CurrentCategory"
+                       class="page-arrow"
+                       aria-label="Trang tiếp theo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="page-arrow page-arrow--disabled" aria-disabled="true" aria-label="Trang tiếp theo (không khả dụng)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </span>
+                }
+            </div>
+        </nav>
+    }
+}
+
+@section Scripts {
 <style>
-    /* 💎 CARD SẢN PHẨM */
+    /* ════════════════════════════════════════════════════
+       SECTION HEADER
+    ════════════════════════════════════════════════════ */
+    .products-header {
+        text-align: center;
+        padding: var(--space-10) 0 var(--space-8);
+    }
+    .products-header__inner { display: inline-block; }
+
+    .products-eyebrow {
+        display: block;
+        font-family:    var(--font-body);
+        font-size:      11px;
+        font-weight:    600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color:          var(--color-accent);
+        margin-bottom:  var(--space-2);
+    }
+
+    .products-heading {
+        font-family:  var(--font-heading);
+        font-size:    clamp(28px, 5vw, 44px);
+        font-weight:  700;
+        color:        var(--color-foreground);
+        margin:       0 0 var(--space-4);
+        line-height:  1.1;
+    }
+    .products-heading em {
+        font-style: italic;
+        color:      var(--color-accent-light);
+    }
+
+    .products-separator {
+        width:        80px;
+        height:       1.5px;
+        background:   linear-gradient(to right, transparent, var(--color-accent-light), transparent);
+        margin:       0 auto var(--space-3);
+    }
+
+    .products-count {
+        font-family: var(--font-body);
+        font-size:   13px;
+        color:       var(--color-text-secondary);
+        margin:      0;
+    }
+
+    /* ════════════════════════════════════════════════════
+       EMPTY STATE
+    ════════════════════════════════════════════════════ */
+    .empty-state {
+        text-align:  center;
+        padding:     var(--space-20) var(--space-4);
+        display:     flex;
+        flex-direction: column;
+        align-items: center;
+        gap:         var(--space-4);
+    }
+    .empty-state__icon {
+        width:  80px; height: 80px;
+        border-radius: var(--radius-full);
+        background: rgba(161, 98, 7, 0.08);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--color-accent-light);
+    }
+    .empty-state__icon svg { width: 38px; height: 38px; }
+    .empty-state__title {
+        font-family: var(--font-heading);
+        font-size:   28px;
+        font-weight: 700;
+        color:       var(--color-foreground);
+        margin:      0;
+    }
+    .empty-state__desc {
+        font-size:  15px;
+        color:      var(--color-text-secondary);
+        max-width:  380px;
+        line-height: 1.7;
+        margin:     0;
+    }
+
+    /* Shared luxury CTA button */
+    .btn-luxury-primary {
+        display:         inline-flex;
+        align-items:     center;
+        gap:             var(--space-2);
+        padding:         var(--space-3) var(--space-8);
+        min-height:      48px;
+        border-radius:   var(--radius-full);
+        background:      var(--color-primary);
+        color:           var(--color-accent-light);
+        font-family:     var(--font-body);
+        font-size:       13px;
+        font-weight:     600;
+        letter-spacing:  1px;
+        text-transform:  uppercase;
+        text-decoration: none;
+        border:          1.5px solid rgba(212, 175, 55, 0.25);
+        cursor:          pointer;
+        transition:      background     var(--dur-normal) var(--ease-out),
+                         box-shadow     var(--dur-normal) var(--ease-out),
+                         transform      var(--dur-fast)   var(--ease-out);
+        touch-action:    manipulation;
+    }
+    .btn-luxury-primary:hover {
+        background:  var(--color-secondary);
+        box-shadow:  var(--shadow-gold);
+        transform:   translateY(-2px);
+        color:       var(--color-accent-light);
+    }
+    .btn-luxury-primary:focus-visible {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: 3px;
+    }
+
+    /* ════════════════════════════════════════════════════
+       PRODUCT GRID
+    ════════════════════════════════════════════════════ */
+    .product-grid {
+        list-style: none;
+        padding:    0;
+        margin:     0 0 var(--space-12);
+        display:    grid;
+        gap:        var(--space-6);
+        /* Mobile-first: 1 col */
+        grid-template-columns: 1fr;
+    }
+
+    /* 2 col — ≥ 576px */
+    @media (min-width: 576px) {
+        .product-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    /* 3 col — ≥ 1024px (Option A: thoáng, luxury) */
+    @media (min-width: 1024px) {
+        .product-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    /* 4 col — ≥ 1400px */
+    @media (min-width: 1400px) {
+        .product-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+        }
+    }
+
+    /* Stagger entrance animation */
+    .product-grid__item {
+        animation: cardEntrance 400ms var(--ease-out) both;
+        animation-delay: var(--stagger-delay, 0ms);
+    }
+    @@keyframes cardEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @@media (prefers-reduced-motion: reduce) {
+        .product-grid__item { animation: none !important; }
+    }
+
+    /* ════════════════════════════════════════════════════
+       PRODUCT CARD
+    ════════════════════════════════════════════════════ */
     .product-card {
-        transition: all 0.3s ease;
-        border-radius: 12px;
-        border: 1px solid #f5e6a1;
-        background-color: #fffef7;
+        position:      relative;
+        background:    white;
+        border-radius: var(--radius-lg);
+        border:        1px solid var(--color-border-subtle);
+        overflow:      hidden;
+        height:        100%;
+        transition:    box-shadow   var(--dur-normal) var(--ease-out),
+                       border-color var(--dur-normal) var(--ease-out),
+                       transform    var(--dur-normal) var(--ease-out);
+    }
+    .product-card:hover {
+        box-shadow:   var(--shadow-gold);
+        border-color: rgba(212, 175, 55, 0.35);
+        transform:    translateY(-4px);
+    }
+    .product-card:focus-within {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: 2px;
     }
 
-        .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
-            border-color: #d4af37;
-        }
-
-        .product-card img {
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover img {
-            transform: scale(1.07);
-        }
-
-    .card-title {
-        color: #2a2a2a;
-        transition: color 0.3s;
+    .product-card__link {
+        display:         flex;
+        flex-direction:  column;
+        height:          100%;
+        text-decoration: none;
+        color:           inherit;
+        cursor:          pointer;
+        touch-action:    manipulation;
     }
 
-    .product-card:hover .card-title {
-        color: #d4af37; /* vàng ánh kim */
+    /* IMAGE — aspect-ratio 1:1, tránh CLS */
+    .product-card__image-wrap {
+        aspect-ratio: 1 / 1;
+        background:   #FAF8F3;   /* cream warm — khớp brand */
+        overflow:     hidden;
+        flex-shrink:  0;
+        position:     relative;
+    }
+    .product-card__img {
+        width:      100%;
+        height:     100%;
+        object-fit: contain;
+        padding:    var(--space-5);
+        transition: transform var(--dur-slow) var(--ease-out);
+    }
+    .product-card:hover .product-card__img {
+        transform: scale(1.06);
     }
 
-    /* 💎 PHÂN TRANG */
-    .btn-warning {
-        background: linear-gradient(45deg, #ffd700, #f5c542);
-        color: #6b4e16;
-        font-weight: 500;
-        border: none;
+    /* BODY */
+    .product-card__body {
+        display:        flex;
+        flex-direction: column;
+        flex:           1;
+        padding:        var(--space-5) var(--space-5) var(--space-6);
+        gap:            var(--space-2);
     }
 
-    .btn-outline-warning {
-        color: #6b4e16;
-        border-color: #f5c542;
+    /* Category badge */
+    .product-card__cat {
+        font-family:    var(--font-body);
+        font-size:      10px;
+        font-weight:    600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color:          var(--color-accent);
     }
 
-        .btn-outline-warning:hover {
-            background: linear-gradient(45deg, #ffe066, #ffd24d);
-            color: #4b3a11;
+    /* Product name — Cormorant */
+    .product-card__name {
+        font-family: var(--font-heading);
+        font-size:   20px;
+        font-weight: 600;
+        color:       var(--color-foreground);
+        line-height: 1.25;
+        margin:      0;
+        /* Giới hạn 2 dòng */
+        display:             -webkit-box;
+        -webkit-line-clamp:  2;
+        -webkit-box-orient:  vertical;
+        overflow:            hidden;
+        transition: color var(--dur-fast) var(--ease-out);
+    }
+    .product-card:hover .product-card__name {
+        color: var(--color-accent);
+    }
+
+    /* Description — 2 lines max */
+    .product-card__desc {
+        font-size:   13px;
+        line-height: 1.6;
+        color:       var(--color-text-secondary);
+        margin:      0;
+        display:             -webkit-box;
+        -webkit-line-clamp:  2;
+        -webkit-box-orient:  vertical;
+        overflow:            hidden;
+        flex:        1;
+    }
+
+    /* Footer: price + CTA */
+    .product-card__footer {
+        display:     flex;
+        align-items: center;
+        justify-content: space-between;
+        gap:         var(--space-2);
+        margin-top:  var(--space-2);
+        padding-top: var(--space-3);
+        border-top:  1px solid var(--color-border-subtle);
+    }
+
+    /* Price — VNĐ format, tabular nums */
+    .product-card__price {
+        font-family:    var(--font-heading);
+        font-size:      19px;
+        font-weight:    700;
+        color:          var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        white-space:    nowrap;
+    }
+
+    /* CTA — hover on desktop, visible on mobile */
+    .product-card__cta {
+        display:     inline-flex;
+        align-items: center;
+        gap:         4px;
+        font-family: var(--font-body);
+        font-size:   12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color:       var(--color-accent);
+        white-space: nowrap;
+        opacity:     1;
+        transition:  opacity   var(--dur-fast) var(--ease-out),
+                     transform var(--dur-fast) var(--ease-out);
+    }
+    /* Desktop-only: ẩn khi không hover */
+    @@media (hover: hover) and (pointer: fine) {
+        .product-card__cta {
+            opacity:   0;
+            transform: translateX(-6px);
         }
-
-        @@media (max-width: 575.98px) {
-            .product-card .card-body {
-                padding: 0.9rem;
-            }
-
-            .card-title {
-                font-size: 14px;
-                min-height: 38px;
-            }
-
-            .product-card img {
-                height: 170px !important;
-            }
-
-            .text-center.mt-4 {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 6px;
-            }
-
-            .text-center.mt-4 .btn {
-                margin: 0 !important;
-            }
+        .product-card:hover .product-card__cta {
+            opacity:   1;
+            transform: translateX(0);
         }
+    }
+
+    /* Gold shimmer overlay on hover */
+    .product-card__overlay {
+        position:   absolute;
+        inset:      0;
+        background: linear-gradient(
+            135deg,
+            transparent 0%,
+            rgba(212, 175, 55, 0.04) 50%,
+            transparent 100%
+        );
+        opacity:    0;
+        pointer-events: none;
+        transition: opacity var(--dur-normal) var(--ease-out);
+    }
+    .product-card:hover .product-card__overlay { opacity: 1; }
+
+    /* ════════════════════════════════════════════════════
+       PAGINATION — Minimal dot/pill style
+    ════════════════════════════════════════════════════ */
+    .pagination-wrap {
+        display:         flex;
+        justify-content: center;
+        padding:         var(--space-6) 0 var(--space-4);
+    }
+    .pagination {
+        display:     flex;
+        align-items: center;
+        gap:         var(--space-2);
+    }
+
+    /* Arrow prev/next */
+    .page-arrow {
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        width:  40px; height: 40px;
+        border-radius:   var(--radius-full);
+        border:          1.5px solid var(--color-border);
+        background:      white;
+        color:           var(--color-secondary);
+        text-decoration: none;
+        transition:      background     var(--dur-fast) var(--ease-out),
+                         border-color   var(--dur-fast) var(--ease-out),
+                         color          var(--dur-fast) var(--ease-out),
+                         transform      var(--dur-fast) var(--ease-out);
+        touch-action:    manipulation;
+    }
+    .page-arrow:hover {
+        background:   var(--color-primary);
+        border-color: var(--color-primary);
+        color:        var(--color-accent-light);
+        transform:    scale(1.05);
+    }
+    .page-arrow:focus-visible {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: 2px;
+    }
+    .page-arrow--disabled {
+        opacity: 0.35;
+        cursor:  not-allowed;
+    }
+
+    /* Page number buttons */
+    .page-numbers {
+        display:     flex;
+        align-items: center;
+        gap:         var(--space-1);
+    }
+    .page-btn {
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        width:  40px; height: 40px;
+        border-radius:   var(--radius-full);
+        border:          1.5px solid var(--color-border);
+        background:      white;
+        font-family:     var(--font-body);
+        font-size:       13px;
+        font-weight:     500;
+        color:           var(--color-secondary);
+        text-decoration: none;
+        transition:      background     var(--dur-fast) var(--ease-out),
+                         border-color   var(--dur-fast) var(--ease-out),
+                         color          var(--dur-fast) var(--ease-out),
+                         transform      var(--dur-fast) var(--ease-out);
+        touch-action:    manipulation;
+    }
+    .page-btn:hover:not(.page-btn--active) {
+        border-color: var(--color-accent-light);
+        color:        var(--color-accent);
+    }
+    .page-btn:focus-visible {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: 2px;
+    }
+    .page-btn--active {
+        background:   var(--color-accent-light);
+        border-color: var(--color-accent-light);
+        color:        var(--color-primary);
+        font-weight:  700;
+        box-shadow:   var(--shadow-gold);
+    }
+
+    .page-ellipsis {
+        display:    flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px; height: 40px;
+        font-size:  16px;
+        color:      var(--color-text-secondary);
+        letter-spacing: 1px;
+    }
+
+    /* Mobile — tighter pagination */
+    @@media (max-width: 480px) {
+        .page-btn,
+        .page-arrow { width: 36px; height: 36px; font-size: 12px; }
+        .pagination  { gap: var(--space-1); }
+    }
 </style>
+}
