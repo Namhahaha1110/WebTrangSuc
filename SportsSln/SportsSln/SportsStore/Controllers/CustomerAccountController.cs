@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SportsStore.Models;
 using SportsStore.Models.ViewModels;
@@ -166,7 +166,9 @@ namespace SportsStore.Controllers
                 EmailCus = user.Email,
                 UserName = user.UserName,
                 Password = "********", // Không hiển thị thật
-                IDCus = user.Id
+                IDCus = user.Id,
+                Tier = user.Tier,
+                TotalSpent = user.TotalSpent
             };
 
             return View(model);

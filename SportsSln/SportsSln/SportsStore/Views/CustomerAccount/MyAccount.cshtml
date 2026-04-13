@@ -1,125 +1,387 @@
-﻿@model SportsStore.Models.ViewModels.EditAccountViewModel
+@model SportsStore.Models.ViewModels.EditAccountViewModel
+@using SportsStore.Models
 @{
     ViewData["Title"] = "Tài khoản của tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var cultureVN = new System.Globalization.CultureInfo("vi-VN");
+    
+    // Logic cho huy hiệu hạng
+    string tierIcon = Model.Tier switch {
+        CustomerTier.Diamond => "💎 Kim Cương",
+        CustomerTier.Gold => "🥇 Vàng",
+        CustomerTier.Silver => "🥈 Bạc",
+        _ => "🥉 Đồng"
+    };
+
+    string tierClass = Model.Tier switch {
+        CustomerTier.Diamond => "tier-diamond",
+        CustomerTier.Gold => "tier-gold",
+        CustomerTier.Silver => "tier-silver",
+        _ => "tier-bronze"
+    };
+    
+    decimal nextTierThreshold = Model.Tier switch {
+        CustomerTier.Diamond => 0,
+        CustomerTier.Gold => 30000000m,
+        CustomerTier.Silver => 15000000m,
+        _ => 5000000m
+    };
+    
+    decimal percentToNext = 100;
+    if (nextTierThreshold > 0 && nextTierThreshold > Model.TotalSpent) {
+        percentToNext = (Model.TotalSpent / nextTierThreshold) * 100;
+    }
 }
 
 <style>
+    /* Liquid Glass & Luxury Minimalism Variables */
+    :root {
+        --lux-bg: #F8F9FA;
+        --lux-surface: rgba(255, 255, 255, 0.65);
+        --lux-surface-hover: rgba(255, 255, 255, 0.9);
+        --lux-border: rgba(200, 160, 50, 0.2);
+        --lux-text-main: #2A241A;
+        --lux-text-muted: #7A705E;
+        --lux-gold: #D4AF37;
+        --lux-gold-dim: rgba(212, 175, 55, 0.15);
+        --shadow-glass: 0 12px 32px rgba(0, 0, 0, 0.04);
+        --shadow-gold: 0 8px 24px rgba(212, 175, 55, 0.15);
+    }
+
     body {
-        background-color: #f7f6f2;
-        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top right, #fffdf8, #f4f5f5) no-repeat;
     }
 
-    .customer-card {
-        max-width: 650px;
-        margin: 60px auto;
-        background: #fff;
-        border-radius: 20px;
-        padding: 40px 50px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        border-top: 6px solid #c9a227;
+    /* Layout Skeleton */
+    .profile-container {
+        max-width: 900px;
+        margin: 5rem auto;
+        padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
     }
 
-    h2 {
+    @@media (min-width: 992px) {
+        .profile-container {
+            grid-template-columns: 320px 1fr;
+            align-items: flex-start;
+        }
+    }
+
+    /* Premium Glassmorphism Card */
+    .glass-card {
+        background: var(--lux-surface);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-glass);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+        background: var(--lux-surface-hover);
+    }
+
+    /* Left Sidebar: ID & Tier */
+    .profile-sidebar {
         text-align: center;
-        color: #b68d40;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, transparent, var(--lux-gold), transparent);
+        opacity: 0.7;
+    }
+
+    .avatar-placeholder {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f2e9d0, #dfc68b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-gold);
+        border: 4px solid #fff;
+    }
+
+    .profile-name {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 30px;
+        color: var(--lux-text-main);
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .profile-username {
+        font-size: 0.9rem;
+        color: var(--lux-text-muted);
+        margin-bottom: 2rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* TIER BADGES */
+    .tier-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        border-radius: 99px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .info-item {
+    .tier-diamond { background: linear-gradient(135deg, #E0F7FA, #b2ebf2); color: #006064; border: 1px solid #80deea; }
+    .tier-gold    { background: linear-gradient(135deg, #fef4ea, #f9e1b2); color: #b47100; border: 1px solid #f2c779; }
+    .tier-silver  { background: linear-gradient(135deg, #f5f7fa, #e2e8f0); color: #475569; border: 1px solid #cbd5e1; }
+    .tier-bronze  { background: linear-gradient(135deg, #fcf4ec, #f1dfcf); color: #8c5319; border: 1px solid #e1b285; }
+
+    /* Progress to next tier */
+    .tier-progress-wrap {
+        width: 100%;
+        text-align: left;
+    }
+    .tier-progress-label {
         display: flex;
         justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        padding: 14px 0;
-        font-size: 17px;
-    }
-
-    .info-label {
-        color: #777;
-        font-weight: 500;
-    }
-
-    .info-value {
+        font-size: 0.8rem;
         font-weight: 600;
-        color: #333;
+        color: var(--lux-text-muted);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+    .progress-track {
+        height: 6px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #D4AF37, #f3d779);
+        border-radius: 99px;
+        transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .spent-amount {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--lux-gold);
+        display: block;
+        text-align: justify;
+        text-align-last: center;
     }
 
-    .action-buttons {
-        margin-top: 35px;
-        text-align: center;
+    /* Right Content: Bento Details */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    @@media (min-width: 600px) {
+        .bento-grid { grid-template-columns: 1fr 1fr; }
     }
 
-        .action-buttons a {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-    .btn-edit {
-        background-color: #f9d371;
-        color: #000;
+    .bento-item {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(0,0,0,0.03);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: background 0.3s;
+    }
+    .bento-item:hover {
+        background: rgba(255, 255, 255, 0.8);
     }
 
-        .btn-edit:hover {
-            background-color: #e6b325;
-            color: #fff;
-        }
+    .bento-icon {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
 
-    .btn-delete {
-        background-color: #dc3545;
+    .bento-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--lux-text-muted);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .bento-value {
+        font-size: 1.05rem;
+        color: var(--lux-text-main);
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    /* Call to action */
+    .cta-area {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding-top: 1.5rem;
+    }
+
+    .btn-luxury {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border-radius: 99px;
+        background: #111;
+        color: #facc15;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+        cursor: pointer;
+    }
+    
+    .btn-luxury:hover {
+        background: #000;
         color: #fff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
     }
-
-        .btn-delete:hover {
-            background-color: #b02a37;
-            color: #fff;
-        }
 </style>
 
 @if (Model != null)
 {
-    <div class="customer-card">
-        <h2>Thông tin tài khoản</h2>
+    <div class="profile-container">
+        
+        <!-- Left Sidebar: Identity & Tier -->
+        <div class="glass-card profile-sidebar">
+            <div class="avatar-placeholder">
+                @(string.IsNullOrEmpty(Model.NameCus) ? "U" : Model.NameCus.Substring(0,1).ToUpper())
+            </div>
+            
+            <h1 class="profile-name">@(string.IsNullOrEmpty(Model.NameCus) ? "Khách Hàng" : Model.NameCus)</h1>
+            <div class="profile-username">@@@Model.UserName</div>
 
-        <div class="info-item">
-            <span class="info-label">👤 Họ và tên:</span>
-            <span class="info-value">@Model.NameCus</span>
+            <div class="tier-badge @tierClass">
+                @tierIcon
+            </div>
+
+            <div class="tier-progress-wrap mt-2">
+                <div class="tier-progress-label">
+                    <span>Tổng chi tiêu</span>
+                    @if (Model.Tier != CustomerTier.Diamond) {
+                        <span>@(percentToNext.ToString("F0"))% tới hạng tiếp</span>
+                    } else {
+                        <span>Hạng Tối Đa</span>
+                    }
+                </div>
+                
+                @if (Model.Tier != CustomerTier.Diamond) {
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: @(percentToNext.ToString("F0", System.Globalization.CultureInfo.InvariantCulture))%;"></div>
+                    </div>
+                    <div style="font-size:0.8rem;color:var(--lux-text-muted);text-align:right;margin-bottom:1rem;">
+                        Đỉnh: @nextTierThreshold.ToString("N0", cultureVN) đ
+                    </div>
+                } else {
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #00BCD4, #80DEEA)"></div>
+                    </div>
+                }
+
+                <div class="spent-amount">
+                    @Model.TotalSpent.ToString("N0", cultureVN) đ
+                </div>
+                <p style="font-size: 0.75rem; text-align: center; color: var(--lux-text-muted); margin-top:0.5rem">
+                    (Dựa trên đơn hàng đã giao thành công)
+                </p>
+            </div>
         </div>
 
-        <div class="info-item">
-            <span class="info-label">📞 Số điện thoại:</span>
-            <span class="info-value">@Model.PhoneCus</span>
+        <!-- Right Content: Account Details -->
+        <div class="glass-card">
+            <h2 style="font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:700;color:var(--lux-text-main);margin:0 0 2rem;letter-spacing:-0.5px;">
+                Chi tiết cá nhân
+            </h2>
+            
+            <div class="bento-grid">
+                
+                <!-- Email -->
+                <div class="bento-item">
+                    <div class="bento-icon">✉️</div>
+                    <div class="bento-label">Thư điện tử</div>
+                    <div class="bento-value">@(string.IsNullOrEmpty(Model.EmailCus) ? "Bổ sung ngay" : Model.EmailCus)</div>
+                </div>
+
+                <!-- Phone -->
+                <div class="bento-item">
+                    <div class="bento-icon">📞</div>
+                    <div class="bento-label">Điện thoại</div>
+                    <div class="bento-value">@(string.IsNullOrEmpty(Model.PhoneCus) ? "Bổ sung ngay" : Model.PhoneCus)</div>
+                </div>
+
+                <!-- Username -->
+                <div class="bento-item">
+                    <div class="bento-icon">🛡️</div>
+                    <div class="bento-label">Tài khoản (ID)</div>
+                    <div class="bento-value" style="font-family: monospace;">@Model.UserName</div>
+                </div>
+
+                <!-- Password -->
+                <div class="bento-item">
+                    <div class="bento-icon">🔑</div>
+                    <div class="bento-label">Bảo mật</div>
+                    <div class="bento-value">••••••••••</div>
+                </div>
+            </div>
+
+            <div class="cta-area">
+                <a href="/CustomerAccount/EditAccount/@Model.IDCus" class="btn-luxury">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Quản lý tài khoản
+                </a>
+            </div>
         </div>
 
-        <div class="info-item">
-            <span class="info-label">✉️ Email:</span>
-            <span class="info-value">@Model.EmailCus</span>
-        </div>
-
-        <div class="info-item">
-            <span class="info-label">👥 Tài khoản đăng nhập:</span>
-            <span class="info-value">@Model.UserName</span>
-        </div>
-
-        <div class="info-item">
-            <span class="info-label">🔒 Mật khẩu:</span>
-            <span class="info-value">@Model.Password</span>
-        </div>
-
-        <div class="action-buttons">
-            <a href="@Url.Action("EditAccount", "CustomerAccount", new { id = Model.IDCus })" class="btn-edit">✏️ Chỉnh sửa</a>
-        </div>
     </div>
 }
 else
 {
-    <p class="text-center text-danger">Không tìm thấy thông tin khách hàng.</p>
+    <div class="profile-container" style="justify-content:center;">
+        <div class="glass-card text-center" style="padding: 5rem 2rem;">
+            <div style="font-size:3rem;margin-bottom:1rem;">⚠️</div>
+            <h2 style="font-family:'Montserrat';font-weight:700;">Không tìm thấy thông tin</h2>
+            <p style="color:var(--lux-text-muted);">Hệ thống đã mất kết nối với phiên đăng nhập của bạn.</p>
+        </div>
+    </div>
 }
