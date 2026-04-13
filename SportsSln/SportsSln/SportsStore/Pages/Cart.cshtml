@@ -1,483 +1,1014 @@
-﻿@page
+@page
 @model SportsStore.Pages.CartModel
 @{
-    ViewData["Title"] = "Thanh toán";
+    ViewData["Title"] = "Giỏ hàng — Flower Jewelry";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var cultureVN = new System.Globalization.CultureInfo("vi-VN");
+    var hasItems  = Model?.ShoppingCart?.Lines?.Any() ?? false;
 }
 
 <style>
-    body {
-        background-color: #fffdfa;
-        font-family: 'Segoe UI', sans-serif;
+    /* ════════════════════════════════════════════════════
+       CART — PAGE HEADER
+    ════════════════════════════════════════════════════ */
+    .cart-page-header {
+        text-align:     center;
+        padding:        var(--space-10) 0 var(--space-8);
+    }
+    .cart-page-eyebrow {
+        display:        block;
+        font-family:    var(--font-body);
+        font-size:      11px;
+        font-weight:    600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color:          var(--color-accent);
+        margin-bottom:  var(--space-2);
+    }
+    .cart-page-title {
+        font-family:  var(--font-heading);
+        font-size:    clamp(28px, 5vw, 42px);
+        font-weight:  700;
+        color:        var(--color-foreground);
+        margin:       0 0 var(--space-3);
+        line-height:  1.1;
+    }
+    .cart-page-sep {
+        width:      60px; height: 1.5px;
+        background: linear-gradient(to right, transparent, var(--color-accent-light), transparent);
+        margin:     0 auto;
     }
 
-    .checkout-container {
-        max-width: 1100px;
-        margin: 40px auto;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        padding: 30px 40px;
+    /* ════════════════════════════════════════════════════
+       EMPTY STATE
+    ════════════════════════════════════════════════════ */
+    .cart-empty {
+        text-align:     center;
+        padding:        var(--space-20) var(--space-4);
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        gap:            var(--space-4);
+    }
+    .cart-empty__icon {
+        width: 88px; height: 88px;
+        border-radius: var(--radius-full);
+        background:    rgba(161,98,7,0.08);
+        display:       flex; align-items: center; justify-content: center;
+        color:         var(--color-accent-light);
+    }
+    .cart-empty__icon svg { width: 42px; height: 42px; }
+    .cart-empty__title {
+        font-family: var(--font-heading);
+        font-size:   30px;
+        font-weight: 700;
+        color:       var(--color-foreground);
+        margin:      0;
+    }
+    .cart-empty__desc {
+        font-size:   15px;
+        color:       var(--color-text-secondary);
+        max-width:   360px;
+        line-height: 1.7;
+        margin:      0;
+    }
+    .btn-go-shop {
+        display:         inline-flex;
+        align-items:     center;
+        gap:             var(--space-2);
+        padding:         var(--space-3) var(--space-8);
+        min-height:      48px;
+        border-radius:   var(--radius-full);
+        background:      var(--color-primary);
+        color:           var(--color-accent-light);
+        font-family:     var(--font-body);
+        font-size:       13px;
+        font-weight:     600;
+        letter-spacing:  1px;
+        text-transform:  uppercase;
+        text-decoration: none;
+        border:          1.5px solid rgba(212,175,55,0.25);
+        transition:      background var(--dur-normal), box-shadow var(--dur-normal), transform var(--dur-fast);
+        touch-action:    manipulation;
+    }
+    .btn-go-shop:hover {
+        background:  var(--color-secondary);
+        box-shadow:  var(--shadow-gold);
+        transform:   translateY(-2px);
+        color:       var(--color-accent-light);
+    }
+    .btn-go-shop:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 3px; }
+
+    /* ════════════════════════════════════════════════════
+       CART LAYOUT — 2 cột desktop
+    ════════════════════════════════════════════════════ */
+    .cart-layout {
+        display:     grid;
+        gap:         var(--space-8);
+        grid-template-columns: 1fr;
+        align-items: start;
+        padding-bottom: var(--space-16);
+    }
+    @@media (min-width: 992px) {
+        .cart-layout { grid-template-columns: 1fr 360px; }
     }
 
-    h2 {
-        text-align: center;
-        color: #b8860b;
-        font-weight: 600;
-        margin-bottom: 30px;
+    /* ════════════════════════════════════════════════════
+       CART SECTIONS
+    ════════════════════════════════════════════════════ */
+    .cart-section {
+        background:    white;
+        border-radius: var(--radius-xl);
+        border:        1px solid var(--color-border-subtle);
+        padding:       var(--space-6);
+        margin-bottom: var(--space-5);
+    }
+    .cart-section:last-child { margin-bottom: 0; }
+
+    .section-hd {
+        display:       flex;
+        align-items:   center;
+        gap:           var(--space-3);
+        margin-bottom: var(--space-5);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .section-hd__icon {
+        width: 36px; height: 36px;
+        border-radius: var(--radius-full);
+        background:    rgba(161,98,7,0.08);
+        display:       flex; align-items: center; justify-content: center;
+        color:         var(--color-accent-light);
+        flex-shrink:   0;
+    }
+    .section-hd__title {
+        font-family:  var(--font-heading);
+        font-size:    20px;
+        font-weight:  700;
+        color:        var(--color-foreground);
+        margin:       0;
     }
 
-    .product-list {
-        border-bottom: 2px solid #f4f4f4;
-        margin-bottom: 25px;
-    }
-
+    /* ════════════════════════════════════════════════════
+       CART ITEMS — Product rows
+    ════════════════════════════════════════════════════ */
     .product-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding: 15px;
-        border-radius: 10px;
-        background-color: #fafafa;
-        gap: 15px;
+        display:       flex;
+        align-items:   center;
+        gap:           var(--space-4);
+        padding:       var(--space-4) 0;
+        border-bottom: 1px solid var(--color-border-subtle);
     }
+    .product-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .product-item:first-child { padding-top: 0; }
 
+    /* Custom checkbox */
     .product-checkbox {
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-        accent-color: #b8860b;
+        width:        22px; height: 22px;
+        accent-color: var(--color-accent-light);
+        cursor:       pointer;
+        flex-shrink:  0;
+        border-radius: 4px;
     }
 
     .product-left {
-        display: flex;
+        display:     flex;
         align-items: center;
-        gap: 15px;
-        flex: 1;
+        gap:         var(--space-3);
+        flex:        1;
+        min-width:   0;
     }
-
-        .product-left img {
-            width: 90px;
-            height: 90px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid #f2e2b1;
-        }
-
-    .product-details {
-        display: flex;
-        flex-direction: column;
-        color: #333;
+    .product-left img {
+        width:         80px; height: 80px;
+        border-radius: var(--radius-lg);
+        object-fit:    contain;
+        background:    #FAF8F3;
+        border:        1px solid var(--color-border-subtle);
+        padding:       var(--space-2);
+        flex-shrink:   0;
     }
-
+    .product-details { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
     .product-name {
-        font-weight: 600;
-        font-size: 17px;
+        font-family:  var(--font-heading);
+        font-size:    17px;
+        font-weight:  600;
+        color:        var(--color-foreground);
+        white-space:  nowrap;
+        overflow:     hidden;
+        text-overflow: ellipsis;
     }
+    .product-code { font-size: 12px; color: var(--color-text-secondary); letter-spacing: 0.5px; }
 
-    .product-code {
-        font-size: 14px;
-        color: #999;
+    /* Quantity stepper in cart */
+    .quantity-group {
+        display:  flex;
+        align-items: center;
+        gap:      var(--space-1);
+        margin-top: var(--space-2);
     }
+    .quantity-btn {
+        width: 32px; height: 32px;
+        background:    white;
+        border:        1.5px solid var(--color-border);
+        border-radius: var(--radius-full);
+        font-size:     16px;
+        color:         var(--color-secondary);
+        cursor:        pointer;
+        display:       flex;
+        align-items:   center;
+        justify-content: center;
+        transition:    background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+        touch-action:  manipulation;
+        line-height:   1;
+    }
+    .quantity-btn:hover {
+        background:   var(--color-accent-light);
+        border-color: var(--color-accent-light);
+        color:        var(--color-primary);
+    }
+    .quantity-btn:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 2px; }
+    .quantity-input {
+        width:         48px; height: 32px;
+        text-align:    center;
+        border:        1.5px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-size:     14px;
+        font-weight:   600;
+        font-family:   var(--font-body);
+        color:         var(--color-foreground);
+        -moz-appearance: textfield;
+    }
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
     .product-actions {
-        display: flex;
-        gap: 15px;
+        display:     flex;
+        gap:         var(--space-4);
         align-items: center;
+        flex-shrink: 0;
     }
-
     .product-price {
-        text-align: right;
-        color: #b8860b;
-        font-weight: 600;
-        font-size: 17px;
-        min-width: 120px;
+        font-family:    var(--font-heading);
+        font-size:      18px;
+        font-weight:    700;
+        color:          var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        white-space:    nowrap;
+        min-width:      110px;
+        text-align:     right;
     }
-
     .btn-delete {
-        background-color: #ff4444;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s;
+        width: 36px; height: 36px;
+        background:    transparent;
+        border:        1.5px solid rgba(239,68,68,0.25);
+        border-radius: var(--radius-full);
+        color:         #DC2626;
+        cursor:        pointer;
+        display:       flex;
+        align-items:   center;
+        justify-content: center;
+        transition:    background var(--dur-fast), border-color var(--dur-fast);
+        touch-action:  manipulation;
+        flex-shrink:   0;
+    }
+    .btn-delete:hover { background: rgba(239,68,68,0.08); border-color: #DC2626; }
+    .btn-delete:focus-visible { outline: 2px solid #DC2626; outline-offset: 2px; }
+
+    /* ════════════════════════════════════════════════════
+       FORM — Inputs, Labels
+    ════════════════════════════════════════════════════ */
+    .form-grid {
+        display:               grid;
+        gap:                   var(--space-4);
+        grid-template-columns: 1fr;
+    }
+    @@media (min-width: 576px) {
+        .form-grid--2col { grid-template-columns: 1fr 1fr; }
     }
 
-        .btn-delete:hover {
-            background-color: #cc0000;
-        }
-
-    .quantity-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 6px;
+    .form-field {
+        display:        flex;
+        flex-direction: column;
+        gap:            var(--space-1);
     }
-
-    .quantity-btn {
-        width: 30px;
-        height: 30px;
-        background: #fff7e6;
-        border: 1px solid #f0dca1;
-        border-radius: 8px;
-        font-size: 18px;
-        color: #b8860b;
-        cursor: pointer;
-        transition: all 0.2s;
+    .form-label {
+        font-family:   var(--font-body);
+        font-size:     12px;
+        font-weight:   600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color:         var(--color-secondary);
     }
+    .field-required::after { content: " *"; color: var(--color-destructive); }
 
-        .quantity-btn:hover {
-            background: #b8860b;
-            color: #fff;
-        }
-
-    .quantity-input {
-        width: 45px;
-        text-align: center;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        height: 30px;
+    .form-input,
+    .form-select,
+    .form-textarea {
+        border:        1.5px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding:       var(--space-3) var(--space-4);
+        font-size:     15px;
+        font-family:   var(--font-body);
+        color:         var(--color-foreground);
+        background:    white;
+        width:         100%;
+        min-height:    48px;
+        transition:    border-color var(--dur-fast), box-shadow var(--dur-fast);
+        outline:       none;
+        appearance:    none;
     }
-
-    .section-title {
-        font-weight: 600;
-        margin-top: 25px;
-        margin-bottom: 10px;
-        font-size: 18px;
-        color: #333;
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        border-color: var(--color-accent-light);
+        box-shadow:   0 0 0 3px rgba(212,175,55,0.12);
     }
+    .form-input::placeholder { color: var(--color-text-secondary); font-size: 14px; }
+    .form-textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
+    .form-select:disabled { background: var(--color-bg-subtle); opacity: 0.6; }
 
-    .input-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        width: 100%;
-    }
-
-        .input-group input, .input-group select {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 15px;
-            width: 100%;
-        }
-
+    /* ════════════════════════════════════════════════════
+       DELIVERY METHOD — Toggle buttons
+    ════════════════════════════════════════════════════ */
     .delivery-options {
         display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
+        gap:     var(--space-3);
     }
-
     .delivery-btn {
-        flex: 1;
-        padding: 14px;
-        border: 1px solid #f0dca1;
-        border-radius: 10px;
-        background-color: #fff7e6;
-        color: #b8860b;
+        flex:          1;
+        min-height:    52px;
+        padding:       var(--space-3) var(--space-4);
+        border:        1.5px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background:    white;
+        color:         var(--color-secondary);
+        font-family:   var(--font-body);
+        font-size:     14px;
+        font-weight:   500;
+        cursor:        pointer;
+        transition:    all var(--dur-normal) var(--ease-out);
+        display:       flex;
+        align-items:   center;
+        justify-content: center;
+        gap:           var(--space-2);
+        touch-action:  manipulation;
+    }
+    .delivery-btn:hover {
+        border-color: var(--color-accent-light);
+        color:        var(--color-accent);
+    }
+    .delivery-btn.active {
+        background:   var(--color-primary);
+        border-color: var(--color-primary);
+        color:        var(--color-accent-light);
+        box-shadow:   var(--shadow-md);
+    }
+    .delivery-btn:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 2px; }
+
+    @@media (max-width: 480px) {
+        .delivery-options { flex-direction: column; }
+    }
+
+    /* ════════════════════════════════════════════════════
+       PAYMENT METHOD — Card style
+    ════════════════════════════════════════════════════ */
+    .payment-options { display: flex; flex-direction: column; gap: var(--space-3); }
+    .payment-option {
+        display:     flex;
+        align-items: center;
+        gap:         var(--space-3);
+        padding:     var(--space-4) var(--space-5);
+        border:      1.5px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        cursor:      pointer;
+        transition:  border-color var(--dur-fast), background var(--dur-fast);
+    }
+    .payment-option:has(input:checked) {
+        border-color: var(--color-accent-light);
+        background:   rgba(212,175,55,0.05);
+    }
+    .payment-option input[type="radio"] {
+        width: 18px; height: 18px;
+        accent-color: var(--color-accent-light);
+        cursor:       pointer;
+        flex-shrink:  0;
+    }
+    .payment-option__text {
+        font-family: var(--font-body);
+        font-size:   14px;
         font-weight: 500;
-        cursor: pointer;
-        transition: 0.3s;
+        color:       var(--color-foreground);
+    }
+    .payment-option__sub {
+        font-size:   12px;
+        color:       var(--color-text-secondary);
+        margin-top:  2px;
     }
 
-        .delivery-btn.active {
-            background-color: #b8860b;
-            color: #fff;
-        }
+    /* ════════════════════════════════════════════════════
+       VALIDATION ERRORS
+    ════════════════════════════════════════════════════ */
+    .form-errors {
+        display:       none;
+        padding:       var(--space-4) var(--space-5);
+        border-radius: var(--radius-lg);
+        background:    rgba(239,68,68,0.06);
+        border:        1.5px solid rgba(239,68,68,0.2);
+        color:         #B91C1C;
+        font-size:     14px;
+        line-height:   1.6;
+        margin-bottom: var(--space-4);
+    }
+    .form-errors ul { list-style: none; padding: 0; margin: 0; }
+    .form-errors li::before { content: "• "; font-weight: 700; }
+    .form-errors__title { font-weight: 700; margin-bottom: var(--space-2); }
 
-    .summary {
-        margin-top: 30px;
-        padding: 15px;
-        border-radius: 10px;
-        background-color: #fff8e5;
-        font-size: 17px;
+    .payment-error-alert {
+        display:       flex;
+        align-items:   flex-start;
+        gap:           var(--space-3);
+        padding:       var(--space-4) var(--space-5);
+        border-radius: var(--radius-lg);
+        background:    rgba(245,158,11,0.08);
+        border:        1.5px solid rgba(245,158,11,0.25);
+        color:         #92400E;
+        font-size:     14px;
+        margin-bottom: var(--space-4);
     }
 
-        .summary div {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
+    /* ════════════════════════════════════════════════════
+       CART SIDEBAR — Summary (sticky)
+    ════════════════════════════════════════════════════ */
+    .cart-sidebar { position: sticky; top: 90px; }
 
-        .summary .total {
-            font-weight: 700;
-            color: #b8860b;
-            font-size: 18px;
-        }
+    .order-summary {
+        background:    white;
+        border-radius: var(--radius-xl);
+        border:        1px solid var(--color-border-subtle);
+        padding:       var(--space-6);
+        overflow:      hidden;
+    }
+    .order-summary__title {
+        font-family:   var(--font-heading);
+        font-size:     22px;
+        font-weight:   700;
+        color:         var(--color-foreground);
+        margin:        0 0 var(--space-5);
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .summary-row {
+        display:         flex;
+        justify-content: space-between;
+        align-items:     center;
+        padding:         var(--space-3) 0;
+        font-size:       15px;
+        color:           var(--color-secondary);
+        border-bottom:   1px solid var(--color-border-subtle);
+    }
+    .summary-row:last-of-type { border-bottom: none; }
+    .summary-row span:first-child { color: var(--color-text-secondary); }
+    .summary-row--total {
+        padding-top: var(--space-4);
+        font-weight: 700;
+        font-size:   17px;
+    }
+    .summary-row--total span:first-child {
+        font-family: var(--font-heading);
+        color:       var(--color-foreground);
+        font-size:   18px;
+    }
+    #subtotal, #total {
+        font-family:    var(--font-heading);
+        font-size:      18px;
+        font-weight:    700;
+        color:          var(--color-accent);
+        font-variant-numeric: tabular-nums;
+    }
+    #total { font-size: 22px; }
+
+    .shipping-free {
+        display:     inline-flex;
+        align-items: center;
+        gap:         var(--space-1);
+        font-size:   13px;
+        font-weight: 600;
+        color:       #15803D;
+    }
 
     .btn-order {
-        width: 100%;
-        background-color: #b8860b;
-        color: #fff;
-        font-size: 18px;
-        border: none;
-        border-radius: 10px;
-        padding: 12px;
-        margin-top: 20px;
-        transition: 0.3s;
-        font-weight: 500;
+        display:       flex;
+        align-items:   center;
+        justify-content: center;
+        gap:           var(--space-2);
+        width:         100%;
+        min-height:    54px;
+        background:    linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+        color:         var(--color-primary);
+        font-family:   var(--font-body);
+        font-size:     14px;
+        font-weight:   700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        border:        none;
+        border-radius: var(--radius-full);
+        cursor:        pointer;
+        margin-top:    var(--space-5);
+        transition:    transform var(--dur-fast), box-shadow var(--dur-fast);
+        touch-action:  manipulation;
+    }
+    .btn-order:hover {
+        transform:  translateY(-2px);
+        box-shadow: var(--shadow-gold);
+    }
+    .btn-order:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 3px; }
+
+    .summary-note {
+        margin-top:  var(--space-4);
+        font-size:   12px;
+        color:       var(--color-text-secondary);
+        text-align:  center;
+        line-height: 1.6;
     }
 
-        .btn-order:hover {
-            background-color: #8b6914;
+    /* ════════════════════════════════════════════════════
+       TOAST (reuse từ Details)
+    ════════════════════════════════════════════════════ */
+    .toast-container {
+        position: fixed;
+        bottom: var(--space-6); right: var(--space-5);
+        z-index: var(--z-toast);
+        display: flex; flex-direction: column;
+        gap: var(--space-3); pointer-events: none;
+    }
+    .toast {
+        display:    flex; align-items: flex-start;
+        gap:        var(--space-3);
+        padding:    var(--space-4) var(--space-5);
+        border-radius: var(--radius-lg);
+        background: white;
+        box-shadow: var(--shadow-xl);
+        border-left: 4px solid var(--color-accent-light);
+        min-width: 260px; max-width: 340px;
+        pointer-events: auto;
+        animation: toastIn 250ms var(--ease-out);
+    }
+    .toast--error   { border-left-color: #DC2626; }
+    .toast--success { border-left-color: #22C55E; }
+    @@keyframes toastIn {
+        from { opacity: 0; transform: translateX(16px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    @@keyframes toastOut {
+        from { opacity: 1; transform: translateX(0); }
+        to   { opacity: 0; transform: translateX(16px); }
+    }
+    .toast__msg { font-size: 14px; line-height: 1.5; color: var(--color-foreground); flex: 1; }
+    .toast__msg strong { display: block; font-weight: 600; margin-bottom: 2px; }
+
+    /* ════════ RESPONSIVE ════════ */
+    @@media (max-width: 767.98px) {
+        .product-item {
+            flex-wrap:   wrap;
+            align-items: flex-start;
         }
-
-        @@media (max-width: 991.98px) {
-            .checkout-container {
-                margin: 20px auto;
-                padding: 22px;
-            }
-
-            .product-item {
-                align-items: flex-start;
-            }
-
-            .product-actions {
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 8px;
-            }
+        .product-actions {
+            width:           100%;
+            justify-content: space-between;
+            padding-left:    calc(22px + var(--space-4) + 80px + var(--space-3));
         }
-
-        @@media (max-width: 767.98px) {
-            .checkout-container {
-                border-radius: 12px;
-                padding: 16px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            }
-
-            .product-item {
-                flex-direction: column;
-                gap: 12px;
-                padding: 12px;
-            }
-
-            .product-left {
-                width: 100%;
-                align-items: flex-start;
-            }
-
-            .product-left img {
-                width: 72px;
-                height: 72px;
-            }
-
-            .product-name {
-                font-size: 15px;
-            }
-
-            .product-actions {
-                width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .product-price {
-                min-width: 0;
-                font-size: 16px;
-                text-align: left;
-            }
-
-            .input-group {
-                gap: 10px;
-            }
-
-            .delivery-options {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .summary {
-                font-size: 15px;
-            }
-
-            .summary .total {
-                font-size: 17px;
-            }
-
-            .btn-order {
-                font-size: 16px;
-                padding: 11px;
-            }
-
-        }
+        .product-price { min-width: 0; }
+    }
+    @@media (max-width: 480px) {
+        .cart-section { padding: var(--space-5); }
+        .product-left img { width: 64px; height: 64px; }
+    }
 </style>
 
-<div class="checkout-container">
-    <h2>Thông tin đặt hàng</h2>
+<!-- ════════════════════════════════════════════════════
+     PAGE HEADER
+════════════════════════════════════════════════════ -->
+<header class="cart-page-header">
+    <span class="cart-page-eyebrow">Mua sắm</span>
+    <h1 class="cart-page-title">Giỏ hàng của bạn</h1>
+    <div class="cart-page-sep" aria-hidden="true"></div>
+</header>
 
-    @if (Model?.ShoppingCart?.Lines?.Any() ?? false)
-    {
-        <div class="product-list">
-            @foreach (var item in Model.ShoppingCart.Lines)
-            {
-                <div class="product-item" data-id="@item.Product.ProductID">
-                    <input type="checkbox" class="product-checkbox" data-product-id="@item.Product.ProductID" checked />
-                    <div class="product-left">
-                        <img src="~/images/@item.Product.ImageUrl" alt="@item.Product.Name" />
-                        <div class="product-details">
-                            <div class="product-name">@item.Product.Name</div>
-                            <div class="product-code">Mã: @item.Product.ProductID</div>
-                            <div class="quantity-group">
-                                <button type="button" class="quantity-btn" data-action="subtract">-</button>
-                                <input type="number" class="quantity-input" value="@item.Quantity" data-product-id="@item.Product.ProductID" data-price="@item.Product.Price" min="1" />
-                                <button type="button" class="quantity-btn" data-action="add">+</button>
+@if (!hasItems)
+{
+    <!-- EMPTY STATE -->
+    <div class="cart-empty" role="status">
+        <div class="cart-empty__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+        </div>
+        <h2 class="cart-empty__title">Giỏ hàng đang trống</h2>
+        <p class="cart-empty__desc">Bạn chưa có sản phẩm nào trong giỏ. Hãy khám phá bộ sưu tập trang sức độc đáo của chúng tôi.</p>
+        <a asp-controller="Products" asp-action="Index" class="btn-go-shop">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+            </svg>
+            Tiếp tục mua sắm
+        </a>
+    </div>
+}
+else
+{
+    <div class="cart-layout">
+        <!-- ══ LEFT: Cart + Form ══ -->
+        <div class="cart-main">
+
+            <!-- ── 1. Cart Items ── -->
+            <div class="cart-section">
+                <div class="section-hd">
+                    <div class="section-hd__icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                    </div>
+                    <h2 class="section-hd__title">Sản phẩm đã chọn</h2>
+                </div>
+
+                @if (ViewData.ModelState.ContainsKey("PaymentError"))
+                {
+                    <div class="payment-error-alert" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        @ViewData.ModelState["PaymentError"]!.Errors[0].ErrorMessage
+                    </div>
+                }
+
+                <div id="cartItems">
+                    @foreach (var item in Model.ShoppingCart.Lines)
+                    {
+                        <div class="product-item" data-id="@item.Product.ProductID">
+                            <input type="checkbox"
+                                   class="product-checkbox"
+                                   data-product-id="@item.Product.ProductID"
+                                   aria-label="Chọn sản phẩm @item.Product.Name"
+                                   checked />
+                            <div class="product-left">
+                                <img src="~/images/@item.Product.ImageUrl"
+                                     alt="@item.Product.Name"
+                                     loading="lazy" />
+                                <div class="product-details">
+                                    <div class="product-name">@item.Product.Name</div>
+                                    <div class="product-code">Mã: @item.Product.ProductID</div>
+                                    <div class="quantity-group" role="group" aria-label="Số lượng @item.Product.Name">
+                                        <button type="button" class="quantity-btn" data-action="subtract" aria-label="Giảm số lượng">−</button>
+                                        <input type="number"
+                                               class="quantity-input"
+                                               value="@item.Quantity"
+                                               data-product-id="@item.Product.ProductID"
+                                               data-price="@item.Product.Price"
+                                               min="1"
+                                               aria-label="Số lượng" />
+                                        <button type="button" class="quantity-btn" data-action="add" aria-label="Tăng số lượng">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="product-actions">
+                                <div class="product-price"
+                                     data-product-id="@item.Product.ProductID"
+                                     data-base-price="@item.Product.Price"
+                                     aria-label="Thành tiền">
+                                    @((item.Quantity * item.Product.Price).ToString("N0", cultureVN)) VNĐ
+                                </div>
+                                <button type="button" class="btn-delete" data-product-id="@item.Product.ProductID" aria-label="Xóa @item.Product.Name">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                                        <path d="M9 6V4h6v2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- ── 2. Customer Info ── -->
+            <form method="post" asp-page-handler="Checkout" id="checkoutForm" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="cart-section">
+                    <div class="section-hd">
+                        <div class="section-hd__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-hd__title">Thông tin người mua</h2>
+                    </div>
+
+                    <div class="form-grid form-grid--2col">
+                        <div class="form-field">
+                            <label class="form-label field-required" for="buyerName">Họ và tên</label>
+                            <input type="text" id="buyerName" name="Name" class="form-input"
+                                   placeholder="Nguyễn Văn An"
+                                   value="@Model.PrefillName"
+                                   autocomplete="name"
+                                   required />
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label field-required" for="buyerPhone">Số điện thoại</label>
+                            <input type="tel" id="buyerPhone" name="Phone" class="form-input"
+                                   placeholder="0912 345 678"
+                                   value="@Model.PrefillPhone"
+                                   autocomplete="tel"
+                                   required />
+                        </div>
+                        <div class="form-field" style="grid-column: 1 / -1">
+                            <label class="form-label field-required" for="buyerEmail">Email</label>
+                            <input type="email" id="buyerEmail" name="Email" class="form-input"
+                                   placeholder="email@example.com"
+                                   value="@Model.PrefillEmail"
+                                   autocomplete="email"
+                                   required />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 3. Delivery Method ── -->
+                <div class="cart-section">
+                    <div class="section-hd">
+                        <div class="section-hd__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="3" width="15" height="13"/>
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                                <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-hd__title">Hình thức nhận hàng</h2>
+                    </div>
+
+                    <input type="hidden" name="DeliveryType" id="deliveryTypeInput" value="delivery" />
+
+                    <div class="delivery-options" role="group" aria-label="Chọn hình thức nhận hàng">
+                        <button type="button" id="btnDelivery" class="delivery-btn active" aria-pressed="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"/>
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                                <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                            </svg>
+                            Giao hàng tận nơi
+                        </button>
+                        <button type="button" id="btnPickup" class="delivery-btn" aria-pressed="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                            Nhận tại cửa hàng
+                        </button>
+                    </div>
+
+                    <!-- Delivery address form -->
+                    <div id="deliveryForm" style="margin-top: var(--space-5);">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label field-required" for="province">Tỉnh / Thành phố</label>
+                                <select name="Province" id="province" class="form-select"
+                                        data-saved="" data-prefill="@Model.PrefillProvince">
+                                    <option value="">Chọn tỉnh/thành *</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label field-required" for="district">Quận / Huyện</label>
+                                <select name="District" id="district" class="form-select"
+                                        data-saved="" data-prefill="@Model.PrefillDistrict">
+                                    <option value="">Chọn quận/huyện *</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label field-required" for="ward">Phường / Xã</label>
+                                <select name="Ward" id="ward" class="form-select"
+                                        data-saved="" data-prefill="@Model.PrefillWard">
+                                    <option value="">Chọn phường/xã *</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label field-required" for="addressDetail">Địa chỉ cụ thể</label>
+                                <input type="text" id="addressDetail" name="AddressDetail" class="form-input"
+                                       placeholder="Số nhà, tên đường..."
+                                       value="@Model.PrefillAddressDetail"
+                                       data-saved=""
+                                       autocomplete="street-address" />
                             </div>
                         </div>
                     </div>
-                    <div class="product-actions">
-                        <div class="product-price" data-product-id="@item.Product.ProductID" data-base-price="@item.Product.Price">
-                            @((item.Quantity * item.Product.Price).ToString("#,##0")) ₫
+
+                    <!-- Pickup store form -->
+                    <div id="pickupForm" style="display:none; margin-top: var(--space-5);">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label class="form-label field-required" for="citySelect">Thành phố</label>
+                                <select id="citySelect" name="City" class="form-select" data-saved="">
+                                    <option value="">— Chọn Thành Phố —</option>
+                                    <option value="hcm">Hồ Chí Minh</option>
+                                    <option value="hn">Hà Nội</option>
+                                    <option value="dn">Đà Nẵng</option>
+                                    <option value="dnai">Đồng Nai</option>
+                                    <option value="ld">Lâm Đồng</option>
+                                    <option value="bd">Bình Dương</option>
+                                    <option value="ct">Cần Thơ</option>
+                                    <option value="tth">Thừa Thiên Huế</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label field-required" for="districtSelect">Quận / Huyện</label>
+                                <select id="districtSelect" name="DistrictPickup" class="form-select" data-saved="" disabled>
+                                    <option value="">— Chọn Quận/Huyện —</option>
+                                </select>
+                            </div>
+                            <div class="form-field" style="grid-column: 1 / -1">
+                                <label class="form-label field-required" for="storeSelect">Cửa hàng</label>
+                                <select id="storeSelect" name="Store" class="form-select" data-saved="" disabled>
+                                    <option value="">— Chọn Cửa Hàng —</option>
+                                </select>
+                            </div>
                         </div>
-                        <button type="button" class="btn-delete" data-product-id="@item.Product.ProductID">Xóa</button>
                     </div>
                 </div>
-            }
+
+                <!-- ── 4. Payment Method ── -->
+                <div class="cart-section">
+                    <div class="section-hd">
+                        <div class="section-hd__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-hd__title">Phương thức thanh toán</h2>
+                    </div>
+
+                    <div class="payment-options" role="radiogroup" aria-label="Chọn phương thức thanh toán">
+                        <label class="payment-option">
+                            <input type="radio" name="Payment" value="COD" checked />
+                            <div>
+                                <div class="payment-option__text">Thanh toán khi nhận hàng (COD)</div>
+                                <div class="payment-option__sub">Trả tiền mặt khi nhận được hàng</div>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="Payment" value="VNPAY" />
+                            <div>
+                                <div class="payment-option__text">Thanh toán online qua VNPAY</div>
+                                <div class="payment-option__sub">ATM, Visa, QR Code</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ── 5. Note ── -->
+                <div class="cart-section">
+                    <div class="form-field">
+                        <label class="form-label" for="orderNote">Ghi chú đơn hàng</label>
+                        <textarea id="orderNote" name="Note" class="form-textarea"
+                                  placeholder="VD: Giao giờ hành chính, gọi điện trước khi giao..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Validation errors (inline) -->
+                <div id="formErrors" class="form-errors" role="alert" aria-live="assertive"></div>
+            </form>
         </div>
-        @if (ViewData.ModelState.ContainsKey("PaymentError"))
-        {
-            <div class="alert alert-warning" style="margin-bottom:15px;">
-                @ViewData.ModelState["PaymentError"].Errors[0].ErrorMessage
-            </div>
-        }
 
-        <form method="post" asp-page-handler="Checkout" id="checkoutForm">
-            @Html.AntiForgeryToken()
+        <!-- ══ RIGHT: Order Summary ══ -->
+        <aside class="cart-sidebar" aria-label="Tóm tắt đơn hàng">
+            <div class="order-summary">
+                <h2 class="order-summary__title">Tóm tắt đơn hàng</h2>
 
-            <div class="section-title">Thông tin người mua</div>
-            <div class="input-group">
-                <input type="text" name="Name" placeholder="Tên người mua *" value="@Model.PrefillName" required />
-                <input type="text" name="Phone" placeholder="Số điện thoại *" value="@Model.PrefillPhone" required />
-                <input type="email" name="Email" placeholder="Email *" value="@Model.PrefillEmail" required />
-            </div>
-
-            <input type="hidden" name="DeliveryType" id="deliveryTypeInput" value="delivery" />
-
-            <div class="section-title">Hình thức nhận hàng</div>
-            <div class="delivery-options">
-                <button type="button" id="btnDelivery" class="delivery-btn active">🚚 Giao hàng tận nơi</button>
-                <button type="button" id="btnPickup" class="delivery-btn">🏬 Nhận tại cửa hàng</button>
-            </div>
-
-            <!-- Added data-saved attributes to preserve form data -->
-            <div id="deliveryForm">
-                <div class="input-group">
-                    <select name="Province" id="province" data-saved="" data-prefill="@Model.PrefillProvince"><option value="">Chọn tỉnh/thành *</option></select>
-                    <select name="District" id="district" data-saved="" data-prefill="@Model.PrefillDistrict"><option value="">Chọn quận/huyện *</option></select>
-                    <select name="Ward" id="ward" data-saved="" data-prefill="@Model.PrefillWard"><option value="">Chọn phường/xã *</option></select>
-                    <input type="text" name="AddressDetail" id="addressDetail" placeholder="Nhập địa chỉ cụ thể *" value="@Model.PrefillAddressDetail" data-saved="" />
+                <div class="summary-row">
+                    <span>Tạm tính</span>
+                    <span id="subtotal">@Model.ShoppingCart.ComputeTotalValue().ToString("N0", cultureVN) VNĐ</span>
                 </div>
-            </div>
-
-            <div id="pickupForm" style="display:none;">
-                <div class="input-group">
-                    <select id="citySelect" name="City" data-saved="">
-                        <option value="">-- Chọn Thành Phố --</option>
-                        <option value="hcm">Hồ Chí Minh</option>
-                        <option value="hn">Hà Nội</option>
-                        <option value="dn">Đà Nẵng</option>
-                        <option value="dnai">Đồng Nai</option>
-                        <option value="ld">Lâm Đồng</option>
-                        <option value="bd">Bình Dương</option>
-                        <option value="ct">Cần Thơ</option>
-                        <option value="tth">Thừa Thiên Huế</option>
-                    </select>
-                    <select id="districtSelect" name="DistrictPickup" data-saved="" disabled>
-                        <option value="">-- Chọn Quận/Huyện --</option>
-                    </select>
-                    <select id="storeSelect" name="Store" data-saved="" disabled>
-                        <option value="">-- Chọn Cửa Hàng --</option>
-                    </select>
+                <div class="summary-row">
+                    <span>Phí giao hàng</span>
+                    <span class="shipping-free">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Miễn phí
+                    </span>
                 </div>
+                <div class="summary-row summary-row--total">
+                    <span>Tổng cộng</span>
+                    <span id="total">@Model.ShoppingCart.ComputeTotalValue().ToString("N0", cultureVN) VNĐ</span>
+                </div>
+
+                <button type="submit" form="checkoutForm" class="btn-order">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                    Đặt hàng ngay
+                </button>
+
+                <p class="summary-note">
+                    🔒 Thông tin của bạn được bảo mật tuyệt đối.<br>
+                    Chính sách đổi trả trong vòng 7 ngày.
+                </p>
             </div>
+        </aside>
+    </div>
+}
 
-            <div class="section-title">Phương thức thanh toán</div>
-            <div>
-                <label><input type="radio" name="Payment" value="COD" checked /> Thanh toán khi nhận hàng</label><br />
-                <label><input type="radio" name="Payment" value="VNPAY" /> Thanh toán online qua VNPAY</label>
-
-            </div>
-
-            <div class="summary">
-                <div><span>Tạm tính:</span><span id="subtotal">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
-                <div><span>Phí giao hàng:</span><span>Miễn phí</span></div>
-                <div class="total"><span>Tổng cộng:</span><span id="total">@Model.ShoppingCart.ComputeTotalValue().ToString("#,##0") ₫</span></div>
-            </div>
-
-            <textarea name="Note" placeholder="VD: Giao giờ hành chính hoặc nhắn tin trước khi giao..." style="width:100%;margin-top:10px;border-radius:8px;border:1px solid #ddd;padding:10px;"></textarea>
-
-            <button type="submit" class="btn-order">ĐẶT HÀNG</button>
-        </form>
-    }
-    else
-    {
-        <p style="text-align:center;">Giỏ hàng rỗng, vui lòng quay lại mua hàng.</p>
-    }
-</div>
+<!-- TOAST CONTAINER -->
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    /* ── TOAST ──────────────────────────────────────── */
+    function showToast(type, title, msg) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const icons = {
+            success: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            error:   `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+        };
+        const toast = document.createElement('div');
+        toast.className = `toast toast--${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `<span>${icons[type] || ''}</span><div class="toast__msg"><strong>${title}</strong>${msg ? msg : ''}</div>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'toastOut 250ms ease-in forwards';
+            setTimeout(() => toast.remove(), 260);
+        }, 3500);
+    }
+
+    /* ── VALIDATION ERRORS ──────────────────────────── */
+    function showValidationErrors(errors) {
+        const el = document.getElementById('formErrors');
+        if (!el) return;
+        el.innerHTML = `<div class="form-errors__title">Vui lòng kiểm tra lại:</div><ul>${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+        el.style.display = 'block';
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function clearValidationErrors() {
+        const el = document.getElementById('formErrors');
+        if (el) { el.innerHTML = ''; el.style.display = 'none'; }
+    }
+
+    /* ── BUSINESS LOGIC (kept from original) ────────── */
     let locationData = [];
     let storesData = {};
-
     let formData = {
-        delivery: {
-            province: "",
-            district: "",
-            ward: "",
-            addressDetail: ""
-        },
-        pickup: {
-            city: "",
-            district: "",
-            store: ""
-        }
+        delivery: { province: "", district: "", ward: "", addressDetail: "" },
+        pickup:   { city: "", district: "", store: "" }
     };
 
     function saveDeliveryData() {
-        formData.delivery.province = $("#province").val();
-        formData.delivery.district = $("#district").val();
-        formData.delivery.ward = $("#ward").val();
+        formData.delivery.province      = $("#province").val();
+        formData.delivery.district      = $("#district").val();
+        formData.delivery.ward          = $("#ward").val();
         formData.delivery.addressDetail = $("#addressDetail").val();
     }
-
     function savePickupData() {
-        formData.pickup.city = $("#citySelect").val();
+        formData.pickup.city     = $("#citySelect").val();
         formData.pickup.district = $("#districtSelect").val();
-        formData.pickup.store = $("#storeSelect").val();
+        formData.pickup.store    = $("#storeSelect").val();
     }
-
     function restoreDeliveryData() {
-        if(!formData.delivery.province) return;
-
+        if (!formData.delivery.province) return;
         $("#province").val(formData.delivery.province);
-        onProvinceChange(); // Trigger district load after setting province
-
+        onProvinceChange();
         setTimeout(() => {
             $("#district").val(formData.delivery.district);
-            onDistrictChange(); // Trigger ward load after setting district
+            onDistrictChange();
             $("#ward").val(formData.delivery.ward);
             $("#addressDetail").val(formData.delivery.addressDetail);
         }, 100);
     }
-
     function restorePickupData() {
-        if(!formData.pickup.city) return;
-
+        if (!formData.pickup.city) return;
         $("#citySelect").val(formData.pickup.city);
-        onCityChange(); // Trigger district load after setting city
-
+        onCityChange();
         setTimeout(() => {
             $("#districtSelect").val(formData.pickup.district);
-            onPickupDistrictChange(); // Trigger store load after setting district
+            onPickupDistrictChange();
             $("#storeSelect").val(formData.pickup.store);
         }, 100);
     }
-
     function loadProvinces() {
         return fetch('/data/vietnam-provinces.json')
             .then(res => res.json())
@@ -485,38 +1016,25 @@
                 locationData = data;
                 const provinceSelect = $("#province");
                 provinceSelect.html('<option value="">Chọn tỉnh/thành *</option>');
-
-                data.forEach(province => {
-                    provinceSelect.append(`<option value="${province.name}">${province.name}</option>`);
-                });
+                data.forEach(p => provinceSelect.append(`<option value="${p.name}">${p.name}</option>`));
             })
-            .catch(err => console.error("[v0] Error loading provinces:", err));
+            .catch(err => console.error("[Cart] Error loading provinces:", err));
     }
-
     function applyInitialDeliveryPrefill() {
         const province = ($("#province").data("prefill") || "").toString().trim();
         const district = ($("#district").data("prefill") || "").toString().trim();
-        const ward = ($("#ward").data("prefill") || "").toString().trim();
-
-        if(!province) return;
-
+        const ward     = ($("#ward").data("prefill") || "").toString().trim();
+        if (!province) return;
         $("#province").val(province);
         onProvinceChange();
-
-        if(district) {
+        if (district) {
             setTimeout(() => {
                 $("#district").val(district);
                 onDistrictChange();
-
-                if(ward) {
-                    setTimeout(() => {
-                        $("#ward").val(ward);
-                    }, 120);
-                }
+                if (ward) setTimeout(() => $("#ward").val(ward), 120);
             }, 120);
         }
     }
-
     function onProvinceChange() {
         const provinceName = $("#province").val();
         const districtSelect = $("#district");
@@ -524,332 +1042,218 @@
         districtSelect.prop('disabled', false);
         $("#ward").html('<option value="">Chọn phường/xã *</option>');
         $("#ward").prop('disabled', false);
-
-        if(!provinceName) {
-            districtSelect.prop('disabled', true);
-            return;
-        }
-
+        if (!provinceName) { districtSelect.prop('disabled', true); return; }
         const province = locationData.find(p => p.name === provinceName);
-        if(province && province.districts && province.districts.length > 0) {
-            province.districts.forEach(district => {
-                districtSelect.append(`<option value="${district.name}">${district.name}</option>`);
-            });
-        } else {
-            console.error("[v0] Province not found or no districts:", provinceName);
-            districtSelect.prop('disabled', true);
-        }
+        if (province && province.districts && province.districts.length > 0) {
+            province.districts.forEach(d => districtSelect.append(`<option value="${d.name}">${d.name}</option>`));
+        } else { districtSelect.prop('disabled', true); }
     }
-
     function onDistrictChange() {
         const provinceName = $("#province").val();
         const districtName = $("#district").val();
         const wardSelect = $("#ward");
         wardSelect.html('<option value="">Chọn phường/xã *</option>');
         wardSelect.prop('disabled', false);
-
-        if(!provinceName || !districtName) {
-            wardSelect.prop('disabled', true);
-            return;
-        }
-
+        if (!provinceName || !districtName) { wardSelect.prop('disabled', true); return; }
         const province = locationData.find(p => p.name === provinceName);
-        if(province && province.districts && province.districts.length > 0) {
+        if (province && province.districts) {
             const district = province.districts.find(d => d.name === districtName);
-            if(district && district.wards && district.wards.length > 0) {
-                district.wards.forEach(ward => {
-                    wardSelect.append(`<option value="${ward.name}">${ward.name}</option>`);
-                });
-            } else {
-                console.error("[v0] District not found or no wards:", districtName);
-                wardSelect.prop('disabled', true);
-            }
+            if (district && district.wards && district.wards.length > 0) {
+                district.wards.forEach(w => wardSelect.append(`<option value="${w.name}">${w.name}</option>`));
+            } else { wardSelect.prop('disabled', true); }
         }
     }
-
     function loadStores() {
         fetch('/data/stores.json')
             .then(res => res.json())
-            .then(data => {
-                storesData = data;
-            })
-            .catch(err => console.error("[v0] Error loading stores:", err));
+            .then(data => { storesData = data; })
+            .catch(err => console.error("[Cart] Error loading stores:", err));
     }
-
     function getCityStoreConfig(city) {
-        if(!city || !storesData || !storesData[city]) return null;
-
+        if (!city || !storesData || !storesData[city]) return null;
         const rawCityData = storesData[city];
-
-        // Schema mới: { districts: [...], branches: { district: [address, ...] } }
-        if(rawCityData && rawCityData.districts && rawCityData.branches) {
+        if (rawCityData && rawCityData.districts && rawCityData.branches) {
             return {
                 districts: rawCityData.districts,
                 getStoresByDistrict: function(district) {
-                    const addresses = rawCityData.branches[district] || [];
-                    return addresses.map((address, index) => ({
-                        id: `${city}-${district}-${index + 1}`,
-                        name: `Chi nhánh ${index + 1}`,
-                        address: address
+                    return (rawCityData.branches[district] || []).map((address, i) => ({
+                        id: `${city}-${district}-${i+1}`, name: `Chi nhánh ${i+1}`, address
                     }));
                 }
             };
         }
-
-        // Schema cũ: [ { id, district, name, address }, ... ]
-        if(Array.isArray(rawCityData)) {
+        if (Array.isArray(rawCityData)) {
             return {
                 districts: [...new Set(rawCityData.map(s => s.district))],
-                getStoresByDistrict: function(district) {
-                    return rawCityData.filter(s => s.district === district);
-                }
+                getStoresByDistrict: district => rawCityData.filter(s => s.district === district)
             };
         }
-
         return null;
     }
-
     function onCityChange() {
         const city = $("#citySelect").val();
         const districtSelect = $("#districtSelect");
         const storeSelect = $("#storeSelect");
-        districtSelect.html('<option value="">-- Chọn Quận/Huyện --</option>');
-        storeSelect.html('<option value="">-- Chọn Cửa Hàng --</option>');
+        districtSelect.html('<option value="">— Chọn Quận/Huyện —</option>');
+        storeSelect.html('<option value="">— Chọn Cửa Hàng —</option>');
         storeSelect.prop('disabled', true);
-
-        const cityStoreConfig = getCityStoreConfig(city);
-
-        if(!cityStoreConfig) {
-            districtSelect.prop('disabled', true);
-            return;
-        }
-
-        cityStoreConfig.districts.forEach(district => {
-            districtSelect.append(`<option value="${district}">${district}</option>`);
-        });
-
+        const cfg = getCityStoreConfig(city);
+        if (!cfg) { districtSelect.prop('disabled', true); return; }
+        cfg.districts.forEach(d => districtSelect.append(`<option value="${d}">${d}</option>`));
         districtSelect.prop('disabled', false);
     }
-
     function onPickupDistrictChange() {
         const city = $("#citySelect").val();
         const district = $("#districtSelect").val();
         const storeSelect = $("#storeSelect");
-        storeSelect.html('<option value="">-- Chọn Cửa Hàng --</option>');
-
-        const cityStoreConfig = getCityStoreConfig(city);
-
-        if(!district || !cityStoreConfig) {
-            storeSelect.prop('disabled', true);
-            return;
-        }
-
-        const stores = cityStoreConfig.getStoresByDistrict(district);
-        stores.forEach(store => {
-            const optionValue = store.address || store.id || "";
-            const optionLabel = store.address
-                ? `${store.name} - ${store.address}`
-                : (store.name || optionValue);
-            storeSelect.append(`<option value="${optionValue}" data-address="${store.address || ''}">${optionLabel}</option>`);
+        storeSelect.html('<option value="">— Chọn Cửa Hàng —</option>');
+        const cfg = getCityStoreConfig(city);
+        if (!district || !cfg) { storeSelect.prop('disabled', true); return; }
+        const stores = cfg.getStoresByDistrict(district);
+        stores.forEach(s => {
+            const val   = s.address || s.id || "";
+            const label = s.address ? `${s.name} - ${s.address}` : (s.name || val);
+            storeSelect.append(`<option value="${val}" data-address="${s.address||''}">${label}</option>`);
         });
-
         storeSelect.prop('disabled', stores.length === 0);
     }
-
     function updateTotal() {
         let total = 0;
         $(".product-item").each(function () {
-            const $checkbox = $(this).find(".product-checkbox");
-            if ($checkbox.is(":checked")) {
-                const $price = $(this).find(".product-price");
-                const priceText = $price.text().replace(/[^\d]/g, "");
+            if ($(this).find(".product-checkbox").is(":checked")) {
+                const priceText = $(this).find(".product-price").text().replace(/[^\d]/g, "");
                 total += parseInt(priceText) || 0;
             }
         });
-
-        $("#subtotal").text(total.toLocaleString("vi-VN") + " ₫");
-        $("#total").text(total.toLocaleString("vi-VN") + " ₫");
+        const fmt = total.toLocaleString("vi-VN") + " VNĐ";
+        $("#subtotal").text(fmt);
+        $("#total").text(fmt);
+    }
+    function updateQuantity(productId, quantity) {
+        const token = $('input[name="__RequestVerificationToken"]').val();
+        $.post("/Cart?handler=UpdateQuantity", { __RequestVerificationToken: token, productId, quantity })
+        .done(function(res) {
+            const fmt = res.total.toLocaleString("vi-VN") + " VNĐ";
+            $("#subtotal").text(fmt);
+            $("#total").text(fmt);
+        })
+        .fail(function(xhr) {
+            showToast('error', 'Lỗi cập nhật số lượng', xhr.responseJSON?.message || 'Vui lòng thử lại.');
+        });
     }
 
-    $(document).ready(function() {
-        loadProvinces().then(() => {
-            applyInitialDeliveryPrefill();
-        });
+    /* ── EVENT LISTENERS ─────────────────────────────── */
+    $(document).ready(function () {
+        loadProvinces().then(() => applyInitialDeliveryPrefill());
         loadStores();
 
-        $(document).on("change", "#province", function() {
-            onProvinceChange();
-        });
+        $(document).on("change", "#province",      () => onProvinceChange());
+        $(document).on("change", "#district",      () => onDistrictChange());
+        $(document).on("change", "#citySelect",    () => onCityChange());
+        $(document).on("change", "#districtSelect",() => onPickupDistrictChange());
 
-        $(document).on("change", "#district", function() {
-            onDistrictChange();
-        });
-
-        $(document).on("change", "#citySelect", function() {
-            onCityChange();
-        });
-
-        $(document).on("change", "#districtSelect", function() {
-            onPickupDistrictChange();
-        });
-
+        /* Quantity buttons */
         $(document).on("click", ".quantity-btn", function () {
-            const $btn = $(this);
+            const $btn  = $(this);
             const $input = $btn.siblings(".quantity-input");
-            const $productItem = $btn.closest(".product-item");
-            const $price = $productItem.find(".product-price");
-            const basePrice = parseInt($price.attr("data-base-price"));
-            let quantity = parseInt($input.val());
-
-            if ($btn.attr("data-action") === "add") quantity++;
-            else if (quantity > 1) quantity--;
-
-            $input.val(quantity);
-            const newPrice = quantity * basePrice;
-            $price.text(newPrice.toLocaleString("vi-VN") + " ₫");
-
+            const $item  = $btn.closest(".product-item");
+            const $price = $item.find(".product-price");
+            const base   = parseInt($price.attr("data-base-price"));
+            let qty      = parseInt($input.val());
+            if ($btn.attr("data-action") === "add") qty++;
+            else if (qty > 1) qty--;
+            $input.val(qty);
+            $price.text((qty * base).toLocaleString("vi-VN") + " VNĐ");
             updateTotal();
-            updateQuantity($input.data("product-id"), quantity);
+            updateQuantity($input.data("product-id"), qty);
         });
 
+        /* Quantity input change */
         $(document).on("change", ".quantity-input", function () {
             const $input = $(this);
-            const $productItem = $input.closest(".product-item");
-            const $price = $productItem.find(".product-price");
-            const basePrice = parseInt($price.attr("data-base-price"));
-            let quantity = parseInt($input.val()) || 1;
-            if (quantity < 1) quantity = 1;
-            $input.val(quantity);
-            $price.text((quantity*basePrice).toLocaleString("vi-VN") + " ₫");
-
+            const $item  = $input.closest(".product-item");
+            const $price = $item.find(".product-price");
+            const base   = parseInt($price.attr("data-base-price"));
+            let qty      = parseInt($input.val()) || 1;
+            if (qty < 1) qty = 1;
+            $input.val(qty);
+            $price.text((qty * base).toLocaleString("vi-VN") + " VNĐ");
             updateTotal();
-            updateQuantity($input.data("product-id"), quantity);
+            updateQuantity($input.data("product-id"), qty);
         });
 
-        $(document).on("change", ".product-checkbox", function () {
-            updateTotal();
-        });
+        /* Checkbox change */
+        $(document).on("change", ".product-checkbox", () => updateTotal());
 
+        /* Delete item */
         $(document).on("click", ".btn-delete", function () {
-            const $productItem = $(this).closest(".product-item");
+            const $item     = $(this).closest(".product-item");
             const productId = $(this).data("product-id");
-            $.post("/Cart?handler=RemoveLine", { productId: productId }, function (res) {
-                if(res.success) {
-                    $productItem.fadeOut(300, function() { $(this).remove(); updateTotal(); });
+            const token     = $('input[name="__RequestVerificationToken"]').val();
+            $.post("/Cart?handler=RemoveLine", { __RequestVerificationToken: token, productId }, function (res) {
+                if (res.success) {
+                    $item.fadeOut(250, function () { $(this).remove(); updateTotal(); });
+                    showToast('success', 'Đã xóa sản phẩm', '');
                 }
-            }).fail(function(){ alert("Lỗi khi xóa sản phẩm"); });
+            }).fail(() => showToast('error', 'Lỗi khi xóa sản phẩm', 'Vui lòng thử lại.'));
         });
 
-        $("#btnDelivery").click(function(e){
+        /* Delivery toggle */
+        $("#btnDelivery").click(function (e) {
             e.preventDefault();
             savePickupData();
-            $(this).addClass("active");
-            $("#btnPickup").removeClass("active");
+            $(this).addClass("active").attr("aria-pressed", "true");
+            $("#btnPickup").removeClass("active").attr("aria-pressed", "false");
             $("#pickupForm").hide();
             $("#deliveryForm").show();
             $("#deliveryTypeInput").val("delivery");
             restoreDeliveryData();
         });
-
-        $("#btnPickup").click(function(e){
+        $("#btnPickup").click(function (e) {
             e.preventDefault();
             saveDeliveryData();
-            $(this).addClass("active");
-            $("#btnDelivery").removeClass("active");
+            $(this).addClass("active").attr("aria-pressed", "true");
+            $("#btnDelivery").removeClass("active").attr("aria-pressed", "false");
             $("#deliveryForm").hide();
             $("#pickupForm").show();
             $("#deliveryTypeInput").val("pickup");
             restorePickupData();
         });
 
-        $("#checkoutForm").on("submit", function(e) {
+        /* Form submit — consolidated validation */
+        $("#checkoutForm").on("submit", function (e) {
+            clearValidationErrors();
+
             const deliveryType = $("#deliveryTypeInput").val();
-            let isValid = true;
-            let errorMsg = "";
+            const errors = [];
 
-            if(!$('input[name="Name"]').val().trim()) {
-                isValid = false;
-                errorMsg += "- Tên người mua không được để trống\n";
-            }
-            if(!$('input[name="Phone"]').val().trim()) {
-                isValid = false;
-                errorMsg += "- Số điện thoại không được để trống\n";
-            }
-            if(!$('input[name="Email"]').val().trim()) {
-                isValid = false;
-                errorMsg += "- Email không được để trống\n";
-            }
+            if (!$('input[name="Name"]').val().trim())  errors.push("Tên người mua không được để trống");
+            if (!$('input[name="Phone"]').val().trim())  errors.push("Số điện thoại không được để trống");
+            if (!$('input[name="Email"]').val().trim())  errors.push("Email không được để trống");
 
-            if(deliveryType === "delivery") {
-                if(!$("#province").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Tỉnh/Thành\n";
-                }
-                if(!$("#district").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Quận/Huyện\n";
-                }
-                if(!$("#ward").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Phường/Xã\n";
-                }
-                if(!$("#addressDetail").val().trim()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng nhập địa chỉ cụ thể\n";
-                }
-            } else if(deliveryType === "pickup") {
-                if(!$("#citySelect").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Thành Phố\n";
-                }
-                if(!$("#districtSelect").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Quận/Huyện\n";
-                }
-                if(!$("#storeSelect").val()) {
-                    isValid = false;
-                    errorMsg += "- Vui lòng chọn Cửa Hàng\n";
-                }
+            const hasChecked = $(".product-checkbox:checked").length > 0;
+            if (!hasChecked) errors.push("Vui lòng chọn ít nhất 1 sản phẩm");
+
+            if (deliveryType === "delivery") {
+                if (!$("#province").val())             errors.push("Vui lòng chọn Tỉnh/Thành");
+                if (!$("#district").val())             errors.push("Vui lòng chọn Quận/Huyện");
+                if (!$("#ward").val())                 errors.push("Vui lòng chọn Phường/Xã");
+                if (!$("#addressDetail").val().trim()) errors.push("Vui lòng nhập địa chỉ cụ thể");
+            } else if (deliveryType === "pickup") {
+                if (!$("#citySelect").val())           errors.push("Vui lòng chọn Thành Phố");
+                if (!$("#districtSelect").val())       errors.push("Vui lòng chọn Quận/Huyện");
+                if (!$("#storeSelect").val())          errors.push("Vui lòng chọn Cửa Hàng");
             }
 
-            let hasCheckedProduct = false;
-            $(".product-checkbox:checked").each(function() {
-                hasCheckedProduct = true;
-            });
-            if(!hasCheckedProduct) {
-                isValid = false;
-                errorMsg += "- Vui lòng chọn ít nhất 1 sản phẩm\n";
-            }
-
-            if(!isValid) {
+            if (errors.length > 0) {
                 e.preventDefault();
-                alert("Vui lòng kiểm tra các trường sau:\n\n" + errorMsg);
+                showValidationErrors(errors);
                 return false;
             }
 
-            if(deliveryType === "delivery") {
-                saveDeliveryData();
-            } else {
-                savePickupData();
-            }
+            /* Append payment method */
+            const paymentMethod = $('input[name="Payment"]:checked').val();
+            $(this).append(`<input type="hidden" name="payment" value="${paymentMethod}">`);
         });
     });
-    function updateQuantity(productId, quantity) {
-        const token = $('input[name="__RequestVerificationToken"]').val();
-        $.post("/Cart?handler=UpdateQuantity", { __RequestVerificationToken: token, productId: productId, quantity: quantity })
-        .done(function(res){
-            $("#subtotal").text(res.total.toLocaleString("vi-VN") + " ₫");
-            $("#total").text(res.total.toLocaleString("vi-VN") + " ₫");
-        }).fail(function(xhr){
-            console.error(xhr.responseJSON?.message || "Lỗi AJAX");
-            alert("Lỗi khi cập nhật số lượng: " + (xhr.responseJSON?.message || "Không xác định"));
-        });
-    }
-
-
-        $("#checkoutForm").on("submit", function(e){
-        const paymentMethod = $('input[name="Payment"]:checked').val();
-        $(this).append(`<input type="hidden" name="payment" value="${paymentMethod}">`);
-    });
-
 </script>
