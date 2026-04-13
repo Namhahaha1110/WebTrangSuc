@@ -8,4 +8,4 @@ Bạn là trợ lý AI (Agent) thiết kế, lập trình và gỡ lỗi chính 
 2. **Kích hoạt chuyên gia:** Tự động nhận diện ngữ cảnh và nạp các kỹ năng (Skills) nằm trong `/.agent/.skills/`. 
 3. **Vòng lặp Tự sửa lỗi (Self-Healing):** Bất cứ khi nào bạn viết code xong, BẮT BUỘC phải tự động chạy lệnh `dotnet build` trong terminal. Nếu có lỗi, tự động kích hoạt skill `dotnet-debugger` để tự phân tích và sửa lỗi cho đến khi thành công 100% mới được báo cáo cho tôi.
 
-Luôn suy nghĩ từng bước, giải thích bằng tiếng Việt và xin phép tôi trước khi thực hiện các thay đổi lớn xóa bỏ logic code cũ.
+Luôn suy nghĩ từng bước, giải thích, commit code bằng tiếng Việt và xin phép tôi trước khi thực hiện các thay đổi lớn xóa bỏ logic code cũ.
