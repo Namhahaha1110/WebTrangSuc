@@ -1,160 +1,903 @@
-﻿@model SportsStore.Models.Product
+@* Views/Products/Details.cshtml — Flower Jewelry | Luxury Product Detail *@
+@model SportsStore.Models.Product
 
 @{
-    ViewData["Title"] = Model.Name;
-    var otherProducts = (ViewBag.OtherProducts as IEnumerable<SportsStore.Models.Product>)?.ToList() ?? new List<SportsStore.Models.Product>();
+    ViewData["Title"] = Model.Name + " — Flower Jewelry";
+    var cultureVN     = new System.Globalization.CultureInfo("vi-VN");
+    var otherProducts = (ViewBag.OtherProducts as IEnumerable<SportsStore.Models.Product>)
+                        ?.ToList() ?? new List<SportsStore.Models.Product>();
+    var inStock       = Model.Quantity > 0;
 }
 
-<div class="container py-5">
-    <div class="row">
-        <!-- Hình ảnh sản phẩm -->
-        <div class="col-md-5 text-center">
-            <img src="~/images/@Model.ImageUrl"
-                 alt="@Model.Name"
-                 class="img-fluid rounded shadow-sm border"
-                 style="max-height: 400px; object-fit: contain;">
+<!-- ════════════════════════════════════════════════════
+     BREADCRUMB
+════════════════════════════════════════════════════ -->
+<nav class="detail-breadcrumb" aria-label="Đường dẫn">
+    <ol class="breadcrumb-list">
+        <li class="breadcrumb-item">
+            <a asp-controller="Products" asp-action="Index">Trang chủ</a>
+        </li>
+        <li class="breadcrumb-sep" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        </li>
+        @if (Model.Category is not null)
+        {
+            <li class="breadcrumb-item">
+                <a href="/?category=@Model.Category.Name.ToLowerInvariant().Replace(" ", "-")">
+                    @Model.Category.Name
+                </a>
+            </li>
+            <li class="breadcrumb-sep" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </li>
+        }
+        <li class="breadcrumb-item breadcrumb-item--current" aria-current="page">
+            @Model.Name
+        </li>
+    </ol>
+</nav>
+
+<!-- ════════════════════════════════════════════════════
+     PRODUCT DETAIL — 2-Column Layout
+════════════════════════════════════════════════════ -->
+<article class="product-detail" aria-label="Chi tiết sản phẩm @Model.Name">
+    <div class="detail-grid">
+
+        <!-- LEFT: Image -->
+        <div class="detail-image-col">
+            <div class="detail-image-wrap">
+                <img src="~/images/@Model.ImageUrl"
+                     alt="@Model.Name"
+                     class="detail-img"
+                     width="600" height="600"
+                     loading="eager" />
+                <!-- Subtle gold shimmer overlay -->
+                <div class="detail-img-overlay" aria-hidden="true"></div>
+            </div>
         </div>
 
-        <!-- Thông tin chi tiết -->
-        <div class="col-md-7">
-            <h2 class="fw-bold text-dark mb-3">@Model.Name</h2>
-            <p class="text-muted mb-4">@Model.Description</p>
+        <!-- RIGHT: Info -->
+        <div class="detail-info-col">
 
-            <h3 class="text-danger fw-bold mb-4">@Model.Price.ToString("N0") ₫</h3>
-
-            @if (Model.Quantity == 0)
+            <!-- Eyebrow: category -->
+            @if (Model.Category is not null)
             {
-                <!-- Nếu hết hàng thì chỉ hiện thông báo -->
-                <div class="alert alert-danger fw-bold">
-                    Sản phẩm này đã hết hàng
+                <span class="detail-eyebrow">@Model.Category.Name</span>
+            }
+
+            <!-- Product name -->
+            <h1 class="detail-name">@Model.Name</h1>
+
+            <!-- Gold separator -->
+            <div class="detail-separator" aria-hidden="true"></div>
+
+            <!-- Price -->
+            <div class="detail-price-row">
+                <span class="detail-price">
+                    @Model.Price.ToString("N0", cultureVN) VNĐ
+                </span>
+                @if (inStock)
+                {
+                    <span class="stock-badge stock-badge--in" role="status" aria-label="Còn hàng">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Còn hàng
+                    </span>
+                }
+                else
+                {
+                    <span class="stock-badge stock-badge--out" role="status" aria-label="Hết hàng">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        Hết hàng
+                    </span>
+                }
+            </div>
+
+            <!-- Description -->
+            <p class="detail-desc">@Model.Description</p>
+
+            @if (inStock)
+            {
+                <!-- Quantity Stepper -->
+                <div class="qty-row">
+                    <label class="qty-label" for="qtyInput">Số lượng</label>
+                    <div class="qty-stepper" role="group" aria-label="Chọn số lượng">
+                        <button type="button" class="qty-btn" id="qtyMinus" aria-label="Giảm số lượng">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                        <input type="number" id="qtyInput" name="quantity"
+                               class="qty-input"
+                               value="1" min="1" max="@Model.Quantity"
+                               aria-label="Số lượng" readonly />
+                        <button type="button" class="qty-btn" id="qtyPlus" aria-label="Tăng số lượng">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="detail-actions">
+                    <!-- Add to Cart -->
+                    <form id="addToCartForm" method="post" class="detail-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.ProductID" />
+                        <input type="hidden" name="quantity" id="cartQty" value="1" />
+                        <button type="submit" class="btn-detail btn-detail--outline" id="addToCartBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            Thêm vào giỏ hàng
+                        </button>
+                    </form>
+
+                    <!-- Buy Now -->
+                    <form id="buyNowForm" method="post"
+                          asp-page="/Cart" asp-page-handler="BuyNow"
+                          class="detail-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.ProductID" />
+                        <input type="hidden" name="quantity" id="buyQty" value="1" />
+                        <button type="submit" class="btn-detail btn-detail--primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                            Mua ngay
+                        </button>
+                    </form>
                 </div>
             }
             else
             {
-                <!-- Không còn size – chỉ còn nút mua -->
-                <p class="text-muted mb-3">
-                    <b>Phân loại:</b> @Model.Category?.Name
-                </p>
-
-                <!-- Nút thêm vào giỏ hàng -->
-                <form id="addToCartForm" method="post">
-                    <input type="hidden" name="productId" value="@Model.ProductID" />
-
-                    <button type="submit" class="btn btn-outline-dark btn-lg">
-                        <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
-                    </button>
-                </form>
-
-                <!-- Nút mua ngay -->
-                <form id="buyNowForm" method="post" asp-page="/Cart" asp-page-handler="BuyNow" class="mt-2">
-                    <input type="hidden" name="productId" value="@Model.ProductID" />
-
-                    <button type="submit" class="btn btn-gold btn-lg">
-                        <i class="fa-solid fa-bolt"></i> Mua ngay
-                    </button>
-                </form>
+                <!-- Out of stock state -->
+                <div class="out-of-stock-msg" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Sản phẩm này hiện đang hết hàng. Vui lòng quay lại sau.
+                </div>
             }
 
-            <a asp-action="Index" class="btn btn-link text-decoration-none mt-3">
-                <i class="fa-solid fa-arrow-left"></i> Quay lại sản phẩm
+            <!-- Back link -->
+            <a asp-controller="Products" asp-action="Index" class="detail-back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+                </svg>
+                Quay lại danh sách
             </a>
         </div>
     </div>
+</article>
 
-    <!-- ===== SẢN PHẨM KHÁC ===== -->
-    @if (otherProducts.Any())
-    {
-        <hr class="my-5" />
-        <h4 class="mb-4">Sản phẩm khác bạn có thể quan tâm</h4>
-        <div class="row row-cols-1 row-cols-md-4 g-4">
-            @foreach (var p in otherProducts)
-            {
-                <div class="col">
-                    <a asp-action="Details" asp-route-id="@p.ProductID" class="text-decoration-none text-dark">
-                        <div class="card h-100 text-center shadow-sm border-0 product-card">
-                            <img src="~/images/@p.ImageUrl"
-                                 class="card-img-top p-3"
-                                 alt="@p.Name"
-                                 style="height:150px; object-fit:contain;" />
-                            <div class="card-body">
-                                <h6 class="card-title fw-semibold mb-1">@p.Name</h6>
-                                <h6 class="text-danger fw-bold">@p.Price.ToString("N0") ₫</h6>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
+<!-- ════════════════════════════════════════════════════
+     RELATED PRODUCTS
+════════════════════════════════════════════════════ -->
+@if (otherProducts.Any())
+{
+    <section class="related-section" aria-labelledby="relatedTitle">
+        <div class="related-header">
+            <span class="related-eyebrow">Khám phá thêm</span>
+            <h2 class="related-title" id="relatedTitle">
+                Có thể bạn <em>sẽ thích</em>
+            </h2>
+            <div class="related-separator" aria-hidden="true"></div>
         </div>
-    }
-</div>
 
-@section Scripts {
-    <script>
-
-        // Add to Cart
-        document.getElementById("addToCartForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-
-            fetch("/Cart?handler=Add", {
-                method: "POST",
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.loginRequired) {
-                        alert("Bạn phải đăng nhập trước khi thêm vào giỏ hàng!");
-                        window.location.href = data.loginUrl || "/CustomerAccount/Login";
-                        return;
-                    }
-
-                    if (data.success) {
-                        alert("Đã thêm sản phẩm vào giỏ hàng!");
-                    } else {
-                        alert("Có lỗi khi thêm sản phẩm!");
-                    }
-                })
-                .catch(() => alert("Không thể kết nối máy chủ!"));
-        });
-
-        // Buy Now (không cần size)
-        document.getElementById("buyNowForm").addEventListener("submit", function (e) {
-            // Không cần validation size nữa
-        });
-    </script>
+        <ul class="product-grid" aria-label="Sản phẩm liên quan">
+            @{int idx = 0;}
+            @foreach (var p in otherProducts.Take(4))
+            {
+                var delay = Math.Min(idx * 60, 240);
+                idx++;
+                <li class="product-grid__item" style="--stagger-delay: @(delay)ms">
+                    <article class="product-card" aria-label="@p.Name">
+                        <a asp-controller="Products"
+                           asp-action="Details"
+                           asp-route-id="@p.ProductID"
+                           class="product-card__link"
+                           aria-label="Xem @p.Name — @p.Price.ToString("N0", cultureVN) VNĐ">
+                            <div class="product-card__image-wrap" aria-hidden="true">
+                                <img src="~/images/@p.ImageUrl"
+                                     alt="@p.Name"
+                                     class="product-card__img"
+                                     width="400" height="400"
+                                     loading="lazy" />
+                            </div>
+                            <div class="product-card__body">
+                                @if (p.Category?.Name is not null)
+                                {
+                                    <span class="product-card__cat">@p.Category.Name</span>
+                                }
+                                <h3 class="product-card__name">@p.Name</h3>
+                                <div class="product-card__footer">
+                                    <span class="product-card__price">
+                                        @p.Price.ToString("N0", cultureVN) VNĐ
+                                    </span>
+                                    <span class="product-card__cta" aria-hidden="true">
+                                        Xem
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="product-card__overlay" aria-hidden="true"></div>
+                        </a>
+                    </article>
+                </li>
+            }
+        </ul>
+    </section>
 }
 
+<!-- ════════════════════════════════════════════════════
+     TOAST NOTIFICATION
+════════════════════════════════════════════════════ -->
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+@section Scripts {
 <style>
-    .btn-gold {
-        background-color: #d4af37;
-        color: #fff;
+    /* ════ BREADCRUMB ════ */
+    .detail-breadcrumb {
+        padding:     var(--space-5) 0 var(--space-3);
+    }
+    .breadcrumb-list {
+        list-style:  none;
+        padding:     0;
+        margin:      0;
+        display:     flex;
+        flex-wrap:   wrap;
+        align-items: center;
+        gap:         var(--space-1);
+    }
+    .breadcrumb-item a,
+    .breadcrumb-item--current {
+        font-family:  var(--font-body);
+        font-size:    13px;
+        color:        var(--color-text-secondary);
+        text-decoration: none;
+        transition:   color var(--dur-fast) var(--ease-out);
+    }
+    .breadcrumb-item a:hover { color: var(--color-accent); }
+    .breadcrumb-item--current {
+        color: var(--color-foreground);
+        font-weight: 500;
+        /* Giới hạn 1 dòng */
+        max-width: 220px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .breadcrumb-sep { color: var(--color-border); display: flex; align-items: center; }
+
+    /* ════ DETAIL GRID ════ */
+    .product-detail { padding: var(--space-6) 0 var(--space-12); }
+
+    .detail-grid {
+        display:  grid;
+        gap:      var(--space-12);
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+    @@media (min-width: 768px) {
+        .detail-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @@media (min-width: 1024px) {
+        .detail-grid {
+            grid-template-columns: 5fr 6fr;
+            gap: var(--space-16);
+        }
+    }
+
+    /* ════ IMAGE ════ */
+    .detail-image-col { position: sticky; top: 80px; }
+
+    .detail-image-wrap {
+        position:     relative;
+        aspect-ratio: 1 / 1;
+        background:   #FAF8F3;
+        border-radius: var(--radius-xl);
+        overflow:     hidden;
+        border:       1px solid var(--color-border-subtle);
+    }
+    .detail-img {
+        width:      100%;
+        height:     100%;
+        object-fit: contain;
+        padding:    var(--space-8);
+        transition: transform var(--dur-slow) var(--ease-out);
+    }
+    .detail-image-wrap:hover .detail-img { transform: scale(1.04); }
+    .detail-img-overlay {
+        position:   absolute;
+        inset:      0;
+        background: linear-gradient(135deg, transparent, rgba(212,175,55,0.04));
+        pointer-events: none;
+    }
+
+    /* ════ INFO COL ════ */
+    .detail-info-col {
+        display:        flex;
+        flex-direction: column;
+        gap:            var(--space-5);
+    }
+
+    .detail-eyebrow {
+        font-family:    var(--font-body);
+        font-size:      11px;
+        font-weight:    600;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color:          var(--color-accent);
+    }
+
+    .detail-name {
+        font-family:  var(--font-heading);
+        font-size:    clamp(26px, 4vw, 40px);
+        font-weight:  700;
+        color:        var(--color-foreground);
+        line-height:  1.15;
+        margin:       0;
+    }
+
+    .detail-separator {
+        width:      60px;
+        height:     1.5px;
+        background: linear-gradient(to right, var(--color-accent-light), transparent);
+    }
+
+    /* Price + stock row */
+    .detail-price-row {
+        display:     flex;
+        align-items: center;
+        flex-wrap:   wrap;
+        gap:         var(--space-4);
+    }
+    .detail-price {
+        font-family:    var(--font-heading);
+        font-size:      clamp(24px, 3vw, 34px);
+        font-weight:    700;
+        color:          var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        line-height:    1;
+    }
+
+    /* Stock badge */
+    .stock-badge {
+        display:       inline-flex;
+        align-items:   center;
+        gap:           var(--space-1);
+        padding:       var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-size:     12px;
+        font-weight:   600;
+        letter-spacing: 0.3px;
+    }
+    .stock-badge--in {
+        background: rgba(34, 197, 94, 0.10);
+        color:      #15803D;
+        border:     1px solid rgba(34, 197, 94, 0.25);
+    }
+    .stock-badge--out {
+        background: rgba(239, 68, 68, 0.08);
+        color:      var(--color-destructive);
+        border:     1px solid rgba(239, 68, 68, 0.20);
+    }
+
+    /* Description */
+    .detail-desc {
+        font-family: var(--font-body);
+        font-size:   15px;
+        line-height: 1.75;
+        color:       var(--color-text-secondary);
+        margin:      0;
+    }
+
+    /* ════ QUANTITY STEPPER ════ */
+    .qty-row {
+        display:     flex;
+        align-items: center;
+        gap:         var(--space-4);
+    }
+    .qty-label {
+        font-size:      13px;
+        font-weight:    500;
+        letter-spacing: 0.5px;
+        color:          var(--color-secondary);
+        flex-shrink:    0;
+    }
+    .qty-stepper {
+        display:     flex;
+        align-items: center;
+        border:      1.5px solid var(--color-border);
+        border-radius: var(--radius-full);
+        overflow:    hidden;
+        background:  white;
+    }
+    .qty-btn {
+        width:      44px; height: 44px;
+        border:     none;
+        background: transparent;
+        cursor:     pointer;
+        display:    flex;
+        align-items: center; justify-content: center;
+        color:      var(--color-secondary);
+        transition: background var(--dur-fast) var(--ease-out),
+                    color      var(--dur-fast) var(--ease-out);
+        touch-action: manipulation;
+    }
+    .qty-btn:hover {
+        background: rgba(161, 98, 7, 0.06);
+        color:      var(--color-accent);
+    }
+    .qty-btn:focus-visible {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: -2px;
+    }
+    .qty-input {
+        width:       52px;
+        border:      none;
+        text-align:  center;
+        font-family: var(--font-body);
+        font-size:   15px;
         font-weight: 600;
-        border-radius: 8px;
-        padding: 10px 24px;
-        transition: all 0.3s ease;
+        color:       var(--color-foreground);
+        background:  transparent;
+        outline:     none;
+        padding:     0;
+        -moz-appearance: textfield;
+    }
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    /* ════ CTA BUTTONS ════ */
+    .detail-actions {
+        display:   flex;
+        flex-wrap: wrap;
+        gap:       var(--space-3);
+    }
+    .detail-form { flex: 1; min-width: 160px; }
+
+    .btn-detail {
+        width:           100%;
+        min-height:      52px;
+        border-radius:   var(--radius-full);
+        font-family:     var(--font-body);
+        font-size:       13px;
+        font-weight:     600;
+        letter-spacing:  1px;
+        text-transform:  uppercase;
+        cursor:          pointer;
+        border:          none;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        gap:             var(--space-2);
+        transition:      background   var(--dur-normal) var(--ease-out),
+                         box-shadow   var(--dur-normal) var(--ease-out),
+                         transform    var(--dur-fast)   var(--ease-out),
+                         color        var(--dur-fast);
+        touch-action:    manipulation;
+    }
+    .btn-detail:focus-visible {
+        outline:        2px solid var(--color-accent-light);
+        outline-offset: 3px;
+    }
+    /* Outline (Add to Cart) */
+    .btn-detail--outline {
+        background:   white;
+        color:        var(--color-primary);
+        border:       1.5px solid var(--color-primary);
+    }
+    .btn-detail--outline:hover {
+        background: var(--color-primary);
+        color:      var(--color-accent-light);
+        transform:  translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    /* Primary (Buy Now) */
+    .btn-detail--primary {
+        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+        color:      var(--color-primary);
+    }
+    .btn-detail--primary:hover {
+        background: linear-gradient(135deg, var(--color-accent-hover), var(--color-accent-light));
+        transform:  translateY(-2px);
+        box-shadow: var(--shadow-gold);
+    }
+    /* Loading state */
+    .btn-detail--loading {
+        opacity: 0.7;
+        pointer-events: none;
     }
 
-        .btn-gold:hover {
-            background-color: #b9972f;
-            transform: scale(1.05);
-        }
+    /* Out of stock message */
+    .out-of-stock-msg {
+        display:     flex;
+        align-items: center;
+        gap:         var(--space-3);
+        padding:     var(--space-4) var(--space-5);
+        border-radius: var(--radius-lg);
+        background:  rgba(239, 68, 68, 0.06);
+        border:      1px solid rgba(239, 68, 68, 0.18);
+        color:       #B91C1C;
+        font-size:   14px;
+        line-height: 1.6;
+    }
 
+    /* Back link */
+    .detail-back-link {
+        display:         inline-flex;
+        align-items:     center;
+        gap:             var(--space-2);
+        font-size:       13px;
+        font-weight:     500;
+        color:           var(--color-text-secondary);
+        text-decoration: none;
+        padding:         var(--space-2) 0;
+        transition:      color     var(--dur-fast) var(--ease-out),
+                         transform var(--dur-fast) var(--ease-out);
+        align-self:      flex-start;
+    }
+    .detail-back-link:hover {
+        color:     var(--color-accent);
+        transform: translateX(-3px);
+    }
+
+    /* ════ RELATED SECTION ════ */
+    .related-section {
+        padding:    var(--space-12) 0 var(--space-8);
+        border-top: 1px solid var(--color-border-subtle);
+        margin-top: var(--space-4);
+    }
+    .related-header { text-align: center; margin-bottom: var(--space-10); }
+
+    .related-eyebrow {
+        display:        block;
+        font-family:    var(--font-body);
+        font-size:      11px;
+        font-weight:    600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color:          var(--color-accent);
+        margin-bottom:  var(--space-2);
+    }
+    .related-title {
+        font-family:  var(--font-heading);
+        font-size:    clamp(24px, 4vw, 38px);
+        font-weight:  700;
+        color:        var(--color-foreground);
+        margin:       0 0 var(--space-4);
+        line-height:  1.15;
+    }
+    .related-title em { font-style: italic; color: var(--color-accent-light); }
+
+    .related-separator {
+        width:     60px;
+        height:    1.5px;
+        background: linear-gradient(to right, transparent, var(--color-accent-light), transparent);
+        margin:    0 auto;
+    }
+
+    /* Reuse product-grid from Index.cshtml */
+    .related-section .product-grid {
+        list-style: none;
+        padding:    0;
+        margin:     0;
+        display:    grid;
+        gap:        var(--space-5);
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @@media (min-width: 768px) {
+        .related-section .product-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* Reuse product-card styles — định nghĩa đầy đủ để trang này standalone */
     .product-card {
-        transition: all 0.3s ease;
-        border-radius: 10px;
+        position: relative;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border-subtle);
+        overflow: hidden;
+        height: 100%;
+        transition: box-shadow var(--dur-normal) var(--ease-out),
+                    border-color var(--dur-normal) var(--ease-out),
+                    transform var(--dur-normal) var(--ease-out);
+    }
+    .product-card:hover {
+        box-shadow: var(--shadow-gold);
+        border-color: rgba(212,175,55,0.35);
+        transform: translateY(-4px);
+    }
+    .product-card:focus-within {
+        outline: 2px solid var(--color-accent-light);
+        outline-offset: 2px;
+    }
+    .product-card__link {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+        touch-action: manipulation;
+    }
+    .product-card__image-wrap {
+        aspect-ratio: 1/1;
+        background: #FAF8F3;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .product-card__img {
+        width: 100%; height: 100%;
+        object-fit: contain;
+        padding: var(--space-4);
+        transition: transform var(--dur-slow) var(--ease-out);
+    }
+    .product-card:hover .product-card__img { transform: scale(1.06); }
+    .product-card__body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: var(--space-4);
+        gap: var(--space-1);
+    }
+    .product-card__cat {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--color-accent);
+    }
+    .product-card__name {
+        font-family: var(--font-heading);
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--color-foreground);
+        margin: 0;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color var(--dur-fast);
+    }
+    .product-card:hover .product-card__name { color: var(--color-accent); }
+    .product-card__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+        padding-top: var(--space-2);
+        border-top: 1px solid var(--color-border-subtle);
+    }
+    .product-card__price {
+        font-family: var(--font-heading);
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+    .product-card__cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--color-accent);
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(-4px);
+        transition: opacity var(--dur-fast), transform var(--dur-fast);
+    }
+    .product-card:hover .product-card__cta { opacity: 1; transform: translateX(0); }
+    .product-card__overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, transparent, rgba(212,175,55,0.04));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--dur-normal);
+    }
+    .product-card:hover .product-card__overlay { opacity: 1; }
+
+    .product-grid__item {
+        animation: cardEntrance 400ms var(--ease-out) both;
+        animation-delay: var(--stagger-delay, 0ms);
+    }
+    @@keyframes cardEntrance {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @@media (prefers-reduced-motion: reduce) {
+        .product-grid__item { animation: none !important; }
     }
 
-        .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
+    /* ════ TOAST ════ */
+    .toast-container {
+        position: fixed;
+        bottom:   var(--space-6);
+        right:    var(--space-5);
+        z-index:  var(--z-toast);
+        display:  flex;
+        flex-direction: column;
+        gap:      var(--space-3);
+        pointer-events: none;
+    }
+    .toast {
+        display:       flex;
+        align-items:   flex-start;
+        gap:           var(--space-3);
+        padding:       var(--space-4) var(--space-5);
+        border-radius: var(--radius-lg);
+        background:    white;
+        box-shadow:    var(--shadow-xl);
+        border-left:   4px solid var(--color-accent-light);
+        min-width:     280px;
+        max-width:     360px;
+        pointer-events: auto;
+        animation:     toastIn var(--dur-normal) var(--ease-out);
+    }
+    .toast--error   { border-left-color: var(--color-destructive); }
+    .toast--success { border-left-color: #22C55E; }
 
-        .product-card img {
-            transition: transform 0.3s ease;
-        }
+    @@keyframes toastIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    @@keyframes toastOut {
+        from { opacity: 1; transform: translateX(0); }
+        to   { opacity: 0; transform: translateX(20px); }
+    }
 
-        .product-card:hover img {
-            transform: scale(1.05);
-        }
+    .toast__icon { flex-shrink: 0; }
+    .toast__msg {
+        font-family: var(--font-body);
+        font-size:   14px;
+        line-height: 1.55;
+        color:       var(--color-foreground);
+        flex: 1;
+    }
+    .toast__msg strong { display: block; font-weight: 600; margin-bottom: 2px; }
 </style>
+
+<script>
+    // ── QUANTITY STEPPER ─────────────────────────────
+    (function () {
+        const input   = document.getElementById('qtyInput');
+        const minus   = document.getElementById('qtyMinus');
+        const plus    = document.getElementById('qtyPlus');
+        const cartQty = document.getElementById('cartQty');
+        const buyQty  = document.getElementById('buyQty');
+        if (!input) return;
+
+        const max = parseInt(input.max, 10) || 99;
+
+        function update(val) {
+            const n = Math.max(1, Math.min(max, val));
+            input.value  = n;
+            if (cartQty) cartQty.value = n;
+            if (buyQty)  buyQty.value  = n;
+            minus.disabled = (n <= 1);
+            plus.disabled  = (n >= max);
+        }
+
+        minus.addEventListener('click', () => update(+input.value - 1));
+        plus.addEventListener('click',  () => update(+input.value + 1));
+        update(1);
+    })();
+
+    // ── TOAST HELPER ─────────────────────────────────
+    function showToast(type, title, msg) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const icons = {
+            success: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            error:   `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+            info:    `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast--${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <span class="toast__icon">${icons[type] || icons.info}</span>
+            <div class="toast__msg">
+                <strong>${title}</strong>
+                ${msg || ''}
+            </div>`;
+
+        container.appendChild(toast);
+
+        // Auto dismiss after 3.5s
+        setTimeout(() => {
+            toast.style.animation = 'toastOut 250ms ease-in forwards';
+            setTimeout(() => toast.remove(), 260);
+        }, 3500);
+    }
+
+    // ── ADD TO CART ───────────────────────────────────
+    (function () {
+        const form = document.getElementById('addToCartForm');
+        const btn  = document.getElementById('addToCartBtn');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Loading state
+            btn.classList.add('btn-detail--loading');
+            btn.textContent = 'Đang thêm...';
+
+            const formData = new FormData(form);
+
+            fetch('/Cart?handler=Add', {
+                method: 'POST',
+                body:   formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.loginRequired) {
+                    showToast('info', 'Chưa đăng nhập',
+                        'Vui lòng đăng nhập để thêm vào giỏ hàng.');
+                    setTimeout(() => {
+                        window.location.href = data.loginUrl || '/CustomerAccount/Login';
+                    }, 1800);
+                    return;
+                }
+                if (data.success) {
+                    showToast('success', 'Đã thêm vào giỏ hàng!',
+                        'Sản phẩm đã được thêm thành công.');
+                } else {
+                    showToast('error', 'Có lỗi xảy ra', 'Vui lòng thử lại.');
+                }
+            })
+            .catch(() => showToast('error', 'Lỗi kết nối', 'Không thể kết nối máy chủ.'))
+            .finally(() => {
+                // Restore button
+                btn.classList.remove('btn-detail--loading');
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Thêm vào giỏ hàng`;
+            });
+        });
+    })();
+</script>
+}
