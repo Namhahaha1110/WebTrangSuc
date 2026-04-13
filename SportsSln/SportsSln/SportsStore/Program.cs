@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SportsStore.Models;
@@ -87,6 +87,10 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton<IBotService, SimpleBotService>();
 builder.Services.AddSignalR();
+
+// Hệ thống phân hạng khách hàng
+builder.Services.AddScoped<SportsStore.Services.ICustomerTierService,
+                            SportsStore.Services.CustomerTierService>();
 
 
 // ------------------ BUILD APP ------------------

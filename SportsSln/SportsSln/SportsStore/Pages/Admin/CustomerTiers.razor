@@ -1,0 +1,276 @@
+@page "/admin/customer-tiers"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@using SportsStore.Models
+@using SportsStore.Services
+@inject UserManager<ApplicationUser> UserManager
+@inject ICustomerTierService TierService
+@inject IJSRuntime JSRuntime
+
+<style>
+    .tier-page-header { text-align: center; padding: var(--space-8) 0 var(--space-6); }
+    .tier-eyebrow { display: block; font-size: 11px; font-weight: 600; letter-spacing: 3px;
+        text-transform: uppercase; color: #b48a3c; margin-bottom: 0.5rem; }
+    .tier-title { font-family: 'Montserrat', sans-serif; font-size: clamp(26px,4vw,38px);
+        font-weight: 700; color: #4b3e2a; margin: 0 0 1rem; }
+    .tier-sep { width: 60px; height: 1.5px; margin: 0 auto 2rem;
+        background: linear-gradient(to right, transparent, #d4af37, transparent); }
+
+    /* Stats cards */
+    .tier-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: white; border: 1px solid rgba(200,160,50,0.3);
+        border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(200,160,50,0.05); }
+    .stat-card__value { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 700;
+        color: #4b3e2a; line-height: 1; }
+    .stat-card__label { font-size: 12px; font-weight: 500; letter-spacing: 1px;
+        text-transform: uppercase; color: #7d6a46; margin-top: 0.5rem; }
+    .tier-diamond  { border-top: 3px solid #67E8F9; }
+    .tier-gold     { border-top: 3px solid #d4af37; }
+    .tier-silver   { border-top: 3px solid #a3b1c6; }
+    .tier-bronze   { border-top: 3px solid #cd7f32; }
+
+    /* Tier badges */
+    .badge-tier { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+        border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .badge-tier.tier-diamond { background: rgba(103,232,249,0.12); color: #0E7490; border:1px solid rgba(103,232,249,0.3); }
+    .badge-tier.tier-gold    { background: rgba(212,175,55,0.12); color: #92400E; border:1px solid rgba(212,175,55,0.3); }
+    .badge-tier.tier-silver  { background: rgba(148,163,184,0.12); color: #475569; border:1px solid rgba(148,163,184,0.3); }
+    .badge-tier.tier-bronze  { background: rgba(205,127,50,0.12); color: #78350F; border:1px solid rgba(205,127,50,0.3); }
+
+    /* Action bar */
+    .action-bar { display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .btn-sync-all { display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem 1.5rem; border-radius: 99px;
+        background: #111; color: #facc15;
+        font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+        border: 1.5px solid rgba(212,175,55,0.3); cursor: pointer;
+        transition: all 0.2s; touch-action: manipulation; }
+    .btn-sync-all:hover { box-shadow: 0 4px 12px rgba(212,175,55,0.2); transform: translateY(-1px); }
+
+    /* Customer table */
+    .tier-table-wrap { background: white; border: 1px solid rgba(200,160,50,0.3);
+        border-radius: 12px; overflow: hidden; margin-bottom: 2.5rem; box-shadow: 0 2px 8px rgba(200,160,50,0.05); }
+    .tier-table { width: 100%; border-collapse: collapse; }
+    .tier-table thead { background: #fffaf0; }
+    .tier-table th { padding: 0.75rem 1rem; text-align: left;
+        font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+        color: #7d6a46; border-bottom: 1px solid rgba(200,160,50,0.2); }
+    .tier-table td { padding: 0.75rem 1rem; font-size: 14px;
+        color: #4b3e2a; border-bottom: 1px solid rgba(200,160,50,0.1); vertical-align: middle; }
+    .tier-table tr:hover td { background: rgba(212,175,55,0.04); }
+
+    /* Inline actions */
+    .btn-sync-one { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px;
+        border-radius: 99px; background: transparent; font-size: 12px;
+        font-weight: 600; color: #b48a3c; border: 1.5px solid rgba(212,175,55,0.4);
+        cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .btn-sync-one:hover { background: rgba(212,175,55,0.1); }
+
+    /* Set tier dropdown */
+    .set-tier-form { display: flex; align-items: center; gap: 0.5rem; }
+    .set-tier-select { font-size: 13px; border: 1px solid rgba(200,160,50,0.4);
+        border-radius: 99px; padding: 4px 10px; background: white;
+        color: #4b3e2a; cursor: pointer; outline: none; }
+    .btn-set-tier { padding: 5px 10px; border-radius: 99px; font-size: 12px;
+        font-weight: 600; background: #111; color: #facc15;
+        border: none; cursor: pointer; white-space: nowrap; }
+
+    @@media (max-width: 960px) {
+        .tier-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+
+<!-- Page Header -->
+<header class="tier-page-header">
+    <span class="tier-eyebrow">Quản trị viên</span>
+    <h1 class="tier-title">Phân hạng Khách hàng</h1>
+    <div class="tier-sep"></div>
+</header>
+
+<div style="max-width:1100px; margin:0 auto;">
+
+    @if (!string.IsNullOrEmpty(SuccessMessage))
+    {
+        <div class="alert alert-success d-flex align-items-center" style="border-radius: 8px;">
+            <span class="me-2">✅</span> @SuccessMessage
+        </div>
+    }
+
+    @if (users == null)
+    {
+        <div class="alert alert-info">Đang tải dữ liệu...</div>
+    }
+    else
+    {
+        <div class="tier-stats">
+            <div class="stat-card tier-diamond">
+                <div class="stat-card__value">@DiamondCount</div>
+                <div class="stat-card__label">Kim Cương</div>
+            </div>
+            <div class="stat-card tier-gold">
+                <div class="stat-card__value">@GoldCount</div>
+                <div class="stat-card__label">Vàng</div>
+            </div>
+            <div class="stat-card tier-silver">
+                <div class="stat-card__value">@SilverCount</div>
+                <div class="stat-card__label">Bạc</div>
+            </div>
+            <div class="stat-card tier-bronze">
+                <div class="stat-card__value">@BronzeCount</div>
+                <div class="stat-card__label">Đồng</div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <p style="font-size:14px;color:#7d6a46;margin:0">
+                Tổng <strong>@users.Count</strong> khách hàng
+            </p>
+            <button class="btn-sync-all" @onclick="SyncAll">
+                Đồng bộ tất cả
+            </button>
+        </div>
+
+        <div class="tier-table-wrap">
+            <table class="tier-table">
+                <thead>
+                    <tr>
+                        <th>Khách hàng</th>
+                        <th>Email</th>
+                        <th>Tổng chi tiêu</th>
+                        <th>Hạng hiện tại</th>
+                        <th>Đồng bộ</th>
+                        <th>Hạng thủ công</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!users.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center p-4">Chưa có khách hàng nào.</td>
+                        </tr>
+                    }
+                    @foreach (var u in users)
+                    {
+                        <tr>
+                            <td>
+                                <div style="font-weight:600">@(string.IsNullOrEmpty(u.FullName) ? u.UserName : u.FullName)</div>
+                                <div style="font-size:12px;color:#7d6a46">@u.UserName</div>
+                            </td>
+                            <td style="color:#7d6a46">@u.Email</td>
+                            <td style="font-weight:700;color:#c99f2b;">@u.TotalSpent.ToString("N0") đ</td>
+                            <td>
+                                <span class="badge-tier @GetTierCssClass(u.Tier)">@u.Tier.ToString()</span>
+                            </td>
+                            <td>
+                                <button class="btn-sync-one" @onclick="() => SyncUser(u.Id)">Sync</button>
+                            </td>
+                            <td>
+                                <div class="set-tier-form">
+                                    <select @bind="UserTiers[u.Id]" class="set-tier-select">
+                                        @foreach (CustomerTier t in Enum.GetValues(typeof(CustomerTier)))
+                                        {
+                                            <option value="@t">@t.ToString()</option>
+                                        }
+                                    </select>
+                                    <button class="btn-set-tier" @onclick="() => SaveTier(u.Id)">Lưu</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Legend -->
+        <div style="background:white;border:1px solid rgba(200,160,50,0.3);border-radius:12px;padding:1.5rem;margin-bottom:2rem;">
+            <h2 style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;margin:0 0 1rem;color:#4b3e2a">
+                Ngưỡng phân hạng
+            </h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                <div><span class="badge-tier tier-bronze">🥉 Đồng</span><p style="font-size:13px;margin:0.5rem 0 0;color:#7d6a46">Dưới 5.000.000 đ</p></div>
+                <div><span class="badge-tier tier-silver">🥈 Bạc</span><p style="font-size:13px;margin:0.5rem 0 0;color:#7d6a46">≥ 5.000.000 đ</p></div>
+                <div><span class="badge-tier tier-gold">🥇 Vàng</span><p style="font-size:13px;margin:0.5rem 0 0;color:#7d6a46">≥ 15.000.000 đ</p></div>
+                <div><span class="badge-tier tier-diamond">💎 Kim Cương</span><p style="font-size:13px;margin:0.5rem 0 0;color:#7d6a46">≥ 30.000.000 đ</p></div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ApplicationUser>? users;
+    private Dictionary<string, CustomerTier> UserTiers = new();
+    private string SuccessMessage = "";
+
+    private int DiamondCount => users?.Count(u => u.Tier == CustomerTier.Diamond) ?? 0;
+    private int GoldCount => users?.Count(u => u.Tier == CustomerTier.Gold) ?? 0;
+    private int SilverCount => users?.Count(u => u.Tier == CustomerTier.Silver) ?? 0;
+    private int BronzeCount => users?.Count(u => u.Tier == CustomerTier.Bronze) ?? 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        // For admin, load all users
+        users = UserManager.Users.ToList();
+        
+        foreach (var u in users)
+        {
+            if (!UserTiers.ContainsKey(u.Id))
+                UserTiers[u.Id] = u.Tier;
+        }
+    }
+
+    private string GetTierCssClass(CustomerTier tier)
+    {
+        return tier switch
+        {
+            CustomerTier.Diamond => "tier-diamond",
+            CustomerTier.Gold => "tier-gold",
+            CustomerTier.Silver => "tier-silver",
+            _ => "tier-bronze",
+        };
+    }
+
+    private async Task SyncAll()
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Đồng bộ hạng cho toàn bộ khách hàng dựa trên chi tiêu thực tế?");
+        if (confirmed)
+        {
+            await TierService.SyncAllCustomersAsync();
+            await LoadUsers();
+            SuccessMessage = "Đồng bộ toàn bộ hạng thành công!";
+            StateHasChanged();
+            _ = ClearMessageAsync();
+        }
+    }
+
+    private async Task SyncUser(string id)
+    {
+        await TierService.UpdateCustomerTierAsync(id);
+        await LoadUsers();
+        SuccessMessage = "Đồng bộ trạng thái người dùng thành công!";
+        StateHasChanged();
+        _ = ClearMessageAsync();
+    }
+
+    private async Task SaveTier(string id)
+    {
+        var tier = UserTiers[id];
+        await TierService.SetTierManuallyAsync(id, tier);
+        await LoadUsers();
+        SuccessMessage = "Đã cập nhật hạng thủ công thành công!";
+        StateHasChanged();
+        _ = ClearMessageAsync();
+    }
+
+    private async Task ClearMessageAsync()
+    {
+        await Task.Delay(3000);
+        SuccessMessage = "";
+        StateHasChanged();
+    }
+}

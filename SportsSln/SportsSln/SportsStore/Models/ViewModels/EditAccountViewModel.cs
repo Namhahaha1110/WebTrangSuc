@@ -1,4 +1,4 @@
-﻿namespace SportsStore.Models.ViewModels
+namespace SportsStore.Models.ViewModels
 {
     public class EditAccountViewModel
     {
@@ -13,6 +13,10 @@
         public string? UserName { get; set; }
 
         public string? Password { get; set; }
+        
+        public CustomerTier Tier { get; set; }
+        
+        public decimal TotalSpent { get; set; }
        
     }
 }

@@ -1,0 +1,21 @@
+# Ẩn thư mục NuGet cục bộ
+.nuget_local/
+.nuget/
+
+# Thư mục build của .NET
+bin/
+obj/
+TestResults/
+
+# Cấu hình IDE / Môi trường
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Files tạm
+*.log
+*.tmp
+*.bak
