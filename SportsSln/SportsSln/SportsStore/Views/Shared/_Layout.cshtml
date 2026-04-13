@@ -365,117 +365,148 @@
         }
 
         /* ============================================================
-           HERO SLIDESHOW
+           HERO SLIDESHOW — Luxury redesign (v2)
            ============================================================ */
         .hero-section {
             position:    relative;
             aspect-ratio: 16 / 6.5;
-            min-height:  280px;
+            min-height:  260px;
             max-height:  640px;
             overflow:    hidden;
-            background:  #1C1917;
+            background:  var(--color-primary);
+            /* contain: layout isolates reflow inside the hero */
+            contain:     layout;
         }
 
+        /* All slides stacked — only opacity transitions (no transform transition) */
         .hero-slide {
-            position: absolute;
-            inset:    0;
-            width:  100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            opacity:   0;
-            transform: scale(1.03);
+            position:      absolute;
+            inset:         0;
+            width:         100%;
+            height:        100%;
+            object-fit:    cover;
+            object-position: var(--slide-focus, 50% 50%);
+            opacity:       0;
             pointer-events: none;
-            transition: opacity   0.9s var(--ease-out),
-                        transform 8s   linear;
+            /* GPU composite layer — only opacity, never transform transition */
+            will-change:   opacity;
+            transition:    opacity 850ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         .hero-slide.active {
             opacity:       1;
-            transform:     scale(1);
             pointer-events: auto;
+            /* Ken Burns via animation — removed when .active removed → no exit glitch */
+            animation:     heroKenBurns 7s ease-out both;
+        }
+        @@keyframes heroKenBurns {
+            from { transform: scale(1.05); }
+            to   { transform: scale(1.00); }
         }
         .hero-slide.clickable { cursor: pointer; }
 
-        /* Gradient overlay for text legibility */
+        /* Richer gradient overlay */
         .hero-overlay {
             position: absolute;
             inset:    0;
             background: linear-gradient(
                 to bottom,
-                transparent 40%,
-                rgba(28, 25, 23, 0.55) 100%
+                transparent 30%,
+                rgba(14, 10, 7, 0.72) 100%
             );
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Hero dots */
-        .hero-controls {
-            position:  absolute;
-            bottom:    var(--space-5);
-            left:      50%;
-            transform: translateX(-50%);
-            display:   flex;
-            gap:       var(--space-2);
-            z-index:   2;
-        }
-        .hero-dot {
-            /* Visual size */
-            width:  10px;
-            height: 10px;
-            border-radius: var(--radius-full);
-            background:    rgba(255, 255, 255, 0.5);
-            border:        none;
-            cursor:        pointer;
-            /* Hit area via padding — achieves 44px touch target */
-            padding: 17px;
-            margin:  -17px;
-            background-clip: content-box;
-            transition: background var(--dur-fast) var(--ease-out),
-                        transform  var(--dur-fast) var(--ease-out);
-        }
-        .hero-dot.active {
-            background: var(--color-accent-light);
-            transform:  scale(1.3);
-        }
-        .hero-dot:focus-visible {
-            outline: 2px solid var(--color-accent-light);
-            outline-offset: 4px;
-        }
-
-        /* Hero prev/next arrows */
+        /* ── Prev / Next arrows ── */
         .hero-arrow {
             position:  absolute;
             top:       50%;
             transform: translateY(-50%);
             z-index:   2;
-            width:  44px; height: 44px;
+            width:     48px; height: 48px;
             border-radius: var(--radius-full);
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            border:  1px solid rgba(255, 255, 255, 0.25);
-            color:   white;
-            cursor:  pointer;
-            display: flex;
-            align-items: center; justify-content: center;
-            transition: background var(--dur-fast) var(--ease-out),
-                        transform  var(--dur-fast) var(--ease-out);
+            background:    rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border:    1.5px solid rgba(255, 255, 255, 0.22);
+            color:     white;
+            cursor:    pointer;
+            display:   flex; align-items: center; justify-content: center;
+            transition: background  200ms ease,
+                        border-color 200ms ease,
+                        transform   200ms ease;
+            touch-action: manipulation;
         }
         .hero-arrow:hover {
-            background: rgba(212, 175, 55, 0.4);
-            transform:  translateY(-50%) scale(1.05);
+            background:   rgba(212, 175, 55, 0.35);
+            border-color: rgba(212, 175, 55, 0.60);
+            transform:    translateY(-50%) scale(1.08);
         }
         .hero-arrow:focus-visible {
-            outline: 2px solid var(--color-accent-light);
-            outline-offset: 2px;
+            outline:        2px solid var(--color-accent-light);
+            outline-offset: 3px;
         }
-        .hero-arrow--prev { left:  var(--space-4); }
-        .hero-arrow--next { right: var(--space-4); }
-        .hero-arrow svg { width: 18px; height: 18px; }
+        .hero-arrow--prev { left:  var(--space-6); }
+        .hero-arrow--next { right: var(--space-6); }
+        .hero-arrow svg   { width: 22px; height: 22px; }
+
+        /* ── Dot controls — pip design (fixes oversized dot bug) ──
+           Old: button with padding:17px + margin:-17px → huge layout area
+           New: transparent 44x44 button + small visual pip inside           */
+        .hero-controls {
+            position:    absolute;
+            bottom:      var(--space-5);
+            left:        50%;
+            transform:   translateX(-50%);
+            display:     flex;
+            align-items: center;
+            z-index:     2;
+            /* No gap — each .hero-dot-btn is 44×44 providing its own spacing */
+        }
+        /* Transparent touch-target button */
+        .hero-dot-btn {
+            width:   44px; height: 44px;
+            background:  transparent;
+            border:      none;
+            cursor:      pointer;
+            display:     flex;
+            align-items: center; justify-content: center;
+            padding:     0;
+            touch-action: manipulation;
+        }
+        .hero-dot-btn:focus-visible {
+            outline:        2px solid var(--color-accent-light);
+            outline-offset: 2px;
+            border-radius:  var(--radius-sm);
+        }
+        /* The visual pill — precise size, no layout effects */
+        .hero-dot-pip {
+            display:      block;
+            height:       6px;
+            width:        6px;
+            border-radius: var(--radius-full);
+            background:   rgba(255, 255, 255, 0.45);
+            flex-shrink:  0;
+            transition:   background 350ms ease,
+                          width     350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .hero-dot-btn.active .hero-dot-pip {
+            background: var(--color-accent-light);
+            width:      22px;
+        }
 
         @@media (max-width: 767.98px) {
-            .hero-section { aspect-ratio: 16 / 9; }
-            .hero-arrow { display: none; }
+            .hero-section  { aspect-ratio: 4 / 3; }
+            .hero-arrow    { display: none; }
+            .hero-controls { bottom: var(--space-3); }
+        }
+        @@media (max-width: 480px) {
+            .hero-section { aspect-ratio: 1 / 1; min-height: 0; }
+        }
+        /* Respect user motion preference */
+        @@media (prefers-reduced-motion: reduce) {
+            .hero-slide        { transition-duration: 50ms; }
+            .hero-slide.active { animation: none; }
         }
 
         /* ============================================================
@@ -1134,10 +1165,10 @@
 
         if (homeBanners.Any())
         {
-            <section class="hero-section" id="heroSlideshow" aria-label="Banner hình ảnh">
+            <section class="hero-section" id="heroSlideshow" aria-label="Banner hình ảnh" role="region">
                 @for (var i = 0; i < homeBanners.Count; i++)
                 {
-                    var banner = homeBanners[i];
+                    var banner      = homeBanners[i];
                     var redirectUrl = banner.RedirectUrl?.Trim();
                     if (!string.IsNullOrWhiteSpace(redirectUrl)
                         && !redirectUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
@@ -1147,31 +1178,38 @@
                         redirectUrl = $"https://{redirectUrl}";
                     }
 
-                    var isClickable   = !string.IsNullOrWhiteSpace(redirectUrl);
-                    var slideClass    = i == 0 ? "hero-slide active" : "hero-slide";
+                    var isClickable  = !string.IsNullOrWhiteSpace(redirectUrl);
+                    var slideClass   = i == 0 ? "hero-slide active" : "hero-slide";
                     if (isClickable) slideClass += " clickable";
-                    var imgPos        = $"object-position:{banner.FocusX}% {banner.FocusY}%;";
-                    var loading       = i == 0 ? "eager" : "lazy";
+                    /* CSS custom prop for object-position — avoids direct inline style */
+                    var slideStyle   = $"--slide-focus:{banner.FocusX}% {banner.FocusY}%";
+                    var loading      = i == 0 ? "eager"  : "lazy";
+                    var fetchPri     = i == 0 ? "high"   : "auto";
+                    var decoding     = i == 0 ? "sync"   : "async";
 
                     if (isClickable)
                     {
-                        <a href="@redirectUrl" tabindex="-1" aria-label="@banner.Title">
+                        <a href="@redirectUrl" tabindex="-1" aria-label="@banner.Title" aria-hidden="true">
                             <img src="@banner.ImageUrl"
                                  class="@slideClass"
-                                 style="@imgPos"
+                                 style="@slideStyle"
                                  alt="@banner.Title"
-                                 width="1920" height="640"
-                                 loading="@loading" />
+                                 width="1920" height="768"
+                                 loading="@loading"
+                                 fetchpriority="@fetchPri"
+                                 decoding="@decoding" />
                         </a>
                     }
                     else
                     {
                         <img src="@banner.ImageUrl"
                              class="@slideClass"
-                             style="@imgPos"
+                             style="@slideStyle"
                              alt="@banner.Title"
-                             width="1920" height="640"
-                             loading="@loading" />
+                             width="1920" height="768"
+                             loading="@loading"
+                             fetchpriority="@fetchPri"
+                             decoding="@decoding" />
                     }
                 }
 
@@ -1182,21 +1220,22 @@
                 @if (homeBanners.Count > 1)
                 {
                     <button class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Ảnh trước">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <button class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Ảnh tiếp theo">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 }
 
-                <!-- Dot controls -->
+                <!-- Dot controls — pip style (fix oversized dots) -->
                 <div class="hero-controls" role="group" aria-label="Chuyển slide">
                     @for (var i = 0; i < homeBanners.Count; i++)
                     {
-                        <button class="hero-dot @(i == 0 ? "active" : "")"
+                        <button class="hero-dot-btn @(i == 0 ? "active" : "")"
                                 data-index="@i"
                                 aria-label="Ảnh @(i+1) / @homeBanners.Count"
                                 aria-pressed="@(i == 0 ? "true" : "false")">
+                            <span class="hero-dot-pip" aria-hidden="true"></span>
                         </button>
                     }
                 </div>
@@ -1496,29 +1535,36 @@
             }, { passive: true });
         })();
 
-        // ── Hero Slideshow ────────────────────────────────────────────
+        // ── Hero Slideshow v2 — fixed dots, no transform glitch, swipe support ──
         (function () {
             const container = document.getElementById('heroSlideshow');
             if (!container) return;
 
+            /* Use updated selector: .hero-dot-btn (pip design) */
             const slides  = Array.from(container.querySelectorAll('.hero-slide'));
-            const dots    = Array.from(container.querySelectorAll('.hero-dot'));
+            const dotBtns = Array.from(container.querySelectorAll('.hero-dot-btn'));
             const btnPrev = document.getElementById('heroPrev');
             const btnNext = document.getElementById('heroNext');
             if (!slides.length) return;
 
             let index = 0;
             let timer;
-            const INTERVAL = 4500;
-
-            // Respect reduced motion
-            const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const INTERVAL   = 5000;
+            const prefersRed = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             function showSlide(i) {
                 slides.forEach((s, idx) => {
+                    const wasActive = s.classList.contains('active');
                     s.classList.toggle('active', idx === i);
+                    /* Remove animation so Ken Burns resets cleanly on re-activation */
+                    if (!wasActive && idx === i) {
+                        s.style.animation = 'none';
+                        /* Force reflow to restart animation */
+                        s.offsetWidth; // eslint-disable-line no-unused-expressions
+                        s.style.animation = '';
+                    }
                 });
-                dots.forEach((d, idx) => {
+                dotBtns.forEach((d, idx) => {
                     d.classList.toggle('active', idx === i);
                     d.setAttribute('aria-pressed', idx === i ? 'true' : 'false');
                 });
@@ -1529,20 +1575,45 @@
             function prev() { showSlide((index - 1 + slides.length) % slides.length); }
 
             function start() {
-                if (prefersReduced) return; // Don't auto-advance if user prefers reduced motion
+                if (prefersRed || slides.length < 2) return;
                 stop();
                 timer = setInterval(next, INTERVAL);
             }
-            function stop() { if (timer) clearInterval(timer); }
+            function stop() { clearInterval(timer); }
 
-            dots.forEach((d, i) => {
+            /* Dot clicks */
+            dotBtns.forEach((d, i) => {
                 d.addEventListener('click', () => { showSlide(i); start(); });
             });
+
+            /* Arrow clicks */
             if (btnPrev) btnPrev.addEventListener('click', () => { prev(); start(); });
             if (btnNext) btnNext.addEventListener('click', () => { next(); start(); });
 
+            /* Pause on hover/focus */
             container.addEventListener('mouseenter', stop);
             container.addEventListener('mouseleave', start);
+            container.addEventListener('focusin',  stop);
+            container.addEventListener('focusout', start);
+
+            /* Touch swipe support — mobile UX */
+            let touchX = 0;
+            container.addEventListener('touchstart', e => {
+                touchX = e.changedTouches[0].clientX;
+            }, { passive: true });
+            container.addEventListener('touchend', e => {
+                const dx = e.changedTouches[0].clientX - touchX;
+                if (Math.abs(dx) > 40) {
+                    dx < 0 ? next() : prev();
+                    start();
+                }
+            }, { passive: true });
+
+            /* Keyboard navigation */
+            container.addEventListener('keydown', e => {
+                if (e.key === 'ArrowLeft')  { prev(); start(); }
+                if (e.key === 'ArrowRight') { next(); start(); }
+            });
 
             showSlide(0);
             start();
