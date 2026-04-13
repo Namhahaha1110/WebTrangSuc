@@ -1011,7 +1011,7 @@
                     <ul class="navbar-nav gap-1">
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Products" asp-action="Index"
-                               @(Context.Request.Path == "/" ? "aria-current=page" : "")>Trang chủ</a>
+                               aria-current="@(Context.Request.Path == "/" ? "page" : null)">Trang chủ</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="GioiThieu" asp-action="Index">Giới thiệu</a>
@@ -1220,7 +1220,7 @@
                     <nav class="category-bar" role="navigation" aria-label="Lọc theo danh mục">
                         <a href="/"
                            class="cat-pill @(string.IsNullOrWhiteSpace(currentCategory) ? "active" : "")"
-                           @(string.IsNullOrWhiteSpace(currentCategory) ? "aria-current=page" : "")>
+                           aria-current="@(string.IsNullOrWhiteSpace(currentCategory) ? "page" : null)">
                             Tất cả
                         </a>
                         @await Component.InvokeAsync("CategoryMenu")

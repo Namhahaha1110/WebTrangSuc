@@ -11,7 +11,7 @@
 
     <a href="/?category=@categorySlug"
        class="cat-pill @(isActive ? "active" : "")"
-       @(isActive ? "aria-current=page" : "")>
+       aria-current="@(isActive ? "page" : null)">
         @cat.Name
     </a>
 }
